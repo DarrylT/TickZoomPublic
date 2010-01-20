@@ -50,7 +50,6 @@ namespace TickZoom
 	/// </summary>
 	public partial class ChartControl : UserControl, TickZoom.Api.Chart
 	{
-		protected PerformanceCounter ramCounter;
 		private static Log log;
 		private static bool debug;
 		private static bool trace;
@@ -77,17 +76,8 @@ namespace TickZoom
         SymbolInfo symbol;
         bool showTradeTips = true;
         
-		/*
-		Call this method every time you need to get
-		the amount of the available RAM in Mb
-		*/
-		public float getAvailableRAM(){
-		    return ramCounter.NextValue();
-		} 	
-		
 	    public ChartControl()
 		{
-			ramCounter = new PerformanceCounter("Memory", "Available MBytes");
 			//
 			// The InitializeComponent() call is required for Windows Forms designer support.
 			//

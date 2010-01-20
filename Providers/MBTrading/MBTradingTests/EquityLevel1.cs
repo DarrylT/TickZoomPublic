@@ -45,5 +45,21 @@ namespace TickZoom.Test
 			symbol = Factory.Symbol.LookupSymbol("IBM");
 		}	
 		
+		public override void AssertTick( TickIO tick, TickIO lastTick, ulong symbol) {
+        	Assert.IsTrue(tick.IsQuote);
+        	if( tick.IsQuote) {
+	        	Assert.Greater(tick.Bid,0);
+	        	Assert.Greater(tick.BidLevel(0),0);
+	        	Assert.Greater(tick.Ask,0);
+	        	Assert.Greater(tick.AskLevel(0),0);
+        	}
+        	Assert.IsFalse(tick.IsTrade);
+        	if( tick.IsTrade) {
+	        	Assert.Greater(tick.Price,0);
+    	    	Assert.Greater(tick.Size,0);
+        	}
+    		Assert.IsTrue(tick.Time>=lastTick.Time,"tick.Time > lastTick.Time");
+    		Assert.AreEqual(symbol,tick.lSymbol);
+		}
 	}
 }

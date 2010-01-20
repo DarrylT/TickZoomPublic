@@ -1,4 +1,4 @@
-﻿#region Copyright
+#region Copyright
 /*
  * Copyright 2008 M. Wayne Walter
  * Software: TickZoom Trading Platform
@@ -21,32 +21,28 @@
  */
 #endregion
 
-#define FOREX
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Windows.Forms;
+using System.ComponentModel;
+using System.Configuration.Install;
+using System.ServiceProcess;
 
-using NUnit.Framework;
-using TickZoom.Api;
-using TickZoom.TickUtil;
-
-namespace TickZoom.Test
+namespace TickZoom.Common
 {
-	[TestFixture]
-	public class DateTimeTest
+	[RunInstaller(true)]
+	public class ProjectInstaller : Installer
 	{
-		[Test]
-		public void TestDateTime()
+		private ServiceProcessInstaller serviceProcessInstaller;
+		private ServiceInstaller serviceInstaller;
+		
+		public ProjectInstaller()
 		{
-			Log log = Factory.Log.GetLogger(typeof(DateTimeTest));
-			TimeStamp normalUtcNow = new TimeStamp(DateTime.UtcNow.ToOADate());
-			TimeStamp adjustedUtcNow = TimeStamp.UtcNow;
-			log.Info( "normal = " + normalUtcNow + ", adjusted = " + adjustedUtcNow);
-
-			normalUtcNow = new TimeStamp(DateTime.UtcNow.ToOADate());
-			adjustedUtcNow = TimeStamp.UtcNow;
-			log.Info( "normal = " + normalUtcNow + ", adjusted = " + adjustedUtcNow);
-		}	
+			serviceProcessInstaller = new ServiceProcessInstaller();
+			serviceInstaller = new ServiceInstaller();
+			// Here you can set properties on serviceProcessInstaller or register event handlers
+			serviceProcessInstaller.Account = ServiceAccount.LocalService;
+			
+			serviceInstaller.ServiceName = Program.ServiceName;
+			this.Installers.AddRange(new Installer[] { serviceProcessInstaller, serviceInstaller });
+		}
 	}
 }

@@ -93,6 +93,7 @@ namespace TickZoom.TickUtil
 		
 		public void SetQuote(long lBid, long lAsk, ushort bidSize, ushort askSize) {
 			IsQuote=true;
+			HasDepthOfMarket=true;
 			binary.Bid = lBid;
 			binary.Ask = lAsk;
 			fixed( ushort *b = binary.DepthBidLevels)

@@ -260,6 +260,10 @@ namespace TickZoom.TickUtil
 			get { return tick.IsTrade; }
 		}
 		
+		public bool IsQuote{
+			get { return tick.IsQuote; }
+		}
+		
 		public bool IsSimulateTicks {
 			get { return tick.IsSimulateTicks; }
 			set { tick.IsSimulateTicks = value; }

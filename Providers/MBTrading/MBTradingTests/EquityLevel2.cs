@@ -46,7 +46,6 @@ namespace TickZoom.Test
 		private Provider provider;
 		protected SymbolInfo symbol;
 		protected VerifyFeed verify;
-		private bool localFlag = true;
 			
 		[TestFixtureSetUp]
 		public virtual void Init()
@@ -62,8 +61,8 @@ namespace TickZoom.Test
 		{
 		}
 		
-		public void CreateProvider() {
-			if( localFlag) {
+		public void CreateProvider(bool inProcessFlag) {
+			if( inProcessFlag) {
 				provider = new MbtInterface();
 			} else {
 				provider = Factory.Provider.ProviderProcess("127.0.0.1",6492,"MBTradingService.exe");
@@ -74,7 +73,7 @@ namespace TickZoom.Test
 		
 		[SetUp]
 		public void Setup() {
-			CreateProvider();
+			CreateProvider(false);
 		}
 		
 		[TearDown]
@@ -93,24 +92,15 @@ namespace TickZoom.Test
 		}
 		
 		[Test]		
-		public void TestAssemblyName() {
-			AssemblyName assemblyName = AssemblyName.GetAssemblyName("MBTradingTests.dll");		
-			assemblyName = AssemblyName.GetAssemblyName("MBTradingService.exe");		
-		}
-		
-		[Test]
 		public void TestSeperateProcess() {
+			provider.Stop(verify);
+			CreateProvider(false);
   			provider.StartSymbol(verify,symbol,TimeStamp.MinValue);
 			if(debug) log.Debug("===VerifyFeed===");
   			long count = verify.Verify(AssertTick,symbol,25);
   			Assert.GreaterOrEqual(count,2,"tick count");
-  			Process[] processes = null;
-  			for(int i=0;i<20;i++) {
-  				processes = Process.GetProcessesByName("MBTradingService");
-  				Thread.Sleep(1000);
-  				if( processes.Length == 0) break;
-  			}
-  			Assert.AreEqual(0,processes.Length,"Number of MBTradingService processes.");
+  			Process[] processes = Process.GetProcessesByName("MBTradingService");
+  			Assert.AreEqual(1,processes.Length,"Number of MBTradingService processes.");
 		}
 		
 		[Test]		
@@ -133,7 +123,7 @@ namespace TickZoom.Test
   			long count = verify.Verify(AssertTick,symbol,25);
   			Assert.GreaterOrEqual(count,2,"tick count");
   			provider.Stop(verify);
-  			CreateProvider();
+  			CreateProvider(false);
   			provider.StartSymbol(verify,symbol,TimeStamp.MinValue);
   			count = verify.Verify(AssertTick,symbol,25);
   			Assert.GreaterOrEqual(count,2,"tick count");

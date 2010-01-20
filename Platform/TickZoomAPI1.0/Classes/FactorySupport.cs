@@ -188,9 +188,6 @@ namespace TickZoom.Api
             foreach (Type t in assembly.GetTypes())
             {
             	if (t.IsClass && !t.IsAbstract && !t.IsInterface) {
-            		if( assembly.FullName.Contains("MBTrading")) {
-            		   	LogMsg("Found type " + t.FullName);
-            		}
             		if( t.GetInterface(type.FullName) != null)
 	                {
 				        LogMsg("Found the interface: " + type.Name);

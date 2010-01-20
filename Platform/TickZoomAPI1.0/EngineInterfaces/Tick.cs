@@ -96,5 +96,9 @@ namespace TickZoom.Api
 		bool IsTrade {
 			get;
 		}
+		
+		bool IsQuote {
+			get;
+		}
 	}
 }
