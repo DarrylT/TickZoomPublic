@@ -99,6 +99,7 @@
     <Compile Include="Converters\TimestampTypeConverter.cs" />
     <Compile Include="EngineInterfaces\ArrowDirection.cs" />
     <Compile Include="EngineInterfaces\Bars.cs" />
+    <Compile Include="EngineInterfaces\Provider.cs" />
     <Compile Include="EngineInterfaces\SymbolInfo.cs" />
     <Compile Include="EngineInterfaces\Task.cs" />
     <Compile Include="EngineInterfaces\Receiver.cs" />
@@ -119,7 +120,6 @@
     <Compile Include="EngineInterfaces\Prices.cs" />
     <Compile Include="EngineInterfaces\Progress.cs" />
     <Compile Include="EngineInterfaces\ProjectProperties.cs" />
-    <Compile Include="EngineInterfaces\DataProvider.cs" />
     <Compile Include="EngineInterfaces\ReportWriter.cs" />
     <Compile Include="EngineInterfaces\Series.cs" />
     <Compile Include="EngineInterfaces\Starter.cs" />

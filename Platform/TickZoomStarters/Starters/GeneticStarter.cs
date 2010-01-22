@@ -291,7 +291,7 @@ namespace TickZoom.Common
 	    	loader.OnClear();
 			
 			TickEngine engine = Factory.Engine.TickEngine;
-			engine.Providers = SetupTickQueues(true,true);
+			engine.Providers = SetupProviders(true,true);
 			engine.SymbolInfo = ProjectProperties.Starter.SymbolProperties;
 			engine.BackgroundWorker = BackgroundWorker;
 			engine.IntervalDefault = ProjectProperties.Starter.IntervalDefault;

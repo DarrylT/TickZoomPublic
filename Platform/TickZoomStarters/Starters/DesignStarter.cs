@@ -85,7 +85,7 @@ namespace TickZoom.Common
 			engine.MaxTicksBack = 2;
 			SymbolInfo symbolInfo = Factory.Symbol.LookupSymbol("Design");
 			engine.SymbolInfo = new SymbolInfo[] { symbolInfo };
-			engine.Providers = SetupTickQueues(false,false);
+			engine.Providers = SetupProviders(false,false);
 			engine.IntervalDefault = ProjectProperties.Starter.IntervalDefault;
 			engine.RunMode = RunMode.Historical;
 			engine.EnableTickFilter = ProjectProperties.Engine.EnableTickFilter;
@@ -102,7 +102,7 @@ namespace TickZoom.Common
 			engine.WaitTask();
 		}
 		
-		public override Provider[] SetupTickQueues(bool quietMode, bool singleLoad) {
+		public override Provider[] SetupProviders(bool quietMode, bool singleLoad) {
 			return new Provider[] { new DesignProvider() };
 		}
 	}

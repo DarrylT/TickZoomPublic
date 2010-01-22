@@ -94,7 +94,7 @@ namespace TickZoom.Common
 //			engine.BreakAtBar = ProjectProperties.Engine.BreakAtBar;
 			engine.EnableTickFilter = ProjectProperties.Engine.EnableTickFilter;
 			
-			engine.Providers = SetupTickQueues(false,false);
+			engine.Providers = SetupProviders(false,false);
 			engine.BackgroundWorker = BackgroundWorker;
 			engine.RunMode = runMode;
 			engine.StartCount = StartCount;

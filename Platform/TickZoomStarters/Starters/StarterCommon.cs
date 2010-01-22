@@ -96,11 +96,7 @@ namespace TickZoom.Common
 	    	}
 		}
 		
-		public virtual Provider[] SetupTickQueues(bool quietMode, bool singleLoad) {
-			return SetupTickReaders(quietMode,singleLoad);
-		}
-		
-		public Provider[] SetupTickReaders(bool quietMode, bool singleLoad) {
+		public virtual Provider[] SetupProviders(bool quietMode, bool singleLoad) {
 			List<Provider> senderList = new List<Provider>();
 			SymbolInfo[] symbols = ProjectProperties.Starter.SymbolProperties;
 			for(int i=0; i<symbols.Length; i++) {

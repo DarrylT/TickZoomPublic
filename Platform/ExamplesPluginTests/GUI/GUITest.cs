@@ -89,8 +89,8 @@ namespace MiscTest
 			form.DefaultCombo.Text = "Hour";
 			form.HistoricalButtonClick(null,null);
 			WaitComplete(30, () => { return !form.ProcessWorker.IsBusy; } );
-			Assert.IsFalse(form.ProcessWorker.IsBusy,"ProcessWorker.Busy");
 			Assert.AreEqual(form.PortfolioDocs.Count,1,"Charts");
+			Assert.IsFalse(form.ProcessWorker.IsBusy,"ProcessWorker.Busy");
 		}
 		
 		public void WaitForEngine() {

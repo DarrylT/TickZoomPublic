@@ -41,7 +41,7 @@ namespace TickZoom.Common
 	{
 		Log log = Factory.Log.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-		public override Provider[] SetupTickQueues(bool quietMode, bool singleLoad)
+		public override Provider[] SetupProviders(bool quietMode, bool singleLoad)
 		{
 			return base.SetupDataProviders();
 		}
