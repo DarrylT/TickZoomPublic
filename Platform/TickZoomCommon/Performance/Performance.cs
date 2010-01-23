@@ -130,9 +130,6 @@ namespace TickZoom.Common
 				double tempNetPortfolioEquity = 0;
 				tempNetPortfolioEquity += portfolio.Performance.Equity.ClosedEquity;
 				tempNetPortfolioEquity -= portfolio.Performance.Equity.StartingEquity;
-				if( tempNetClosedEquity != tempNetPortfolioEquity) {
-					int x = 0;
-				}
 			}
 			return true;
 		}

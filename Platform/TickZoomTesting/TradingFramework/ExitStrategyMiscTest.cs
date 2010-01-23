@@ -63,7 +63,6 @@ namespace TickZoom.TradingFramework
 			exitStrategy = new ExitStrategyMock(logic);
 			Assert.IsNotNull(exitStrategy,"ExitSupport constructor");
 			logic.ExitStrategy = exitStrategy;
-			int x = 0;
 //			Assert.AreSame(logic.PositionSize,exitStrategy.Chain.Previous.Model,"Strategy property");
 		}
 		

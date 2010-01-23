@@ -143,13 +143,7 @@ namespace TickZoom.Common
 		
 		public bool OnIntervalOpen(Interval interval)
 		{
-			TimeStamp dt;
-			try { 
-				dt = model.Ticks[0].Time;
-			} catch( NullReferenceException ex) {
-				Thread.Sleep(100);
-				dt = model.Ticks[0].Time;
-			}
+			TimeStamp dt = model.Ticks[0].Time;
 			if( dailyBinary.Count == 0) CalcNew(dailyBinary);
 			if( weeklyBinary.Count == 0) CalcNew(weeklyBinary);
 			if( monthlyBinary.Count == 0) CalcNew(monthlyBinary);
@@ -375,12 +369,7 @@ namespace TickZoom.Common
 				if( isMultiSymbolPortfolio) {
 					return portfolio.GetOpenEquity();
 				} else {
-					try { 
-						return performance.ComboTrades.OpenProfitLoss;
-					} catch( Exception) {
-						int x = 0;
-						return 0;
-					}
+					return performance.ComboTrades.OpenProfitLoss;
 				}
 			}
 		}

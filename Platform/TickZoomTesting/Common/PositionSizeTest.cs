@@ -61,7 +61,6 @@ namespace TickZoom.Common
 			strategy.PositionSize = performance;
 			strategy.Performance = new Performance(strategy);
 			Assert.AreSame(strategy.PositionSize,performance);
-			int x = 0;
 //			Assert.AreSame(strategy.Performance.Equity,performance.Chain.Previous.Model);
 //			Assert.AreSame(strategy.ExitStrategy,performance.Chain.Next.Model);
 		}
