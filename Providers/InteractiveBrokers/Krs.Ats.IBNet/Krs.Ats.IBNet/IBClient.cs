@@ -512,12 +512,21 @@ namespace Krs.Ats.IBNet
         public event EventHandler<UpdateNewsBulletinEventArgs> UpdateNewsBulletin;
 
         /// <summary>
+        /// This method is triggered for any exceptions caught.
+        /// </summary>
+        public event EventHandler<ReportExceptionEventArgs> ReportException;
+        
+        /// <summary>
         /// Called internally when the receive thread receives an update news bulletin event.
         /// </summary>
         /// <param name="e">Update News Bulletin Event Arguments</param>
         protected virtual void OnUpdateNewsBulletin(UpdateNewsBulletinEventArgs e)
         {
             RaiseEvent(UpdateNewsBulletin, this, e);
+        }
+        
+        protected virtual void OnReportException(ReportExceptionEventArgs e) {
+        	RaiseEvent(ReportException, this, e);
         }
 
         private void updateNewsBulletin(int msgId, NewsType msgType, string message, string origExchange)
@@ -526,6 +535,12 @@ namespace Krs.Ats.IBNet
             OnUpdateNewsBulletin(e);
         }
 
+        private void exception(Exception ex)
+        {
+            ReportExceptionEventArgs e = new ReportExceptionEventArgs(ex);
+            OnReportException(e);
+        }
+        
         /// <summary>
         /// This method is called when a successful connection is made to a Financial Advisor account.
         /// It is also called when the reqManagedAccts() method is invoked.
@@ -3359,9 +3374,9 @@ namespace Krs.Ats.IBNet
                 // loop until thread is terminated
                 while (!Stopping && ProcessMsg((IncomingMessage) ReadInt())) ;
             }
-            catch(IOException)
+            catch(Exception ex)
             {
-                
+            	exception(ex);
             }
             finally
             {
