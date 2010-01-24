@@ -152,23 +152,29 @@ namespace TickZoom.InteractiveBrokers
 		
 		public void PositionChange(Receiver receiver, SymbolInfo symbol, double signal)
 		{
-			SymbolHandler handler = symbolHandlers[(int)symbol.BinaryIdentifier];
-			int delta = (int)(signal - handler.Position);
-			if( delta != 0) {
-				Contract contract = new Contract(symbol.Symbol,"SMART",SecurityType.Stock,"USD");
-				Order order = new Order();
-				order.OrderType = Krs.Ats.IBNet.OrderType.Market;
-				if( delta > 0) {
-					order.Action = ActionSide.Buy;
-				} else {
-					order.Action = ActionSide.Sell;
+			try {
+				SymbolHandler handler = symbolHandlers[(int)symbol.BinaryIdentifier];
+				int delta = (int)(signal - handler.Position);
+				if( delta != 0) {
+					Contract contract = new Contract(symbol.Symbol,"SMART",SecurityType.Stock,"USD");
+					Order order = new Order();
+					order.OrderType = Krs.Ats.IBNet.OrderType.Market;
+					if( delta > 0) {
+						order.Action = ActionSide.Buy;
+					} else {
+						order.Action = ActionSide.Sell;
+					}
+					order.TotalQuantity = Math.Abs(delta);
+					while(nextValidId==0) {
+						Thread.Sleep(10);
+					}
+					nextValidId++;
+					client.PlaceOrder(nextValidId,contract,order);
+					if(debug) log.Debug("PlaceOrder: " + nextValidId + " for " + contract.Symbol + " = " + order.TotalQuantity);
 				}
-				order.TotalQuantity = Math.Abs(delta);
-				while(nextValidId==0) {
-					Thread.Sleep(10);
-				}
-				client.PlaceOrder(nextValidId,contract,order);
-				if(debug) log.Debug("PlaceOrder: " + nextValidId + " f or " + contract.Symbol + " = " + order.TotalQuantity);
+			} catch( Exception ex) {
+				log.Error(ex.Message,ex);
+				throw;
 			}
 		}
 		
@@ -190,7 +196,7 @@ namespace TickZoom.InteractiveBrokers
 
         private void client_OrderStatus(object sender, OrderStatusEventArgs e)
         {
-        	if(debug) log.Debug("Order Placed.");
+        	if(debug) log.Debug("Order Status " + e.Status);
         }
 
         private void client_UpdateMktDepth(object sender, UpdateMarketDepthEventArgs e)

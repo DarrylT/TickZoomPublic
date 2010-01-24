@@ -49,7 +49,7 @@ namespace TickZoom.Test
 			string appData = Factory.Settings["AppDataFolder"];
 			File.Delete( appData + @"\Logs\IBProviderTests.log");
 			File.Delete( appData + @"\Logs\IBProviderService.log");
-	  			symbol = Factory.Symbol.LookupSymbol("IBM");
+	  		symbol = Factory.Symbol.LookupSymbol("CSCO");
 		}
 		
 		[TestFixtureTearDown]
@@ -81,20 +81,32 @@ namespace TickZoom.Test
 		public void TestSingleOrder() {
 			if(debug) log.Debug("===DemoConnectionTest===");
   			provider.StartSymbol(verify,symbol,TimeStamp.MinValue);
-  			provider.PositionChange(verify,symbol,300);
+  			provider.PositionChange(verify,symbol,150);
   			long count = verify.Verify(10,AssertTick,symbol,25);
+  			Assert.GreaterOrEqual(count,2,"tick count");
+  			Thread.Sleep(500);
+  			provider.PositionChange(verify,symbol,0);
+  			count = verify.Verify(10,AssertTick,symbol,25);
+  			Assert.GreaterOrEqual(count,2,"tick count");
+  			Thread.Sleep(500);
+  			provider.PositionChange(verify,symbol,100);
+  			count = verify.Verify(10,AssertTick,symbol,25);
+  			Assert.GreaterOrEqual(count,2,"tick count");
+  			Thread.Sleep(500);
+  			provider.PositionChange(verify,symbol,0);
+  			count = verify.Verify(10,AssertTick,symbol,25);
   			Assert.GreaterOrEqual(count,2,"tick count");
 		}
 		
 		public virtual void AssertTick( TickIO tick, TickIO lastTick, ulong symbol) {
-        	Assert.IsTrue(tick.IsQuote);
+        	Assert.IsFalse(tick.IsQuote);
         	if( tick.IsQuote) {
 	        	Assert.Greater(tick.Bid,0);
 	        	Assert.Greater(tick.BidLevel(0),0);
 	        	Assert.Greater(tick.Ask,0);
 	        	Assert.Greater(tick.AskLevel(0),0);
         	}
-        	Assert.IsFalse(tick.IsTrade);
+        	Assert.IsTrue(tick.IsTrade);
         	if( tick.IsTrade) {
 	        	Assert.Greater(tick.Price,0);
     	    	Assert.Greater(tick.Size,0);

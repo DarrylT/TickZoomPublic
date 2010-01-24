@@ -69,7 +69,6 @@ namespace TickZoom.Test
         			}
         		}
         	}
-            tickQueue.Terminate();
             return count;
 		}
 
