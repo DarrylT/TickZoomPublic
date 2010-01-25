@@ -65,6 +65,7 @@
     <Compile Include="Common\IndicatorCommon.cs" />
     <Compile Include="Common\Intervals.cs" />
     <Compile Include="Common\Model.cs" />
+    <Compile Include="Common\ModelEvents.cs" />
     <Compile Include="Common\ModelInvoker.cs" />
     <Compile Include="Common\ModelLoaderCommon.cs" />
     <Compile Include="Common\OrderManager.cs" />

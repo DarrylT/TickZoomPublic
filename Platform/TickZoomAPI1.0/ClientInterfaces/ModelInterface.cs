@@ -31,6 +31,14 @@ namespace TickZoom.Api
 	public interface ModelInterface
 	{
 		
+		/// <summary>
+		/// Whether receiving events from the data engine or not.
+		/// </summary>
+		bool IsActive {
+			get;
+			set;
+		}
+		
 		Context Context {
 			get;
 			set;

@@ -91,7 +91,6 @@
     <Compile Include="Loaders\ExampleSimplePortfolioLoader.cs" />
     <Compile Include="Loaders\ExampleSimulatedLoader.cs" />
     <Compile Include="Loaders\ExampleDualSymbolLoader.cs" />
-    <Compile Include="Strategies\BenchmarkSimpleStrategy.cs" />
     <Compile Include="Strategies\BreakoutTrend.cs" />
     <Compile Include="Strategies\DOMSmooth.cs" />
     <Compile Include="Strategies\ExampleDataChecker.cs" />

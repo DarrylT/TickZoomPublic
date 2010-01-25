@@ -32,80 +32,7 @@ using TickZoom.Api;
 
 namespace TickZoom.Common
 {
-	public class ModelEvents {
-		private static readonly Log log = Factory.Log.GetLogger(typeof(ModelEvents));
-		private static readonly bool debug = log.IsDebugEnabled;
-		private static readonly bool trace = log.IsTraceEnabled;
-		protected ModelProperties properties;
-		public void OnProperties(ModelProperties properties)
-		{
-			this.properties = properties;
-	   			if( trace) log.Trace(GetType().Name+".OnProperties() - NotImplemented");
-			string[] propertyKeys = properties.GetPropertyKeys();
-			for( int i=0; i<propertyKeys.Length; i++) {
-				HandleProperty(propertyKeys[i],properties.GetProperty(propertyKeys[i]).Value);
-			}
-		}
-		
-		private void HandleProperty( string name, string str) {
-			PropertyInfo property = this.GetType().GetProperty(name);
-			Type propertyType = property.PropertyType;
-			object value = Converters.Convert(propertyType,str);
-			property.SetValue(this,value,null);
-	//			log.WriteFile("Property " + property.Name + " = " + value);
-		}		
-		
-		public virtual void OnConfigure() {
-			
-		}
-		
-		public virtual void OnInitialize() {
-		}
-		
-		public virtual bool OnBeforeIntervalOpen() {
-   			return false;
-		}
-	
-		public virtual bool OnBeforeIntervalOpen(Interval interval) {
-	   			return false;
-		}
-	
-		public virtual bool OnIntervalOpen() {
-			return false;
-		}
-	
-		public virtual bool OnIntervalOpen(Interval interval) {
-			return false;
-		}
-		
-		public virtual void OnGetPosition(EventContext context) {
-			
-		}
-		
-		public virtual bool OnProcessTick(Tick tick) {
-			return true;
-		}
-		
-		public virtual bool OnBeforeIntervalClose() {
-			return false;
-		}
-		
-		public virtual bool OnBeforeIntervalClose(Interval interval) {
-			return false;
-		}
-		
-		public virtual bool OnIntervalClose() {
-			return false;
-		}
-		
-		public virtual bool OnIntervalClose(Interval interval) {
-			return false;
-		}
-	
-		public virtual void OnEndHistorical() {
-		}
-	}
-	
+
 	public partial class Model : ModelEvents, ModelInterface
 	{
 		string name;
@@ -115,6 +42,7 @@ namespace TickZoom.Common
 		Interval intervalDefault = Intervals.Default;
 		string symbolDefault = "Default";
 		DrawingInterface drawing;
+		bool isActive = true;
 	
 		List<Interval> updateIntervals = new List<Interval>();
 		Data data;
@@ -500,6 +428,14 @@ namespace TickZoom.Common
 		
 		public List<StrategyInterceptor> StrategyInterceptors {
 			get { return strategyInterceptors; }
+		}
+
+		/// <summary>
+		/// Whether receiving events from the data engine or not.
+		/// </summary>
+		public bool IsActive {
+			get { return isActive; }
+			set { isActive = value; }
 		}
 	}
 
