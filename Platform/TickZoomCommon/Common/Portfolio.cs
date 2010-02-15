@@ -240,14 +240,22 @@ namespace TickZoom.Common
 			return stats.Daily.SortinoRatio;
 		}
 		
-		public virtual string OnGetOptimizeResult(Dictionary<string,object> optimizeValues)
+		public virtual string OnGetOptimizeHeader(Dictionary<string,object> optimizeValues)
 		{
 			StringBuilder sb = new StringBuilder();
 			sb.Append("Fitness,");
-			sb.Append(OnGetFitness());
 			foreach( KeyValuePair<string,object> kvp in optimizeValues) {
 				sb.Append(",");
 				sb.Append(kvp.Key);
+			}
+			return sb.ToString();
+		}
+		
+		public virtual string OnGetOptimizeResult(Dictionary<string,object> optimizeValues)
+		{
+			StringBuilder sb = new StringBuilder();
+			sb.Append(OnGetFitness());
+			foreach( KeyValuePair<string,object> kvp in optimizeValues) {
 				sb.Append(",");
 				sb.Append(kvp.Value);
 			}

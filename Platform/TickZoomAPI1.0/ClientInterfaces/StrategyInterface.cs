@@ -47,6 +47,7 @@ namespace TickZoom.Api
 		}
 		double OnGetFitness();
 		bool OnWriteReport(string folder);
+		string OnGetOptimizeHeader(Dictionary<string,object> optimizeValues);
 		string OnGetOptimizeResult(Dictionary<string,object> optimizeValues);
 	 	IList<LogicalOrder> LogicalOrders {
         	get;

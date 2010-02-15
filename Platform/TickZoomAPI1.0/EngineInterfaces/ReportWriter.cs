@@ -36,6 +36,7 @@ namespace TickZoom.Api
 			set;
 		}
 		void Summary(StrategyInterface[] strategies);
+		string StatisticsHeader(StrategyInterface strategy);
 		string Statistics(StrategyInterface strategy);
 	}
 }

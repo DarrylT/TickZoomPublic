@@ -65,6 +65,11 @@ namespace TickZoom.StarterTest
 			return true;
 		}
 		
+		public override string OnGetOptimizeHeader(System.Collections.Generic.Dictionary<string, object> optimizeValues)
+		{
+			return "DailyCount,DailyWinRate,DailyProfitFactor," + base.OnGetOptimizeHeader(optimizeValues);
+		}
+		
 		public override string OnGetOptimizeResult(System.Collections.Generic.Dictionary<string, object> optimizeValues)
 		{
 			EquityStats stats = Performance.Equity.CalculateStatistics();

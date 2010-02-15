@@ -119,14 +119,22 @@ namespace TickZoom.Common
 			throw new NotImplementedException();
 		}
 		
-		public virtual string OnGetOptimizeResult(Dictionary<string,object> optimizeValues)
+		public virtual string OnGetOptimizeHeader(Dictionary<string,object> optimizeValues)
 		{
 			StringBuilder sb = new StringBuilder();
-			sb.Append("Fitness,");
-			sb.Append(OnGetFitness());
+			sb.Append("Fitness");
 			foreach( KeyValuePair<string,object> kvp in optimizeValues) {
 				sb.Append(",");
 				sb.Append(kvp.Key);
+			}
+			return sb.ToString();
+		}
+		
+		public virtual string OnGetOptimizeResult(Dictionary<string,object> optimizeValues)
+		{
+			StringBuilder sb = new StringBuilder();
+			sb.Append(OnGetFitness());
+			foreach( KeyValuePair<string,object> kvp in optimizeValues) {
 				sb.Append(",");
 				sb.Append(kvp.Value);
 			}

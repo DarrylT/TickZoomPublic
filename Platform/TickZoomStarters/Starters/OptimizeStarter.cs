@@ -122,8 +122,13 @@ namespace TickZoom.Common
 					loader.OptimizeOutput = new FileStream(fileName,FileMode.Append);
     			}
     			StreamWriter fwriter = new StreamWriter(loader.OptimizeOutput);
+				TickEngine engine = engineIterations[0];
+				string header = engine.OptimizeHeader;
+				if( header != null && header.Length > 0) {
+					fwriter.WriteLine(header);
+				}
 				for( int i=0; i<engineIterations.Count; i++) {
-					TickEngine engine = engineIterations[i];
+					engine = engineIterations[i];
 					string stats = engine.OptimizeResult;
 					if( stats != null && stats.Length > 0) {
 						fwriter.WriteLine(stats);

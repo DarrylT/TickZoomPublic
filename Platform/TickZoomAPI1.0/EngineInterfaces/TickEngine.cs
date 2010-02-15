@@ -92,6 +92,10 @@ namespace TickZoom.Api
 			get;
 		}
 		
+		string OptimizeHeader {
+			get;
+		}
+		
 		string OptimizeResult {
 			get;
 		}
