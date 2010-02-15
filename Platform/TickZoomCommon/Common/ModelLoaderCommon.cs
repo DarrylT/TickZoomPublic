@@ -89,7 +89,7 @@ namespace TickZoom.Common
 		}
 
 		public Portfolio CreatePortfolio( string type, string name) {
-			Model model = CreateStrategy(type);
+			Model model = CreatePortfolio(type);
 			model.Name = name;
 			return model as Portfolio;
 		}

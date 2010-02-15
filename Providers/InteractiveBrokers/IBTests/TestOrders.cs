@@ -74,7 +74,8 @@ namespace TickZoom.Test
 		
 		[TearDown]
 		public void TearDown() { 
-	  			provider.Stop(verify);	
+	  		provider.Stop(verify);	
+	  		provider.Stop();	
 		}
 		
 		[Test]
@@ -82,19 +83,19 @@ namespace TickZoom.Test
 			if(debug) log.Debug("===DemoConnectionTest===");
   			provider.StartSymbol(verify,symbol,TimeStamp.MinValue);
   			provider.PositionChange(verify,symbol,150);
-  			long count = verify.Verify(10,AssertTick,symbol,25);
+  			long count = verify.Verify(2,AssertTick,symbol,25);
   			Assert.GreaterOrEqual(count,2,"tick count");
   			Thread.Sleep(500);
   			provider.PositionChange(verify,symbol,0);
-  			count = verify.Verify(10,AssertTick,symbol,25);
+  			count = verify.Verify(2,AssertTick,symbol,25);
   			Assert.GreaterOrEqual(count,2,"tick count");
   			Thread.Sleep(500);
   			provider.PositionChange(verify,symbol,100);
-  			count = verify.Verify(10,AssertTick,symbol,25);
+  			count = verify.Verify(2,AssertTick,symbol,25);
   			Assert.GreaterOrEqual(count,2,"tick count");
   			Thread.Sleep(500);
   			provider.PositionChange(verify,symbol,0);
-  			count = verify.Verify(10,AssertTick,symbol,25);
+  			count = verify.Verify(2,AssertTick,symbol,25);
   			Assert.GreaterOrEqual(count,2,"tick count");
 		}
 		

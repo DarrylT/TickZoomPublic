@@ -1,4 +1,4 @@
-﻿#region Copyright
+#region Copyright
 /*
  * Copyright 2008 M. Wayne Walter
  * Software: TickZoom Trading Platform
@@ -33,16 +33,16 @@ using TickZoom.TickUtil;
 
 namespace TickZoom.Test
 {
-
-	[TestFixture]
-	public class EquityLevel1 : EquityTimeAndSales
+//#if FOREX
+//	[TestFixture]
+	public class ForexLevel1 : EquityTimeAndSales
 	{
 		[TestFixtureSetUp]
 		public override void Init()
 		{
 			base.Init();
-			symbol = Factory.Symbol.LookupSymbol("IBM");
-		}	
+			symbol = Factory.Symbol.LookupSymbol("USD/JPY");
+		}
 		
 		public override void AssertTick( TickIO tick, TickIO lastTick, ulong symbol) {
         	Assert.IsTrue(tick.IsQuote);
@@ -60,5 +60,7 @@ namespace TickZoom.Test
     		Assert.IsTrue(tick.Time>=lastTick.Time,"tick.Time > lastTick.Time");
     		Assert.AreEqual(symbol,tick.lSymbol);
 		}
+	
 	}
+//#endif
 }

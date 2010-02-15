@@ -40,6 +40,10 @@ namespace TickZoom.Test
 		private static readonly bool debug = log.IsDebugEnabled;
 		private TickQueue tickQueue = Factory.TickUtil.TickQueue(typeof(VerifyFeed));
 		
+		public TickQueue TickQueue {
+			get { return tickQueue; }
+		}
+		
 		public ReceiverState OnGetReceiverState(SymbolInfo symbol) {
 			return ReceiverState.Ready;
 		}

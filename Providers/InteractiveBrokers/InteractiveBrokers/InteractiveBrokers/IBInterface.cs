@@ -125,7 +125,6 @@ namespace TickZoom.InteractiveBrokers
         
         
         public void Stop(Receiver receiver) {
-        	client.Disconnect();
         }
         
 		private string UpperFirst(string input)
@@ -136,6 +135,7 @@ namespace TickZoom.InteractiveBrokers
         
 		public void StartSymbol(Receiver receiver, SymbolInfo symbol, TimeStamp lastTimeStamp)
 		{
+			
 			if( debug) log.Debug("StartSymbol " + symbol + ", " + lastTimeStamp);
             Equity equity = new Equity(symbol.Symbol);
             SymbolHandler handler = GetSymbolHandler(symbol,receiver);
@@ -180,6 +180,7 @@ namespace TickZoom.InteractiveBrokers
 		
 		public void Stop()
 		{	
+        	client.Disconnect();
 		}
 		
         private void client_ExecDetails(object sender, ExecDetailsEventArgs e)
@@ -238,6 +239,10 @@ namespace TickZoom.InteractiveBrokers
         	return symbolHandlers[(int)symbol.BinaryIdentifier];
         }
 
+        private void RemoveSymbolHandler(SymbolInfo symbol) {
+        	symbolHandlers[(int)symbol.BinaryIdentifier] = null;
+        }
+        
         private void client_Error(object sender, Krs.Ats.IBNet.ErrorEventArgs e)
         {
             log.Error("Error: "+ e.ErrorMsg);
@@ -254,7 +259,9 @@ namespace TickZoom.InteractiveBrokers
         		buffer.SendQuote();
         	} else if( e.TickType == TickType.LastPrice) {
         		buffer.Last = (double) e.Price;
-        		buffer.SendTimeAndSales();
+        		if( buffer.LastSize > 0) {
+	        		buffer.SendTimeAndSales();
+        		}
         	}
 		}
         

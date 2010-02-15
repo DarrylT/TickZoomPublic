@@ -52,10 +52,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EquityLevel1.cs" />
-    <Compile Include="EquityLevel2.cs" />
     <Compile Include="EquityTimeAndSales.cs" />
-    <Compile Include="ForexMBTrading.cs" />
+    <Compile Include="ForexLevel2.cs" />
+    <Compile Include="ForexLevel1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SeperateProcess.cs" />
     <Compile Include="VerifyFeed.cs" />
     <None Include="app.config" />
     <None Include="Lib\nunit.framework.dll" />

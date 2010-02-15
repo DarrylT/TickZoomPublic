@@ -73,7 +73,8 @@ namespace TickZoom.Test
 		
 		[TearDown]
 		public void TearDown() {
-  			provider.Stop(verify);	
+	  		provider.Stop(verify);	
+  			provider.Stop();	
 		}
 		
 		[Test]
@@ -96,8 +97,9 @@ namespace TickZoom.Test
   			Assert.GreaterOrEqual(count,2,"tick count");
 			if(debug) log.Debug("===StopSymbol===");
   			provider.StopSymbol(verify,symbol);
-  			count = verify.Verify(2,AssertTick,symbol,25);
-  			Assert.AreEqual(count,0,"tick count");
+  			verify.TickQueue.Clear();
+  			count = verify.Verify(0,AssertTick,symbol,10);
+  			Assert.AreEqual(0,count,"tick count");
 		}
 
 		[Test]
@@ -105,7 +107,7 @@ namespace TickZoom.Test
   			provider.StartSymbol(verify,symbol,TimeStamp.MinValue);
   			long count = verify.Verify(2,AssertTick,symbol,25);
   			Assert.GreaterOrEqual(count,2,"tick count");
-  			provider.Stop(verify);
+  			provider.Stop();
   			CreateProvider(true);
   			provider.StartSymbol(verify,symbol,TimeStamp.MinValue);
   			count = verify.Verify(2,AssertTick,symbol,25);
@@ -114,7 +116,7 @@ namespace TickZoom.Test
 
 		[Test]
 		public void TestSeperateProcess() {
-			provider.Stop(verify);
+			provider.Stop();
 			CreateProvider(false);
   			provider.StartSymbol(verify,symbol,TimeStamp.MinValue);
 			if(debug) log.Debug("===VerifyFeed===");

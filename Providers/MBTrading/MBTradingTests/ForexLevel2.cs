@@ -33,15 +33,14 @@ using TickZoom.TickUtil;
 
 namespace TickZoom.Test
 {
-
 	[TestFixture]
-	public class EquityLevel1 : EquityTimeAndSales
+	public class ForexLevel2 : EquityTimeAndSales
 	{
 		[TestFixtureSetUp]
 		public override void Init()
 		{
 			base.Init();
-			symbol = Factory.Symbol.LookupSymbol("IBM");
+			symbol = Factory.Symbol.LookupSymbol("USD/CHF");
 		}	
 		
 		public override void AssertTick( TickIO tick, TickIO lastTick, ulong symbol) {
@@ -52,7 +51,6 @@ namespace TickZoom.Test
 	        	Assert.Greater(tick.Ask,0);
 	        	Assert.Greater(tick.AskLevel(0),0);
         	}
-        	Assert.IsFalse(tick.IsTrade);
         	if( tick.IsTrade) {
 	        	Assert.Greater(tick.Price,0);
     	    	Assert.Greater(tick.Size,0);

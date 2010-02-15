@@ -67,7 +67,7 @@ namespace TickZoom.Common
 			this.model = model;
 			this.performance = performance;
 			equityProfitLoss = new TradeProfitLoss(model);
-			dailyBinary   = new TransactionPairsBinary();
+			dailyBinary = new TransactionPairsBinary();
 		}
 		
 		public void Intercept(EventContext context, EventType eventType, object eventDetail)

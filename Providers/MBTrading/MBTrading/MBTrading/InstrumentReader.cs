@@ -251,7 +251,7 @@ namespace TickZoom.MBTrading
         	CreateTick();
 			
 			if( TryAddLevel2()) {
-        		if( Symbol.TimeAndSales == TimeAndSales.Extrapolated) {
+        		if( recordTrade && Symbol.TimeAndSales == TimeAndSales.Extrapolated) {
         			tick.SetTrade(side, price, size);
         		}
         		SendTick();

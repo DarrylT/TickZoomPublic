@@ -1,4 +1,4 @@
-﻿#region Copyright
+#region Copyright
 /*
  * Copyright 2008 M. Wayne Walter
  * Software: TickZoom Trading Platform
@@ -21,29 +21,106 @@
  */
 #endregion
 
-#define FOREX
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Reflection;
+using System.Text;
+using System.Threading;
 using System.Windows.Forms;
 
+using MBTProvider;
 using NUnit.Framework;
 using TickZoom.Api;
+using TickZoom.MBTrading;
 using TickZoom.TickUtil;
 
 namespace TickZoom.Test
 {
 	[TestFixture]
-	public class EquityTimeAndSales : EquityLevel2
+	public class EquityTimeAndSales
 	{
+		private static readonly Log log = Factory.Log.GetLogger(typeof(EquityTimeAndSales));
+		private static readonly bool debug = log.IsDebugEnabled;		
+		protected Provider provider;
+		protected SymbolInfo symbol;
+		protected VerifyFeed verify;
+		protected bool inProcessFlag = false;
+			
 		[TestFixtureSetUp]
-		public override void Init()
+		public virtual void Init()
 		{
-			base.Init();
-			symbol = Factory.Symbol.LookupSymbol("CSCO");
-		}	
+			string appData = Factory.Settings["AppDataFolder"];
+			File.Delete( appData + @"\Logs\MBTradingTests.log");
+			File.Delete( appData + @"\Logs\MBTradingService.log");
+  			symbol = Factory.Symbol.LookupSymbol("CSCO");
+		}
 		
-		public override void AssertTick( TickIO tick, TickIO lastTick, ulong symbol) {
+		[TestFixtureTearDown]
+		public void Dispose()
+		{
+		}
+		
+		public void CreateProvider() {
+			if( inProcessFlag) {
+				provider = new MbtInterface();
+			} else {
+				provider = Factory.Provider.ProviderProcess("127.0.0.1",6492,"MBTradingService.exe");
+			}
+			verify = new VerifyFeed();
+			provider.Start(verify);
+		}
+		
+		[SetUp]
+		public void Setup() {
+			CreateProvider();
+		}
+		
+		[TearDown]
+		public void TearDown() {
+			provider.Stop(verify);
+  			provider.Stop();	
+		}
+		
+		[Test]
+		public void DemoConnectionTest() {
+			if(debug) log.Debug("===DemoConnectionTest===");
+			if(debug) log.Debug("===StartSymbol===");
+  			provider.StartSymbol(verify,symbol,TimeStamp.MinValue);
+			if(debug) log.Debug("===VerifyFeed===");
+  			long count = verify.Verify(AssertTick,symbol,25);
+  			Assert.GreaterOrEqual(count,2,"tick count");
+		}
+		
+		[Test]		
+		public void DemoStopSymbolTest() {
+			if(debug) log.Debug("===DemoConnectionTest===");
+			if(debug) log.Debug("===StartSymbol===");
+  			provider.StartSymbol(verify,symbol,TimeStamp.MinValue);
+			if(debug) log.Debug("===VerifyFeed===");
+  			long count = verify.Verify(AssertTick,symbol,35);
+  			Assert.GreaterOrEqual(count,2,"tick count");
+			if(debug) log.Debug("===StopSymbol===");
+  			provider.StopSymbol(verify,symbol);
+  			count = verify.Verify(AssertTick,symbol,10);
+  			Assert.AreEqual(count,0,"tick count");
+		}
+
+		[Test]
+		public void DemoReConnectionTest() {
+  			provider.StartSymbol(verify,symbol,TimeStamp.MinValue);
+  			long count = verify.Verify(AssertTick,symbol,25);
+  			Assert.GreaterOrEqual(count,2,"tick count");
+  			provider.Stop(verify);
+  			provider.Stop();
+  			CreateProvider();
+  			provider.StartSymbol(verify,symbol,TimeStamp.MinValue);
+  			count = verify.Verify(AssertTick,symbol,25);
+  			Assert.GreaterOrEqual(count,2,"tick count");
+		}
+
+		public virtual void AssertTick( TickIO tick, TickIO lastTick, ulong symbol) {
         	Assert.Greater(tick.Price,0);
         	Assert.Greater(tick.Size,0);
     		Assert.IsTrue(tick.Time>=lastTick.Time,"tick.Time > lastTick.Time");

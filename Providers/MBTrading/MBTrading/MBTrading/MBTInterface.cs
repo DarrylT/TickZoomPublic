@@ -69,7 +69,6 @@ namespace TickZoom.MBTrading
         private int memberId;
         private string username;
         private string password;
-        private bool isLoggedIn;
 	    private readonly static object listLock = new object();
         private enumConnectionState permsHealth = enumConnectionState.csDisconnected;
         private enumConnectionState ordersHealth = enumConnectionState.csDisconnected;
@@ -151,7 +150,7 @@ namespace TickZoom.MBTrading
         {
         	try {
 	            log.Info("Com Manager Connected");
-            	AttemptConnectReaders();
+//            	AttemptConnectReaders();
             	lastChangePerms = 0;
         	} catch( Exception e) {
         		log.Error( "OnLogonSucceed exception", e);
@@ -162,7 +161,7 @@ namespace TickZoom.MBTrading
         {
         	try {
         		if( debug) log.Debug("Order Client Connected");
-            	AttemptConnectReaders();
+//            	AttemptConnectReaders();
             	lastChangeOrders = 0;
         	} catch( Exception e) {
         		log.Error( "Order Client Connect exception", e);
@@ -267,12 +266,14 @@ namespace TickZoom.MBTrading
         public void RemoveEventHandlers()
         {
             m_OrderClient.OnAccountLoaded -= m_OrderClient_OnAccountLoaded;
+            m_OrderClient.OnAccountUnavailable -= m_OrderClient_OnAccountUnavailable;
             m_OrderClient.OnSubmit -= m_OrderClient_OnSubmit;
             m_OrderClient.OnClose -= m_OrderClient_OnClose;
             m_OrderClient.OnConnect -= m_OrderClient_OnConnect;
             m_OrderClient.OnLogonSucceed -= m_OrderClient_OnLogonSucceed;
             m_ComMgr.OnCriticalShutdown -= m_ComMgr_OnCriticalShutdown;
             m_ComMgr.OnHealthUpdate -= m_ComMgr_OnHealthUpdate;
+            m_ComMgr.OnLogonSucceed -= m_ComMgr_OnLogonSucceed;
             m_Quotes.OnClose -= m_Quotes_OnClose;
             m_Quotes.OnConnect -= m_Quotes_OnConnect;
             m_Quotes.OnLogonSucceed -= m_Quotes_OnLogonSucceed;
@@ -409,11 +410,7 @@ namespace TickZoom.MBTrading
             log.Info("Login: Checking if previous instance detected");
             if( m_ComMgr.IsPreviousInstanceDetected( username)) {
 	            log.Info("Login: Checking current health.");
-            	if (m_ComMgr.get_CurrentHealth(enumServerIndex.siPerms) == enumConnectionState.csDisconnected) {
-		            log.Info("Login: ReconnectPerms");
-            		m_ComMgr.ReconnectPerms();
-            		lastChangePerms = Environment.TickCount;
-            	}
+	            CheckPermsHealth();
             } else {
 	           	m_OrderClient.OnDemandMode = false;
 	            log.Info("Executing DoLogin with " + memberId + ", " + username);
@@ -427,10 +424,9 @@ namespace TickZoom.MBTrading
 	                	Thread.Sleep(5);
 	                }
 	            }
+	        	lastChangeQuotes = lastChangeOrders = lastChangePerms = lastChangeReaders = Environment.TickCount;
+	            log.Info("Login Succeeded - Please wait for all accounts to load.");
             }
-            isLoggedIn = true;
-        	lastChangeQuotes = lastChangeOrders = lastChangePerms = lastChangeReaders = Environment.TickCount;
-            log.Info("Login Succeeded - Please wait for all accounts to load.");
         }
         
 		Receiver receiver;
@@ -474,9 +470,10 @@ namespace TickZoom.MBTrading
             monitorThread.Name = "MBTMonitor";
             monitorThread.Start();
             // Wait for connection.
-            while(!isLoggedIn) {
+            while(permsHealth != enumConnectionState.csLoggedIn) {
             	Application.DoEvents();
             	Thread.Sleep(5);
+            	permsHealth = m_ComMgr.get_CurrentHealth(enumServerIndex.siPerms);
             }
         }
 
@@ -548,7 +545,6 @@ namespace TickZoom.MBTrading
         }
         
         public void Stop(Receiver receiver) {
-        	LogoutInternal();
         }
         
 		private string UpperFirst(string input)
@@ -558,6 +554,7 @@ namespace TickZoom.MBTrading
 		}
 
         public void LogoutInternal() {
+        	log.Info("MBTInterface Logout");
         	closePending=true;
         	if( monitorThread != null) { monitorThread.Join(); }
             if( m_Quotes.ConnectionState != enumConnectionState.csDisconnected) {
@@ -567,6 +564,7 @@ namespace TickZoom.MBTrading
             	m_OrderClient.Disconnect();
             }
         	InstrumentReaders.Close();
+        	RemoveEventHandlers();
         }
         
 		public InstrumentReaders InstrumentReaders {
@@ -616,6 +614,7 @@ namespace TickZoom.MBTrading
 		
 		public void Stop()
 		{	
+			if( receiver != null) 
 			LogoutInternal();
 		}
 	}

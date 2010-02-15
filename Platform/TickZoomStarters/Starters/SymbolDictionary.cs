@@ -315,8 +315,11 @@ namespace TickZoom.Common
     <property name=""TimeAndSales"" value=""Extrapolated"" />
    	<property name=""QuoteType"" value=""Level1"" />
     <category name=""4 Pip"">
-      <symbol name=""USD/CHF"" universal=""USDCHF"" />
-      <symbol name=""USD/CAD"" universal=""USDCAD"" />
+      <symbol name=""USD/CHF"" universal=""USDCHF"">
+			<property name=""QuoteType"" value=""Level2"" />
+			<property name=""TimeAndSales"" value=""Extrapolated"" />
+      </symbol>
+	  <symbol name=""USD/CAD"" universal=""USDCAD"" />
       <symbol name=""AUD/USD"" universal=""AUDUSD"" />
       <symbol name=""USD/NOK"" universal=""USDNOK"" />
       <symbol name=""EUR/USD"" universal=""EURUSD"" />
