@@ -79,7 +79,7 @@ namespace TickZoom.Common
 			loader.OnInitialize(ProjectProperties);
 			
 			totalTasks = 0;
-			
+
 			try {
 				RecursiveOptimize(0);
 			} catch( ApplicationException ex) {
@@ -149,7 +149,8 @@ namespace TickZoom.Common
 				// Loop through a specific optimization variable.
 				for( double i = loader.Variables[index].Start;
 				    i <= loader.Variables[index].End;
-				    i += loader.Variables[index].Increment) {
+				    i = Math.Round(i+loader.Variables[index].Increment,9)) {
+//				    i += loader.Variables[index].Increment) {
 					loader.Variables[index].Value = i.ToString();
 					RecursiveOptimize(index+1);
 				}
