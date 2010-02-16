@@ -71,5 +71,9 @@ namespace TickZoom.Api
 			set;
 		}
 		
+		int Id {
+			get;
+		}
+		
 	}
 }

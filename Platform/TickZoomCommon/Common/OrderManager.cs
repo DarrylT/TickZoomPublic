@@ -83,7 +83,7 @@ namespace TickZoom.Common
 		
 		public bool OnProcessTick(Tick tick)
 		{
-			if( Strategy.Data.ActiveOrders.Count > 0) {
+			if( Strategy.ActiveOrders.Count > 0) {
 				ProcessOrders(tick);
 			}
 			return true;

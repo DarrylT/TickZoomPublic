@@ -81,12 +81,12 @@ namespace TickZoom.Common
 				
 		public void OnInitialize()
 		{
-			marketOrder = Strategy.Data.CreateOrder();
+			marketOrder = Strategy.Data.CreateOrder(Strategy);
 			marketOrder.TradeDirection = TradeDirection.Exit;
 			Strategy.OrderManager.Add(marketOrder);
-			breakEvenStopOrder = Strategy.Data.CreateOrder();
+			breakEvenStopOrder = Strategy.Data.CreateOrder(Strategy);
 			breakEvenStopOrder.TradeDirection = TradeDirection.Exit;
-			stopLossOrder = Strategy.Data.CreateOrder();
+			stopLossOrder = Strategy.Data.CreateOrder(Strategy);
 			Strategy.OrderManager.Add(stopLossOrder);
 			stopLossOrder.TradeDirection = TradeDirection.Exit;
 			stopLossOrder.Tag = "ExitStrategy" ;
@@ -98,7 +98,7 @@ namespace TickZoom.Common
 		
 		public void OnProcessPosition(Tick tick) {
 			// Handle ActiveNow orders.
-			if( Strategy.Data.ActiveOrders.Count > 0) {
+			if( Strategy.ActiveOrders.Count > 0) {
 				Strategy.OrderManager.ProcessOrders(tick);
 			}
 			

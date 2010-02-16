@@ -45,6 +45,8 @@ namespace TickZoom.Common
 		private readonly bool instanceTrace;
 		private Result result;
 		List<LogicalOrder> logicalOrders = new List<LogicalOrder>();
+		List<LogicalOrder> activeOrders = new List<LogicalOrder>();
+		List<LogicalOrder> nextBarOrders = new List<LogicalOrder>();
 		
 		OrderManager orderManager;
 		OrderHandlers orderHandlers;
@@ -146,6 +148,27 @@ namespace TickZoom.Common
 			return performance.WriteReport(Name,folder);
 		}
 
+		public void OrderModified( LogicalOrder order) {
+			if( order.IsActive ) {
+				if( !activeOrders.Contains(order)) {
+					activeOrders.Add(order);
+				}
+			} else {
+				if( activeOrders.Contains(order)) {
+					activeOrders.Remove(order);
+				}
+			}
+			if( order.IsNextBar) {
+				if( !nextBarOrders.Contains(order)) {
+					nextBarOrders.Add(order);
+				}
+			} else {
+				if( nextBarOrders.Contains(order)) {
+					nextBarOrders.Remove(order);
+				}
+			}
+		}
+		
 		[Browsable(true)]
 		[Category("Strategy Settings")]		
 		public override Interval IntervalDefault {
@@ -241,6 +264,12 @@ namespace TickZoom.Common
 		
 		public ResultInterface Result {
 			get { return result; }
+		}
+
+		public IList<LogicalOrder> ActiveOrders {
+			get {
+				return activeOrders;
+			}
 		}
 	}
 	

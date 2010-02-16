@@ -35,16 +35,20 @@ namespace TickZoom.Api
 	public interface StrategyInterface : ModelInterface
 	{
 		string OnOptimizeResults();
+		
 		[Obsolete("Please, implement OnGetFitness() method instead.")]
 		double Fitness {
 			get;
 		}
+		
 		PositionInterface Position {
 			get;
 		}
+		
 		ResultInterface Result {
 			get;
 		}
+		
 		double OnGetFitness();
 		bool OnWriteReport(string folder);
 		string OnGetOptimizeHeader(Dictionary<string,object> optimizeValues);
@@ -52,5 +56,11 @@ namespace TickZoom.Api
 	 	IList<LogicalOrder> LogicalOrders {
         	get;
 		}
+		
+	 	IList<LogicalOrder> ActiveOrders {
+        	get;
+		}
+		
+		void OrderModified( LogicalOrder order);
 	}
 }

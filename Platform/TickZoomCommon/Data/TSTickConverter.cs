@@ -72,7 +72,6 @@ namespace TickZoom.Common
 		public void Convert(bool isFromMinute) {
 			// Do all the work here.
 			fromMinute = isFromMinute;
-//			TickWriter tickWriter = new TickWriter();
 			int countLines = 0;
 			
 			try 
@@ -131,7 +130,6 @@ namespace TickZoom.Common
 		                	} else {
 								// each tsLine is a separate tick, written independently
 								double tickPrice = double.Parse(tsBits[2]);
-//								ushort tickVol = (ushort)(int.Parse(tsBits[6]) + int.Parse(tsBits[7]));
 
 								// get a timestamp and write out the tick
 								writeATick(tickPrice);

@@ -50,26 +50,6 @@ namespace Loaders
 		[TestFixtureSetUp]
 		public void RunStrategy() {
 			try {
-				fullTickStarter = new HistoricalStarter(false);
-				
-				// Set run properties as in the GUI.
-				fullTickStarter.ProjectProperties.Starter.StartTime = new TimeStamp(1800,1,1);
-	    		fullTickStarter.ProjectProperties.Starter.EndTime = new TimeStamp(1990,1,1);
-	    		fullTickStarter.DataFolder = "TestData";
-	    		fullTickStarter.ProjectProperties.Starter.Symbols = "FullTick";
-				fullTickStarter.ProjectProperties.Starter.IntervalDefault = Intervals.Day1;
-				
-				// Run the loader.
-				ExampleOrdersLoader loader = new ExampleOrdersLoader();
-	    		fullTickStarter.Run(loader);
-	
-	    		// Get the stategy
-	    		fullTickData = loader.TopModel as ExampleOrderStrategy;
-	    		
-	    		/// <summary>
-	    		/// Now run the other strategy to compare results.
-	    		/// </summary>
-	    		
 				fourTickStarter = new HistoricalStarter(false);
 				
 				// Set run properties as in the GUI.
@@ -85,6 +65,27 @@ namespace Loaders
 	
 	    		// Get the stategy
 	    		fourTicksPerBar = simulatedLoader.TopModel as ExampleOrderStrategy;
+
+	    		/// <summary>
+	    		/// Now run the other strategy to compare results.
+	    		/// </summary>
+	    		
+	    		fullTickStarter = new HistoricalStarter(false);
+				
+				// Set run properties as in the GUI.
+				fullTickStarter.ProjectProperties.Starter.StartTime = new TimeStamp(1800,1,1);
+	    		fullTickStarter.ProjectProperties.Starter.EndTime = new TimeStamp(1990,1,1);
+	    		fullTickStarter.DataFolder = "TestData";
+	    		fullTickStarter.ProjectProperties.Starter.Symbols = "FullTick";
+				fullTickStarter.ProjectProperties.Starter.IntervalDefault = Intervals.Day1;
+				
+				// Run the loader.
+				ExampleOrdersLoader loader = new ExampleOrdersLoader();
+	    		fullTickStarter.Run(loader);
+	
+	    		// Get the stategy
+	    		fullTickData = loader.TopModel as ExampleOrderStrategy;
+	    		
 			} catch( Exception ex) {
 				Console.Out.WriteLine(ex.GetType() + ": " + ex.Message + Environment.NewLine + ex.StackTrace);
 				throw;
@@ -115,8 +116,8 @@ namespace Loaders
 				TransactionPair fullRT = fullTicksRTs[i];
 				double fourEntryPrice = Math.Round(fourRT.EntryPrice,2).Round();
 				double fullEntryPrice = Math.Round(fullRT.EntryPrice,2).Round();
-				Assert.AreEqual(fourEntryPrice,fullEntryPrice,"Entry Price for Trade #" + i);
-				Assert.AreEqual(fourRT.ExitPrice,fullRT.ExitPrice,"Exit Price for Trade #" + i);
+				Assert.AreEqual(fullEntryPrice,fourEntryPrice,"Entry Price for Trade #" + i);
+				Assert.AreEqual(fullRT.ExitPrice,fourRT.ExitPrice,"Exit Price for Trade #" + i);
 			}
 		}
 		
