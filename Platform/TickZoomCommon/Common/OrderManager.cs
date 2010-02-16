@@ -40,7 +40,7 @@ namespace TickZoom.Common
 	{
 		IList<LogicalOrder> orders;
 		public OrderManager(Strategy strategy) : base(strategy) {
-			orders = strategy.LogicalOrders;
+			orders = new List<LogicalOrder>();
 		}
 		
 		public override void Intercept(EventContext context, EventType eventType, object eventDetail)

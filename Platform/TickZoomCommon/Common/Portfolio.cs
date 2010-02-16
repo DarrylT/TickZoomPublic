@@ -266,18 +266,13 @@ namespace TickZoom.Common
 			get { return performance; }
 		}
 
-		List<LogicalOrder> logicalOrders = new List<LogicalOrder>();
-		public IList<LogicalOrder> LogicalOrders {
-			get {
-				return logicalOrders;
-			}
-		}
 		List<LogicalOrder> activeOrders = new List<LogicalOrder>();
 		public IList<LogicalOrder> ActiveOrders {
 			get {
 				return activeOrders;
 			}
 		}
+		
 		public void OrderModified( LogicalOrder order) {
 			throw new NotImplementedException();
 		}
