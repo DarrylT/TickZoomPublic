@@ -53,15 +53,6 @@ namespace MiscTest
        			throw new ApplicationException( "Must set AppDataFolder property in app.config");
    			}
 	    }
-		[SetUp]
-		public void TestSetup() {
-			TimeStamp.SetCustomUtcOffset(-4);
-		}
-		
-		[TearDown]
-		public void TearDown() {
-			TimeStamp.ResetUtcOffset();
-		}
 		
 		[Test]
 		public void Ticket123()

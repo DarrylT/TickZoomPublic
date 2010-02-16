@@ -60,9 +60,10 @@ namespace TickZoom.Indicators
 		[Test]
 		public void Values()
 		{
+			SymbolInfo symbol = Factory.Symbol.LookupSymbol("USD_JPY");
 			for( int i = 0; i < data.Length; i++) {
 				// open, high, low, close all the same.
-				bars.AddBar( data[i], data[i], data[i], data[i], 0);
+				bars.AddBar( symbol, data[i], data[i], data[i], data[i], 0);
 				for(int j=0; j<tema.Chain.Dependencies.Count; j++) {
 					Model formula = (Model) tema.Chain.Dependencies[j].Model;
 					formula.OnBeforeIntervalOpen();

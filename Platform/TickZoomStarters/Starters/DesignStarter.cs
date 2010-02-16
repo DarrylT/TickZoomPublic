@@ -113,16 +113,16 @@ namespace TickZoom.Common
 		{
 			TickImpl tickImpl = new TickImpl();
 			tickImpl.Initialize();
+			tickImpl.SetSymbol( symbol.BinaryIdentifier);
 			tickImpl.SetTime( new TimeStamp(2000,1,1));
 			tickImpl.SetQuote(100D, 100D);
-			tickImpl.SetSymbol( symbol.BinaryIdentifier);
 			TickBinary tickBinary = tickImpl.Extract();
 			receiver.OnHistorical(symbol);
 			receiver.OnSend(ref tickBinary );
 			tickImpl.Initialize();
+			tickImpl.SetSymbol( symbol.BinaryIdentifier);
 			tickImpl.SetTime( new TimeStamp(2000,1,2));
 			tickImpl.SetQuote(101D, 101D);
-			tickImpl.SetSymbol( symbol.BinaryIdentifier);
 			tickBinary = tickImpl.Extract();
 			receiver.OnSend(ref tickBinary);
 			receiver.OnEndHistorical(symbol);

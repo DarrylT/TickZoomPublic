@@ -40,16 +40,6 @@ namespace TickZoom.Common
 		private static readonly bool trace = log.IsTraceEnabled;
 		PerformanceInner performance;
 		
-    	[SetUp]
-    	public void Init() {
-    		TimeStamp.SetToUtcTimeZone();
-		}
-    	
-    	[TearDown]
-    	public void Dispose() {
-    		TimeStamp.ResetUtcOffset();
-    	}
-    	
 		[Test]
 		public void Constructor()
 		{

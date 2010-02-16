@@ -53,9 +53,9 @@ namespace TickZoom.InteractiveBrokers
 			if( isInitialized) {
 				if( symbol.QuoteType == QuoteType.Level1) {
 					tickIO.Initialize();
+					tickIO.SetSymbol(symbol.BinaryIdentifier);
 					tickIO.SetTime(TimeStamp.UtcNow);
 					tickIO.SetQuote(Bid,Ask,(ushort)BidSize,(ushort)AskSize);
-					tickIO.SetSymbol(symbol.BinaryIdentifier);
 					TickBinary binary = tickIO.Extract();
 					receiver.OnSend(ref binary);
 				}
@@ -72,12 +72,12 @@ namespace TickZoom.InteractiveBrokers
 			if( isInitialized) {
 				if( symbol.TimeAndSales == TimeAndSales.ActualTrades) {
 					tickIO.Initialize();
+					tickIO.SetSymbol(symbol.BinaryIdentifier);
 					tickIO.SetTime(TimeStamp.UtcNow);
 					tickIO.SetTrade(Last,LastSize);
 					if( symbol.QuoteType == QuoteType.Level1) {
 						tickIO.SetQuote(Bid,Ask,(ushort)BidSize,(ushort)AskSize);
 					}
-					tickIO.SetSymbol(symbol.BinaryIdentifier);
 					TickBinary binary = tickIO.Extract();
 					receiver.OnSend(ref binary);
 				}

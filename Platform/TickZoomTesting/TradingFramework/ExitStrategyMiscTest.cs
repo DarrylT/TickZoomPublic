@@ -26,14 +26,6 @@ using NUnit.Framework;
 using TickZoom.Api;
 using TickZoom.Common;
 
-//using mscoree;
-
-
-
-
-
-
-
 #if TESTING
 namespace TickZoom.TradingFramework
 {
@@ -44,17 +36,6 @@ namespace TickZoom.TradingFramework
 		private static readonly bool debug = log.IsDebugEnabled;
 		private static readonly bool trace = log.IsTraceEnabled;
 		ExitStrategyMock exitStrategy;
-		
-	    	[TestFixtureSetUp]
-	    	public virtual void Init() {
-	    		TimeStamp.SetToUtcTimeZone();
-			log.Notice("Setup ExitStrategyTest");
-	    	}
-	    	
-	    	[TestFixtureTearDown]
-	    	public void Dispose() {
-	    		TimeStamp.ResetUtcOffset();
-	    	}
 		
 		[Test]
 		public void Constructor()

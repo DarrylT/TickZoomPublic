@@ -57,7 +57,6 @@ namespace Loaders
 		[TestFixtureSetUp]
 		public virtual void RunStrategy() {
 			try {
-				TimeStamp.SetCustomUtcOffset(-4);
 				Starter starter = CreateStarter();
 				
 				// Set run properties as in the GUI.
@@ -82,12 +81,6 @@ namespace Loaders
 				throw;
 			}
 		}
-
-		[TestFixtureTearDown]
-		public void FixtureTearDown() {
-			TimeStamp.ResetUtcOffset();
-		}
-		
 		#endregion
 		
 		[Test]

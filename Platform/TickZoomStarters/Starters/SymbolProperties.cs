@@ -54,6 +54,8 @@ namespace TickZoom.Common
 		private int chartGroup;
 		private QuoteType quoteType = QuoteType.Level2;
 		private TimeAndSales timeAndSales = TimeAndSales.ActualTrades;
+		private string displayTimeZone;
+		private string timeZone;
 		
 		public TimeAndSales TimeAndSales {
 			get { return timeAndSales; }
@@ -157,5 +159,16 @@ namespace TickZoom.Common
 			get { return quoteType; }
 			set { quoteType = value; }
 		}
+		
+		public string DisplayTimeZone {
+			get { return displayTimeZone; }
+			set { displayTimeZone = value; }
+		}
+
+		public string TimeZone {
+			get { return timeZone; }
+			set { timeZone = value; }
+		}
+		
 	}
 }

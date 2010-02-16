@@ -46,7 +46,6 @@ namespace Loaders
 		[TestFixtureSetUp]
 		public void RunStrategy() {
 			try {
-				TimeStamp.SetCustomUtcOffset(-4);
 				Starter starter = new HistoricalStarter();
 				
 				// Set run properties as in the GUI.
@@ -88,10 +87,6 @@ namespace Loaders
 			Assert.AreEqual( 10000,strategy.Performance.Equity.StartingEquity,"starting equity");
 		}
 
-		[TestFixtureTearDown]
-		public void FixtureTearDown() {
-			TimeStamp.ResetUtcOffset();
-		}
 		#endregion
 		
 		[Test]

@@ -51,7 +51,6 @@ namespace Loaders
 			
 		[TestFixtureSetUp]
 		public void RunStrategy() {
-			TimeStamp.SetCustomUtcOffset(-4);
 			Starter starter = new HistoricalStarter();
 			
 			// Set run properties as in the GUI.
@@ -80,10 +79,6 @@ namespace Loaders
     		exampleSimple = singleSymbolPortfolio.Strategies[1] as ExampleSimpleStrategy;
 		}
 		
-		[TestFixtureTearDown]
-		public void FixtureTearDown() {
-			TimeStamp.ResetUtcOffset();
-		}
 		#endregion
 		
 		[Test] 

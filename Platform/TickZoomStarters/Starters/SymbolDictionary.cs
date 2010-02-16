@@ -272,54 +272,59 @@ namespace TickZoom.Common
 		public static string UniversalDictionary = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <category name=""Universal"">
   <category name=""Stock"">
+    <property name=""DisplayTimeZone"" value=""Local"" />
     <property name=""Level2LotSize"" value=""100"" />
     <property name=""Level2LotSizeMinimum"" value=""1"" />
     <property name=""Level2Increment"" value=""0.01"" />
     <property name=""FullPointValue"" value=""1"" />
     <property name=""MinimumTick"" value=""0.01"" />
-   	<property name=""SessionStart"" value=""08:00:00"" />
-   	<property name=""SessionEnd"" value=""16:30:00"" />
-   	<property name=""TimeAndSales"" value=""ActualTrades"" />
-   	<property name=""QuoteType"" value=""Level1"" />
+    <property name=""SessionStart"" value=""08:00:00"" />
+    <property name=""SessionEnd"" value=""16:30:00"" />
+    <property name=""TimeAndSales"" value=""ActualTrades"" />
+    <property name=""QuoteType"" value=""Level1"" />
     <category name=""Testing"">
       <symbol name=""CSCO"">
-          <property name=""TimeAndSales"" value=""ActualTrades"" />
-          <property name=""QuoteType"" value=""None"" />
+        <property name=""TimeAndSales"" value=""ActualTrades"" />
+        <property name=""QuoteType"" value=""None"" />
       </symbol>
-	  <symbol name=""MSFT"">
-          <property name=""TimeAndSales"" value=""None"" />
-     	  <property name=""QuoteType"" value=""Level2"" />
-	  </symbol>
-	  <symbol name=""IBM"">
-	      <property name=""TimeAndSales"" value=""None"" />
-	      <property name=""QuoteType"" value=""Level1"" />
-	  </symbol>
+      <symbol name=""MSFT"">
+        <property name=""TimeAndSales"" value=""None"" />
+        <property name=""QuoteType"" value=""Level2"" />
+      </symbol>
+      <symbol name=""IBM"">
+        <property name=""TimeAndSales"" value=""None"" />
+        <property name=""QuoteType"" value=""Level1"" />
+      </symbol>
       <symbol name=""Design"" />
       <symbol name=""FullTick"" />
       <symbol name=""Daily4Ticks"" />
       <symbol name=""MockFull"" />
       <symbol name=""Mock4Ticks"" />
       <symbol name=""Mock4Sim"" />
-      <symbol name=""Daily4Sim"" />
+      <symbol name=""Daily4Sim"" >
+	  <property name=""DisplayTimeZone"" value=""Local"" />
+      </symbol>
       <symbol name=""Daily4Test"" />
       <symbol name=""TXF"" />
       <symbol name=""spyTestBars"" />
     </category>
   </category>
   <category name=""Forex"">
+    <property name=""TimeZone"" value=""Eastern Standard Time"" />
+    <property name=""DisplayTimeZone"" value=""Local"" />
     <property name=""Level2LotSize"" value=""10000"" />
     <property name=""Level2LotSizeMinimum"" value=""100"" />
     <property name=""Level2Increment"" value=""10"" />
     <property name=""FullPointValue"" value=""1"" />
     <property name=""MinimumTick"" value=""0.01"" />
     <property name=""TimeAndSales"" value=""Extrapolated"" />
-   	<property name=""QuoteType"" value=""Level1"" />
+    <property name=""QuoteType"" value=""Level1"" />
     <category name=""4 Pip"">
       <symbol name=""USD/CHF"" universal=""USDCHF"">
-			<property name=""QuoteType"" value=""Level2"" />
-			<property name=""TimeAndSales"" value=""Extrapolated"" />
+        <property name=""QuoteType"" value=""Level2"" />
+        <property name=""TimeAndSales"" value=""Extrapolated"" />
       </symbol>
-	  <symbol name=""USD/CAD"" universal=""USDCAD"" />
+      <symbol name=""USD/CAD"" universal=""USDCAD"" />
       <symbol name=""AUD/USD"" universal=""AUDUSD"" />
       <symbol name=""USD/NOK"" universal=""USDNOK"" />
       <symbol name=""EUR/USD"" universal=""EURUSD"" />
@@ -339,15 +344,23 @@ namespace TickZoom.Common
       <symbol name=""USD/JPY"" />
       <category name=""Testing"">
         <symbol name=""USD_JPY"">
-	    	<property name=""SessionStart"" value=""06:00:00"" />
-	    	<property name=""SessionEnd"" value=""15:00:00.000"" />
-		</symbol>
-		<symbol name=""USD_JPY_YEARS"" />
-		<symbol name=""USDJPYBenchMark"" />
+          <property name=""DisplayTimeZone"" value=""UTC"" />
+          <property name=""SessionStart"" value=""06:00:00"" />
+          <property name=""SessionEnd"" value=""15:00:00.000"" />
+        </symbol>
+        <symbol name=""USD_JPY2"" universal=""USD_JPY"">
+          <property name=""DisplayTimeZone"" value=""Exchange"" />
+          <property name=""SessionStart"" value=""06:00:00"" />
+          <property name=""SessionEnd"" value=""15:00:00.000"" />
+        </symbol>
+        <symbol name=""USD_JPY_YEARS"">
+          <property name=""DisplayTimeZone"" value=""UTC"" />
+        </symbol>
+        <symbol name=""USDJPYBenchMark"" />
         <symbol name=""USD_JPY_Volume"" />
         <symbol name=""USD_JPY_TEST"">
-	    	<property name=""SessionEnd"" value=""09:22:13.000"" />
-		</symbol>
+          <property name=""SessionEnd"" value=""09:22:13.000"" />
+        </symbol>
         <symbol name=""TST_TST"" />
         <symbol name=""TST_VR2"" />
         <symbol name=""TST_VR3"" />
@@ -365,12 +378,13 @@ namespace TickZoom.Common
     </category>
   </category>
   <category name=""Futures"">
+    <property name=""DisplayTimeZone"" value=""Local"" />
     <property name=""Level2LotSize"" value=""1"" />
     <property name=""Level2LotSizeMinimum"" value=""1"" />
     <property name=""Level2Increment"" value=""1"" />
     <property name=""FullPointValue"" value=""50"" />
     <property name=""MinimumTick"" value=""0.25"" />
-      <symbol name=""/ESZ9"" />
+    <symbol name=""/ESZ9"" />
     <category name=""Testing"">
       <symbol name=""ESZ9"" />
     </category>
@@ -380,17 +394,20 @@ namespace TickZoom.Common
 
 #region USER_DICTIONARY
 		public static string UserDictionary = @"<?xml version=""1.0"" encoding=""utf-16""?>
-<category name=""MB Trading""> 
-     <category name=""Stock"">
-        <property name=""FullPointValue"" value=""1"" />
-        <property name=""MinimumTick"" value=""0.01"" />
-        <category name=""Testing"">
-            <symbol name=""FullTick""/> 
-            <symbol name=""Daily4Sim""/>
-            <symbol name=""TXF""/>
-      <symbol name=""spyTestBars""/>
-		</category>
-     </category>
+<category name=""MB Trading"">
+  <category name=""Stock"">
+    <property name=""DisplayTimeZone"" value=""Exchange"" />
+    <property name=""FullPointValue"" value=""1"" />
+    <property name=""MinimumTick"" value=""0.01"" />
+    <category name=""Testing"">
+      <property name=""TimeZone"" value=""UTC-4"" />
+      <symbol name=""FullTick"" />
+      <symbol name=""Daily4Sim"" />
+      <symbol name=""Mock4Sim"" />
+      <symbol name=""TXF"" />
+      <symbol name=""spyTestBars"" />
+    </category>
+  </category>
 </category>";
 #endregion
 	}

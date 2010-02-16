@@ -49,16 +49,10 @@ namespace TickZoom.TradingFramework
 		
     	[TestFixtureSetUp]
     	public virtual void Init() {
-    		TimeStamp.SetToUtcTimeZone();
 			log.Notice("Setup ExitStrategyTest");
 			TickProcessing();
     	}
     	
-    	[TestFixtureTearDown]
-    	public void Dispose() {
-    		TimeStamp.ResetUtcOffset();
-    	}
-		
 		public void TickProcessing() {
 			Strategy random = new RandomCommon();
 			exitStrategy = new ExitStrategyMock(random);

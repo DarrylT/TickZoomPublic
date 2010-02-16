@@ -62,6 +62,7 @@ namespace TickZoom.InteractiveBrokers
             client.OrderStatus += client_OrderStatus;
             client.ExecDetails += new EventHandler<ExecDetailsEventArgs>(client_ExecDetails);
             client.UpdatePortfolio += client_UpdatePortfolio;
+            client.ReportException += client_ReportException;
             client.Connect("127.0.0.1", 7496, 0);
             client.RequestAccountUpdates(true,null);
             Thread.Sleep(1000);
@@ -265,7 +266,11 @@ namespace TickZoom.InteractiveBrokers
         	}
 		}
         
-        private void cilent_UpdateAccountSize(object sender, UpdateAccountValueEventArgs e) {
+        private void client_UpdateAccountSize(object sender, UpdateAccountValueEventArgs e) {
+        }
+        
+        private void client_ReportException(object sender, ReportExceptionEventArgs e) {
+        	log.Error(e.Error.Message,e.Error);
         }
         
         private void client_UpdatePortfolio(object sender, UpdatePortfolioEventArgs e) {

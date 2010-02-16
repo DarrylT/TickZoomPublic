@@ -49,17 +49,6 @@ namespace TickZoom.TradingFramework
 		private static readonly bool trace = log.IsTraceEnabled;
 		ExitStrategyMock exitStrategy;
 		
-    	[SetUp]
-    	public virtual void Init() {
-    		TimeStamp.SetToUtcTimeZone();
-			log.Notice("Setup ExitStrategyTest");
-    	}
-    	
-    	[TearDown]
-    	public void Dispose() {
-    		TimeStamp.ResetUtcOffset();
-    	}
-		
 		public void ExitTickProcessing(int stop, int target) {
 			Strategy random = new RandomCommon();
 			exitStrategy = new ExitStrategyMock(random);

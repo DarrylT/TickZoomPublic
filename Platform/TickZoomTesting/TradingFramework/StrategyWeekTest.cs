@@ -69,16 +69,10 @@ namespace TickZoom.TradingFramework
 		Log log = Factory.Log.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
     	[TestFixtureSetUp]
     	public virtual void Init() {
-    		TimeStamp.SetToUtcTimeZone();
 			log.Notice("Setup StrategySupportTest");
 			WeekProcessingSetup();
     	}
     	
-    	[TestFixtureTearDown]
-    	public void Dispose() {
-    		TimeStamp.ResetUtcOffset();
-    	}	
-		
 		[Test]
 		public void TestEmptyMethods()
 		{

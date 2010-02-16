@@ -38,13 +38,7 @@ namespace TickZoom.TradingFramework
 		
     	[SetUp]
     	public virtual void Init() {
-    		TimeStamp.SetToUtcTimeZone();
 			log.Notice("Setup RandomStrategyTest");
-    	}
-    	
-    	[TearDown]
-    	public void Dispose() {
-    		TimeStamp.ResetUtcOffset();
     	}
     	
 		[Test]

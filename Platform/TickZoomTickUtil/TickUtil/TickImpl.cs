@@ -51,6 +51,7 @@ namespace TickZoom.TickUtil
 
 		byte dataVersion;
 		TickBinary binary;
+		SymbolTimeZone timeZone;
 		TimeStamp localTime;
 		TimeStamp nextUtcOffsetUpdate;
 		long utcOffset;
@@ -65,7 +66,14 @@ namespace TickZoom.TickUtil
 		{
 			binary.UtcTime = utcTime;
 			if( utcTime.Internal >= nextUtcOffsetUpdate.Internal) {
-				utcOffset = utcTime.UtcOffset;
+				if( timeZone == null) {
+					if( binary.Symbol == 0) {
+						throw new ApplicationException("Please call SetSymbol() prior to SetTime() method.");
+					}
+					SymbolInfo symbol = Factory.Symbol.LookupSymbol(binary.Symbol);
+					timeZone = new SymbolTimeZone(symbol);
+				}
+				utcOffset = timeZone.UtcOffset(UtcTime);
 				nextUtcOffsetUpdate = utcTime;
 				int dayOfWeek = nextUtcOffsetUpdate.GetDayOfWeek();
 				nextUtcOffsetUpdate.AddDays( 7 - dayOfWeek);
@@ -165,8 +173,8 @@ namespace TickZoom.TickUtil
 			bool simulateTicks = (contentMask & ContentBit.SimulateTicks) != 0;
 			bool quote = (contentMask & ContentBit.Quote) != 0;
 			bool trade = (contentMask & ContentBit.TimeAndSales) != 0;
-			binary.Symbol = lSymbol;
 			Initialize();
+			SetSymbol(tick.lSymbol);
 			SetTime(tick.UtcTime);
 			IsSimulateTicks = simulateTicks;
 			if( quote) {
@@ -642,7 +650,6 @@ namespace TickZoom.TickUtil
 				}
 				reader.Position += (int) (ptr - sptr);
 			}
-			SetTime(binary.UtcTime);
 		}
 
 		/// <summary>
@@ -678,7 +685,6 @@ namespace TickZoom.TickUtil
 				default:
 					throw new ApplicationException("Unknown Tick Version Number " + dataVersion);
 			}
-			SetTime(binary.UtcTime);
 			return position;
 		}
 		

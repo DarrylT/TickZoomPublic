@@ -46,7 +46,7 @@ namespace TickZoom.Test
 		protected Provider provider;
 		protected SymbolInfo symbol;
 		protected VerifyFeed verify;
-		protected bool inProcessFlag = false;
+		protected bool inProcessFlag = true;
 			
 		[TestFixtureSetUp]
 		public virtual void Init()

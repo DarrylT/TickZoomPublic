@@ -114,8 +114,8 @@ namespace TickZoom.MBTrading
         private void CreateTick() {
         	TimeStamp timeStamp = TimeStamp.UtcNow;
 			tick.Initialize();
-			tick.SetTime(timeStamp);
 			tick.SetSymbol(symbol.BinaryIdentifier);
+			tick.SetTime(timeStamp);
         }
         
         private void SendTick() {
@@ -598,13 +598,21 @@ namespace TickZoom.MBTrading
         void MBTQUOTELib.IMbtQuotesNotify.OnTSData(ref TSRECORD pRec)
         {
         	lock( tsDataLocker) {
-       			ProcessTimeAndSales(ref pRec);
+        		try { 
+	       			ProcessTimeAndSales(ref pRec);
+        		} catch( Exception ex) {
+        			log.Notice(ex.ToString());
+        		}
         	}
         }
         void MBTQUOTELib.IMbtQuotesNotify.OnQuoteData(ref QUOTERECORD pQuote)
         {
         	lock( quotesLocker) {
-       			ProcessLevel1(ref pQuote);
+        		try { 
+       				ProcessLevel1(ref pQuote);
+        		} catch( Exception ex) {
+        			log.Notice(ex.ToString());
+        		}
         	}
         }
         void MBTQUOTELib.IMbtQuotesNotify.OnLevel2Data(ref LEVEL2RECORD pRec)

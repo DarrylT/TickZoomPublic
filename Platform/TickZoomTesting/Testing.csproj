@@ -96,6 +96,7 @@
     <Compile Include="TradingFramework\BaseStatsTest.cs" />
     <Compile Include="TradingFramework\ChromosomeTest.cs" />
     <Compile Include="TradingFramework\EquityStatsTest.cs" />
+    <Compile Include="TradingFramework\ExchangeTimeZoneTest.cs" />
     <Compile Include="TradingFramework\ExitStrategyMiscTest.cs" />
     <Compile Include="TradingFramework\ExitStrategyMock.cs" />
     <Compile Include="TradingFramework\ExitStrategyStopTest.cs" />

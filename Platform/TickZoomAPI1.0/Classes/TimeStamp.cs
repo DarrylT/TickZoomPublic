@@ -291,32 +291,6 @@ namespace TickZoom.Api
 			return timeStamp;
 		}
 		
-//		private static Elapsed utcOffset = TimeZone.CurrentTimeZone.GetUtcOffset(DateTime.Now).TotalDays;
-		private static Elapsed utcOffset = new Elapsed(-4,0,0);
-//		public static Elapsed UtcOffset {
-//			get { return utcOffset; }
-//			set { utcOffset = value; }
-//		}
-		
-		private static TimeZoneInfo timeZoneInfo = TimeZoneInfo.Local;
-
-		public long UtcOffset {
-			get { return (long) timeZoneInfo.GetUtcOffset(this.DateTime).TotalSeconds; }
-			set { }
-		}
-		
-		public static void SetCustomUtcOffset(int offset) {
-			timeZoneInfo = TimeZoneInfo.CreateCustomTimeZone("Custom",new TimeSpan(offset,0,0),"Custom","Custom");
-		}
-		
-		public static void ResetUtcOffset() {
-			timeZoneInfo = TimeZoneInfo.Local;
-		}
-		
-		public static void SetToUtcTimeZone() {
-			timeZoneInfo = TimeZoneInfo.Utc;
-		}
-
 		public void GetDate( out int year, out int month, out int day )
 		{
 			int hour, minute, second;

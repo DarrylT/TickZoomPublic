@@ -56,7 +56,7 @@ namespace TickZoom.TradingFramework
 					Tick tick = Strategy.Data.Ticks[0];
 					signalChanges.Add(tick.Time);
 					signalDirection.Add(context.Position.Current);
-					log.Warn( signalChanges.Count + " " + context.Position.Current + " " + tick);
+					if( trace) log.Trace( signalChanges.Count + " " + context.Position.Current + " " + tick);
 					prevSignal = context.Position.Current;
 				}
 			}

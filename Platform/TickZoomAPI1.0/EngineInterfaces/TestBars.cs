@@ -27,6 +27,6 @@ using System.ComponentModel;
 namespace TickZoom.Api
 {
 	public interface TestBars : Bars {
-		void AddBar( double open, double high, double low, double close, int volume);
+		void AddBar( SymbolInfo symbol, double open, double high, double low, double close, int volume);
 	}
 }

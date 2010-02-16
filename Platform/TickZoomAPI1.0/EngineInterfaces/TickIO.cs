@@ -41,12 +41,6 @@ namespace TickZoom.Api
 		void Initialize();
 		
 		/// <summary>
-		/// Sets the time of the tick. 
-		/// </summary>
-		/// <param name="utcTime">Must be the UTC time.</param>
-		void SetTime(TimeStamp utcTime);
-		
-		/// <summary>
 		/// Sets quote data for the tick
 		/// </summary>
 		/// <param name="dBid">The Bid price.</param>

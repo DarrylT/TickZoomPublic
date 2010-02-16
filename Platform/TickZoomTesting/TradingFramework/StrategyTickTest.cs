@@ -31,24 +31,21 @@ using TickZoom.TickUtil;
 #if TESTING
 namespace TickZoom.TradingFramework
 {
+
+	
 	[TestFixture]
 	public class StrategyTickTest //: StrategyTest
 	{
+		protected string symbol = "USD_JPY";
 		StrategySupportMock logic;
 		Log log = Factory.Log.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 		
 	    	[TestFixtureSetUp]
 	    	public virtual void Init() {
-	    		TimeStamp.SetToUtcTimeZone();
 			log.Notice("Setup StrategySupportTest");
 			InitializeTick();
 	    	}
 	    	
-	    	[TestFixtureTearDown]
-	    	public void Dispose() {
-	    		TimeStamp.ResetUtcOffset();
-	    	}	
-		
 		[Test]
 		public void TestEmptyMethods()
 		{
@@ -69,7 +66,7 @@ namespace TickZoom.TradingFramework
 			logic = new StrategySupportMock();
 			Starter starter = new HistoricalStarter();
 			starter.EndCount = 1;
-			starter.ProjectProperties.Starter.Symbols = "USD_JPY";
+			starter.ProjectProperties.Starter.Symbols = symbol;
 			Elapsed start = new Elapsed(6,0,0);
 			Elapsed end = new Elapsed(15,0,0);
 			starter.DataFolder = "TestData";

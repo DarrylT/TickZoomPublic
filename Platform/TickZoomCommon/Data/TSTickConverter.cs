@@ -195,13 +195,19 @@ namespace TickZoom.Common
 		TimeStamp startTime = new TimeStamp(2009,2,23,9,0,0);
 		TimeStamp endTime = new TimeStamp(2009,2,23,10,0,0);
 		TimeStamp utcTime = new TimeStamp();
+		SymbolTimeZone timeZone;
 		private void writeATick(double insertPrice) {
 			tickTime = getTimeStamp(tsBits[0], tsBits[1]);
 			utcTime.Assign(tickTime.Year,tickTime.Month,tickTime.Day,tickTime.Hour,tickTime.Minute,tickTime.Second,tickTime.Millisecond);
-			utcTime.AddDays(utcTime.UtcOffset);
+			if( timeZone == null) {
+				timeZone = new SymbolTimeZone(symbol);
+				timeZone.SetExchangeTimeZone();
+			}
+			utcTime.AddSeconds( - timeZone.UtcOffset(tickTime));
 			double price = insertPrice;
 			
 			tickImpl.Initialize();
+			tickImpl.SetSymbol(symbol.BinaryIdentifier);
 			tickImpl.SetTime(utcTime);
 			tickImpl.SetQuote(price, price);
 

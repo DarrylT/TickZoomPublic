@@ -41,7 +41,6 @@ namespace TickZoom.TradingFramework
 		[TestFixtureSetUp]
 		public void Setup() 
 		{
-			TimeStamp.SetToUtcTimeZone();
 			starter = new HistoricalStarter();
 			random = new RandomCommon();
 			random.Performance.Slippage = 0.0140;
@@ -183,12 +182,6 @@ namespace TickZoom.TradingFramework
 //			109: -1,107420,2005-05-18 07:16:12.837,107470,2005-05-18 07:27:53.753,-74
 		
 		}
-
-    	
-    	[TestFixtureTearDown]
-    	public void Dispose() {
-    		TimeStamp.ResetUtcOffset();
-    	}
     	
 		public virtual void Constructor(TransactionPairs trades)
 		{

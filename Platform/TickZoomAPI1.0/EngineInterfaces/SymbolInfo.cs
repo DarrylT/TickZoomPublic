@@ -155,6 +155,24 @@ namespace TickZoom.Api
  			get;
  		}
  		
+ 		/// <summary>
+ 		/// What time zone to use for displaying of date for this symbol.
+ 		/// Optional values are "Exchange", "UTC", or "Local"
+ 		/// "Exchange" means to use the time zone set by the TimeZone property
+ 		/// and represents the time zone of the exchange where the symbol is traded.
+ 		/// "Local" means to use the time zone set on the current PC.
+ 		/// "UTC" means to use the UTC time zone.
+ 		/// </summary>
+ 		string DisplayTimeZone {
+ 			get;
+ 		}
+ 		
+ 		/// <summary>
+ 		/// The time zone of the exchange where the symbol is traded.
+ 		/// </summary>
+ 		string TimeZone {
+ 			get;
+ 		}
 	}
 	
 	public enum TimeAndSales {
