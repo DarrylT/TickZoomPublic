@@ -274,7 +274,13 @@ namespace TickZoom.Common
 		}
 		
 		public void OrderModified( LogicalOrder order) {
-			throw new NotImplementedException();
+			return;
+		}
+		
+		public bool IsActiveOrdersChanged {
+			get {
+				return false;
+			}
 		}
 	}
 

@@ -44,9 +44,9 @@ namespace TickZoom.Common
 		private readonly bool instanceDebug;
 		private readonly bool instanceTrace;
 		private Result result;
-//		List<LogicalOrder> logicalOrders = new List<LogicalOrder>();
 		List<LogicalOrder> activeOrders = new List<LogicalOrder>();
 		List<LogicalOrder> nextBarOrders = new List<LogicalOrder>();
+		private bool isActiveOrdersChanged = false;
 		
 		OrderManager orderManager;
 		OrderHandlers orderHandlers;
@@ -147,15 +147,21 @@ namespace TickZoom.Common
 		{
 			return performance.WriteReport(Name,folder);
 		}
-
+		
 		public void OrderModified( LogicalOrder order) {
 			if( order.IsActive ) {
+				// Any change to an active order even if only 
+				// a price change means the list change.
+				isActiveOrdersChanged = true;
 				if( !activeOrders.Contains(order)) {
 					activeOrders.Add(order);
 				}
 			} else {
 				if( activeOrders.Contains(order)) {
 					activeOrders.Remove(order);
+					// Since this order became inactive, it
+					// means the active list changed.
+					isActiveOrdersChanged = true;
 				}
 			}
 			if( order.IsNextBar) {
@@ -258,10 +264,6 @@ namespace TickZoom.Common
 			set { position = value; }
 		}
 		
-//	 	public IList<LogicalOrder> LogicalOrders {
-//        	get { return (IList<LogicalOrder>) logicalOrders; }
-//		}
-		
 		public ResultInterface Result {
 			get { return result; }
 		}
@@ -270,6 +272,11 @@ namespace TickZoom.Common
 			get {
 				return activeOrders;
 			}
+		}
+		
+		public bool IsActiveOrdersChanged {
+			get { return isActiveOrdersChanged; }
+			set { isActiveOrdersChanged = value; }
 		}
 	}
 	
