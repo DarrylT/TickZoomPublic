@@ -42,7 +42,7 @@ namespace TickZoom.BlackBox
 			// Here you can set properties on serviceProcessInstaller or register event handlers
 			serviceProcessInstaller.Account = ServiceAccount.LocalService;
 			
-			serviceInstaller.ServiceName = BlackBoxService.MyServiceName;
+			serviceInstaller.ServiceName = TradeService.MyServiceName;
 			this.Installers.AddRange(new Installer[] { serviceProcessInstaller, serviceInstaller });
 		}
 	}

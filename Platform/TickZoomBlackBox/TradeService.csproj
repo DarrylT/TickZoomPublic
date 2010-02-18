@@ -63,7 +63,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="BlackBoxService.cs">
+    <Compile Include="TradeService.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Program.cs" />

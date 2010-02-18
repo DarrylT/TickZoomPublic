@@ -132,7 +132,7 @@ namespace TickZoom.Common
 		{
 		}
 
-	    public void PositionChange(Receiver receiver, SymbolInfo symbol, double signal)
+	    public void PositionChange(Receiver receiver, SymbolInfo symbol, double signal, IList<LogicalOrder> orders)
 	    {
 	        throw new NotImplementedException();
 	    }

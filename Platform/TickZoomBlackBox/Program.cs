@@ -36,7 +36,7 @@ namespace TickZoom.BlackBox
 		static void Main()
 		{
 			// To run more than one service you have to add them here
-			ServiceBase.Run(new ServiceBase[] { new BlackBoxService() });
+			ServiceBase.Run(new ServiceBase[] { new TradeService() });
 		}
 	}
 }

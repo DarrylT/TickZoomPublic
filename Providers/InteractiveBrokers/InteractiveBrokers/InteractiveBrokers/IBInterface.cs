@@ -151,7 +151,7 @@ namespace TickZoom.InteractiveBrokers
 			receiver.OnEndRealTime(symbol);
 		}
 		
-		public void PositionChange(Receiver receiver, SymbolInfo symbol, double signal)
+		public void PositionChange(Receiver receiver, SymbolInfo symbol, double signal, IList<LogicalOrder> orders)
 		{
 			try {
 				SymbolHandler handler = symbolHandlers[(int)symbol.BinaryIdentifier];

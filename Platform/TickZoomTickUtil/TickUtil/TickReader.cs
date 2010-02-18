@@ -22,6 +22,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using TickZoom.Api;
 
 //using TickZoom.Api;
@@ -96,7 +97,7 @@ namespace TickZoom.TickUtil
 			
 		}
 		
-		public void PositionChange(Receiver receiver, SymbolInfo symbol, double position)
+		public void PositionChange(Receiver receiver, SymbolInfo symbol, double position, IList<LogicalOrder> orders)
 		{
 			throw new NotImplementedException();
 		}

@@ -606,7 +606,7 @@ namespace TickZoom.MBTrading
 			receiver.OnEndRealTime(symbol);
 		}
 		
-		public void PositionChange(Receiver receiver, SymbolInfo symbol, double signal)
+		public void PositionChange(Receiver receiver, SymbolInfo symbol, double signal, IList<LogicalOrder> orders)
 		{
 			instrumentReaders.Signal(symbol.Symbol,signal);
 		}

@@ -82,19 +82,19 @@ namespace TickZoom.Test
 		public void TestSingleOrder() {
 			if(debug) log.Debug("===DemoConnectionTest===");
   			provider.StartSymbol(verify,symbol,TimeStamp.MinValue);
-  			provider.PositionChange(verify,symbol,150);
+  			provider.PositionChange(verify,symbol,150,null);
   			long count = verify.Verify(2,AssertTick,symbol,25);
   			Assert.GreaterOrEqual(count,2,"tick count");
   			Thread.Sleep(500);
-  			provider.PositionChange(verify,symbol,0);
+  			provider.PositionChange(verify,symbol,0,null);
   			count = verify.Verify(2,AssertTick,symbol,25);
   			Assert.GreaterOrEqual(count,2,"tick count");
   			Thread.Sleep(500);
-  			provider.PositionChange(verify,symbol,100);
+  			provider.PositionChange(verify,symbol,100,null);
   			count = verify.Verify(2,AssertTick,symbol,25);
   			Assert.GreaterOrEqual(count,2,"tick count");
   			Thread.Sleep(500);
-  			provider.PositionChange(verify,symbol,0);
+  			provider.PositionChange(verify,symbol,0,null);
   			count = verify.Verify(2,AssertTick,symbol,25);
   			Assert.GreaterOrEqual(count,2,"tick count");
 		}

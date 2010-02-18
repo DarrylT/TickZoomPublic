@@ -22,6 +22,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 
 namespace TickZoom.Api
 {
@@ -34,7 +35,7 @@ namespace TickZoom.Api
         void Stop(Receiver receiver);
         void StartSymbol(Receiver receiver, SymbolInfo symbol, TimeStamp startTime);
 	    void StopSymbol(Receiver receiver, SymbolInfo symbol);
-	    void PositionChange(Receiver receiver, SymbolInfo symbol, double position);
+	    void PositionChange(Receiver receiver, SymbolInfo symbol, double position, IList<LogicalOrder> orders);
 	    void Stop();
 	}
 }
