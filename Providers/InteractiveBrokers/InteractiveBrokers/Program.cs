@@ -22,9 +22,7 @@
 #endregion
 
 using System;
-using System.Diagnostics;
 using System.ServiceProcess;
-
 using TickZoom.Api;
 using TickZoom.InteractiveBrokers;
 
@@ -54,7 +52,7 @@ namespace TickZoom.Common
 				}
 			} catch( Exception ex) {
 				string exception = ex.GetType() + ": " + ex.Message + Environment.NewLine + ex.StackTrace;
-				Debug.WriteLine( exception);
+				System.Diagnostics.Debug.WriteLine( exception);
 				Console.WriteLine( exception);
 				Environment.Exit(1);
 			}

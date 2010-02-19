@@ -61,10 +61,11 @@ namespace TickZoom.Common
 		
 		public void Change( double position) {
 			double price;
+			Tick tick = model.Data.Ticks[0];
 			if( position > current) {
-				price = model.Data.Ticks[0].Ask;
+				price = tick.IsQuote ? tick.Ask : tick.Price;
 			} else if( position < current) {
-				price = model.Data.Ticks[0].Bid;
+				price = tick.IsQuote ? tick.Bid : tick.Price;
 			} else {
 				throw new ApplicationException("Position.Change called with the same position. You must pass a different position value than Position.Current in order to call Change().");
 			}

@@ -22,10 +22,18 @@
 #endregion
 
 using System;
+using System.Diagnostics;
 
 namespace TickZoom.Api
 {
-
+	public class Debug {
+		[Conditional("DEBUG")]
+		public static void Assert( Log log, bool condition) {
+			if( !condition) {
+				throw new Exception("assertion failed");
+			}
+		}
+	}
 
 	public interface Log 
     {

@@ -9,7 +9,7 @@
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <SourceAnalysisOverrideSettingsFile>C:\Documents and Settings\Wayne Walter\Application Data\ICSharpCode/SharpDevelop3.0\Settings.SourceAnalysis</SourceAnalysisOverrideSettingsFile>
-    <StartArguments>migrate USD/JPY C:\TickZoom\DataCache\USDJPYBenchMark_Tick.tck</StartArguments>
+    <StartArguments>filter /ESH0 C:\TickZoom\DataCache\ESH0_Tick.tck C:\TickZoom\DataCache\ESH0_Tick2.tck 1800/1/1 "2010-02-16 17:00:00"</StartArguments>
     <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
     <NoStdLib>False</NoStdLib>
     <WarningLevel>4</WarningLevel>

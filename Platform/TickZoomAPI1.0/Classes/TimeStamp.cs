@@ -206,6 +206,9 @@ namespace TickZoom.Api
 				}
 			}
 			strings = date.Split(new char[] {'-'});
+			if( strings.Length == 1) {
+				strings = date.Split(new char[] {'/'});
+			}
 			int year = Convert.ToInt32(strings[0]);
 			int month = Convert.ToInt32(strings[1]);
 			int day = Convert.ToInt32(strings[2]);

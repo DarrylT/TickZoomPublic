@@ -58,10 +58,11 @@ namespace TickZoom.Common
 		
 		public double GetCurrentPrice( double direction) {
 			System.Diagnostics.Debug.Assert(direction!=0);
+			Tick tick = model.Ticks[0];
 			if( direction > 0) {
-				return model.Ticks[0].Bid;
+				return tick.IsQuote ? tick.Bid : tick.Price;
 			} else {
-				return model.Ticks[0].Ask;
+				return tick.IsQuote ? tick.Ask : tick.Price;
 			}
 		}
 		

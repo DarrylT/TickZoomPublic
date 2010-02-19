@@ -24,11 +24,9 @@
 using System;
 using System.Collections.Generic;
 using System.Configuration;
-using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Windows.Forms;
-
 using TickZoom.Api;
 
 namespace TickZoom
@@ -49,7 +47,7 @@ namespace TickZoom
 	            Application.Run(new Form1());
         	} catch( Exception ex) {
         		Console.WriteLine(ex.GetType() + ": " + ex.Message + Environment.NewLine + ex.StackTrace);
-        		Debug.WriteLine(ex.GetType() + ": " + ex.Message + Environment.NewLine + ex.StackTrace);
+        		System.Diagnostics.Debug.WriteLine(ex.GetType() + ": " + ex.Message + Environment.NewLine + ex.StackTrace);
         	}
         }
         
@@ -61,11 +59,11 @@ namespace TickZoom
 			}
 			public override void Write(char value)
 			{
-				Debug.Write(value);
+				System.Diagnostics.Debug.Write(value);
 			}
 			public override void WriteLine(string value)
 			{
-				Debug.WriteLine(value);
+				System.Diagnostics.Debug.WriteLine(value);
 			}
         }
     }

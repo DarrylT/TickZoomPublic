@@ -301,8 +301,8 @@ namespace TickZoom.Common
       <symbol name=""MockFull"" />
       <symbol name=""Mock4Ticks"" />
       <symbol name=""Mock4Sim"" />
-      <symbol name=""Daily4Sim"" >
-	  <property name=""DisplayTimeZone"" value=""Local"" />
+      <symbol name=""Daily4Sim"">
+        <property name=""DisplayTimeZone"" value=""Local"" />
       </symbol>
       <symbol name=""Daily4Test"" />
       <symbol name=""TXF"" />
@@ -384,9 +384,12 @@ namespace TickZoom.Common
     <property name=""Level2Increment"" value=""1"" />
     <property name=""FullPointValue"" value=""50"" />
     <property name=""MinimumTick"" value=""0.25"" />
-    <symbol name=""/ESZ9"" />
     <category name=""Testing"">
-      <symbol name=""ESZ9"" />
+      <symbol name=""/ESZ9"" />
+	  <symbol name=""/ESH0"">
+	        <property name=""TimeAndSales"" value=""ActualTrades"" />
+	        <property name=""QuoteType"" value=""None"" />
+	  </symbol>
     </category>
   </category>
 </category>";

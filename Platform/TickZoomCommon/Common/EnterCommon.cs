@@ -117,7 +117,7 @@ namespace TickZoom.Common
 				LogEntry("Long Market Entry at " + tick);
 				Strategy.Position.Change(order.Positions);
 				if( Strategy.Performance.GraphTrades) {
-	                Strategy.Chart.DrawTrade(order,tick.Ask,Strategy.Position.Current);
+	                Strategy.Chart.DrawTrade(order,tick.IsQuote ? tick.Ask : tick.Price,Strategy.Position.Current);
 				}
 				CancelOrders();
 			} 
@@ -129,7 +129,7 @@ namespace TickZoom.Common
 				LogEntry("Short Market Entry at " + tick);
 				Strategy.Position.Change(- order.Positions);
 				if( Strategy.Performance.GraphTrades) {
-	                Strategy.Chart.DrawTrade(order,tick.Bid,Strategy.Position.Current);
+					Strategy.Chart.DrawTrade(order,tick.IsQuote ? tick.Bid : tick.Price,Strategy.Position.Current);
 				}
 				CancelOrders();
 			} 
@@ -196,7 +196,7 @@ namespace TickZoom.Common
 				LogEntry("Long Stop Entry at " + tick);
 				Strategy.Position.Change(order.Positions);
 				if( Strategy.Performance.GraphTrades) {
-	                Strategy.Chart.DrawTrade(order,tick.Ask,Strategy.Position.Current);
+	                Strategy.Chart.DrawTrade(order,tick.IsQuote ? tick.Ask : tick.Price,Strategy.Position.Current);
 				}
 				CancelOrders();
 			} 
@@ -210,7 +210,7 @@ namespace TickZoom.Common
 				LogEntry("Short Stop Entry at " + tick);
 				Strategy.Position.Change(order.Positions);
 				if( Strategy.Performance.GraphTrades) {
-	                Strategy.Chart.DrawTrade(order,tick.Ask,Strategy.Position.Current);
+	                Strategy.Chart.DrawTrade(order,tick.IsQuote ? tick.Bid : tick.Price,Strategy.Position.Current);
 				}
 				CancelOrders();
 			}

@@ -50,9 +50,9 @@ namespace tzdata
 			string to = args[2];
 			TimeStamp startTime;
 			TimeStamp endTime;
-			if( args.Length > 2) {
-				startTime = new TimeStamp(args[2]);
-				endTime = new TimeStamp(args[3]);
+			if( args.Length > 3) {
+				startTime = new TimeStamp(args[3]);
+				endTime = new TimeStamp(args[4]);
 			} else {
 				startTime = TimeStamp.MinValue;
 				endTime = TimeStamp.MaxValue;

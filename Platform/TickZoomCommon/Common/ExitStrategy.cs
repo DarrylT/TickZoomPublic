@@ -120,10 +120,10 @@ namespace TickZoom.Common
 				// copy signal in case of increased position size
 				double exitPrice;
 				if( strategySignal > 0) {
-					exitPrice = tick.Bid;
+					exitPrice = tick.IsQuote ? tick.Bid : tick.Price;
 					pnl = (exitPrice - entryPrice).Round();
 				} else {
-					exitPrice = tick.Ask;
+					exitPrice = tick.IsQuote ? tick.Ask : tick.Price;
 					pnl = (entryPrice - exitPrice).Round();
 				}
 				maxPnl = pnl > maxPnl ? pnl : maxPnl;

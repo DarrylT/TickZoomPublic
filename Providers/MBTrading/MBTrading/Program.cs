@@ -23,7 +23,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.ServiceProcess;
 using System.Text;
 using System.Threading;
@@ -57,7 +56,7 @@ namespace MBTProvider
 				}
 			} catch( Exception ex) {
 				string exception = ex.GetType() + ": " + ex.Message + Environment.NewLine + ex.StackTrace;
-				Debug.WriteLine( exception);
+				System.Diagnostics.Debug.WriteLine( exception);
 				Console.WriteLine( exception);
 				Environment.Exit(1);
 			}

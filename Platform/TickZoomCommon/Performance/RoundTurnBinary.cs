@@ -230,9 +230,9 @@ namespace TickZoom.Common
 		public void TryUpdate(Tick tick) {
 			if( !completed) {
 				if( direction > 0) {
-					UpdatePrice(tick.Bid);
+					UpdatePrice(tick.IsQuote ? tick.Bid : tick.Price);
 				} else {
-					UpdatePrice(tick.Ask);
+					UpdatePrice(tick.IsQuote ? tick.Ask : tick.Price);
 				}
 				exitTime = tick.Time;
 			}

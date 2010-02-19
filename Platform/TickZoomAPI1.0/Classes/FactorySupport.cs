@@ -59,8 +59,7 @@ namespace TickZoom.Api
 			string currentDirectoryPath = "";
 	        // This loads plugins from the installation folder
 	        // so all the common models and modelloaders get loaded.
-	        string commandLine = System.Environment.CommandLine;
-	        string[] commandLineParts = commandLine.Split('\"');
+	        string[] commandLineParts = Environment.GetCommandLineArgs();
 	        if( commandLineParts.Length > 1) {
 		        string exeName = commandLineParts[1].Trim();
 	            int length = exeName.Length;
