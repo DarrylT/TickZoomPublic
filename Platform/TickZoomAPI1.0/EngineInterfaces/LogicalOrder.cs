@@ -34,7 +34,7 @@ namespace TickZoom.Api
 	/// <summary>
 	/// Description of OrderCommon.
 	/// </summary>
-	public interface LogicalOrder
+	public interface LogicalOrder :  Serializable
 	{
 		OrderType Type {
 			get;

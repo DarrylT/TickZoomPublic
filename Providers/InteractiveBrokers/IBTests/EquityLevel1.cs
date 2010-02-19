@@ -33,8 +33,6 @@ using TickZoom.TickUtil;
 
 namespace TickZoom.Test
 {
-
-	
 	[TestFixture]
 	public class EquityLevel1 : TimeAndSales
 	{

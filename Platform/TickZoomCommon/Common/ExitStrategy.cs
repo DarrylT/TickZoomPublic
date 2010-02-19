@@ -81,12 +81,12 @@ namespace TickZoom.Common
 				
 		public void OnInitialize()
 		{
-			marketOrder = Strategy.Data.CreateOrder(Strategy);
+			marketOrder = Factory.Engine.LogicalOrder(Strategy.Data.SymbolInfo,Strategy);
 			marketOrder.TradeDirection = TradeDirection.Exit;
 			Strategy.OrderManager.Add(marketOrder);
-			breakEvenStopOrder = Strategy.Data.CreateOrder(Strategy);
+			breakEvenStopOrder = Factory.Engine.LogicalOrder(Strategy.Data.SymbolInfo,Strategy);
 			breakEvenStopOrder.TradeDirection = TradeDirection.Exit;
-			stopLossOrder = Strategy.Data.CreateOrder(Strategy);
+			stopLossOrder = Factory.Engine.LogicalOrder(Strategy.Data.SymbolInfo,Strategy);
 			Strategy.OrderManager.Add(stopLossOrder);
 			stopLossOrder.TradeDirection = TradeDirection.Exit;
 			stopLossOrder.Tag = "ExitStrategy" ;

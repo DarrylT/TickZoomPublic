@@ -28,6 +28,63 @@ using TickZoom.Api;
 
 namespace TickZoom.TickUtil
 {
+	public class HandlePool<T> where T : new()
+	{
+		private Dictionary<int,HandleItemPair> handles = new Dictionary<int,HandleItemPair>();
+		private class HandleItemPair {
+			public int Handle;
+			public T Item;
+			private static int nextHandle = 0;
+			private object locker = new object();
+			public HandleItemPair() {
+				lock(locker) {
+					Handle = ++ nextHandle;
+				}
+				Item = new T();
+			}
+		}
+	    private Stack<HandleItemPair> _items = new Stack<HandleItemPair>();
+	    private object _sync = new object(); 
+	    
+	    public T Get(int handle) {
+	    	return handles[handle].Item;
+	    }
+	
+	    public int CreateHandle()
+	    {
+	        lock (_sync)
+	        {
+	            if (_items.Count == 0)
+	            {
+	                HandleItemPair pair = new HandleItemPair();
+	                handles.Add(pair.Handle,pair);
+	                return pair.Handle;
+	            }
+	            else
+	            {
+	                HandleItemPair pair = _items.Pop();
+	                handles.Add(pair.Handle,pair);
+	                return pair.Handle;
+	            }
+	        }
+	    }
+	
+	    public void FreeHandle(int handle)
+	    {
+	        lock (_sync)
+	        {
+	        	HandleItemPair pair = handles[handle];
+	        	handles.Remove(handle);
+            	_items.Push(pair);
+	        }
+	    }
+	    
+	    public void Clear() {
+	    	lock( _sync) {
+	    		_items.Clear();
+	    	}
+	    }
+	}
 	public class Pool<T> where T : new()
 	{
 	    private Stack<T> _items = new Stack<T>();
@@ -37,7 +94,6 @@ namespace TickZoom.TickUtil
 	    {
 	        lock (_sync)
 	        {
-	
 	            if (_items.Count == 0)
 	            {
 	                return new T();
@@ -53,9 +109,7 @@ namespace TickZoom.TickUtil
 	    {
 	        lock (_sync)
 	        {
-//	        	if( !_items.Contains(item)) {
             	_items.Push(item);
-//	        	}
 	        }
 	    }
 	    
@@ -66,5 +120,3 @@ namespace TickZoom.TickUtil
 	    }
 	}
 }
-
-

@@ -68,5 +68,7 @@ namespace TickZoom.Api
 		Parallel Parallel();
 		
 		TestBars TestBars(Interval interval);
+		
+		LogicalOrder LogicalOrder(SymbolInfo symbol, StrategyInterface strategy);
 	}
 }

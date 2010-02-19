@@ -56,21 +56,21 @@ namespace TickZoom.Common
 		{
 			if( IsTrace) Log.Trace(Strategy.FullName+".Initialize()");
 			Strategy.Drawing.Color = Color.Black;
-			orders.buyMarket = Strategy.Data.CreateOrder(Strategy);
+			orders.buyMarket = Factory.Engine.LogicalOrder(Strategy.Data.SymbolInfo,Strategy);
 			orders.buyMarket.Type = OrderType.BuyMarket;
-			orders.sellMarket = Strategy.Data.CreateOrder(Strategy);
+			orders.sellMarket = Factory.Engine.LogicalOrder(Strategy.Data.SymbolInfo,Strategy);
 			orders.sellMarket.Type = OrderType.SellMarket;
-			orders.buyStop = Strategy.Data.CreateOrder(Strategy);
+			orders.buyStop = Factory.Engine.LogicalOrder(Strategy.Data.SymbolInfo,Strategy);
 			orders.buyStop.Type = OrderType.BuyStop;
 			orders.buyStop.TradeDirection = TradeDirection.Exit;
-			orders.sellStop = Strategy.Data.CreateOrder(Strategy);
+			orders.sellStop = Factory.Engine.LogicalOrder(Strategy.Data.SymbolInfo,Strategy);
 			orders.sellStop.Type = OrderType.SellStop;
 			orders.sellStop.TradeDirection = TradeDirection.Exit;
 			orders.sellStop.Tag = "ExitCommon";
-			orders.buyLimit = Strategy.Data.CreateOrder(Strategy);
+			orders.buyLimit = Factory.Engine.LogicalOrder(Strategy.Data.SymbolInfo,Strategy);
 			orders.buyLimit.Type = OrderType.BuyLimit;
 			orders.buyLimit.TradeDirection = TradeDirection.Exit;
-			orders.sellLimit = Strategy.Data.CreateOrder(Strategy);
+			orders.sellLimit = Factory.Engine.LogicalOrder(Strategy.Data.SymbolInfo,Strategy);
 			orders.sellLimit.Type = OrderType.SellLimit;
 			orders.sellLimit.TradeDirection = TradeDirection.Exit;
 			Strategy.OrderManager.Add( orders.buyMarket);

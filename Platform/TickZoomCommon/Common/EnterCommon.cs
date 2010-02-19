@@ -56,17 +56,17 @@ namespace TickZoom.Common
 		{
 			if( IsDebug) Log.Debug("OnInitialize()");
 			Strategy.Drawing.Color = Color.Black;
-			orders.buyMarket = Strategy.Data.CreateOrder(Strategy);
+			orders.buyMarket = Factory.Engine.LogicalOrder(Strategy.Data.SymbolInfo,Strategy);
 			orders.buyMarket.Type = OrderType.BuyMarket;
-			orders.sellMarket = Strategy.Data.CreateOrder(Strategy);
+			orders.sellMarket = Factory.Engine.LogicalOrder(Strategy.Data.SymbolInfo,Strategy);
 			orders.sellMarket.Type = OrderType.SellMarket;
-			orders.buyStop = Strategy.Data.CreateOrder(Strategy);
+			orders.buyStop = Factory.Engine.LogicalOrder(Strategy.Data.SymbolInfo,Strategy);
 			orders.buyStop.Type = OrderType.BuyStop;
-			orders.sellStop = Strategy.Data.CreateOrder(Strategy);
+			orders.sellStop = Factory.Engine.LogicalOrder(Strategy.Data.SymbolInfo,Strategy);
 			orders.sellStop.Type = OrderType.SellStop;
-			orders.buyLimit = Strategy.Data.CreateOrder(Strategy);
+			orders.buyLimit = Factory.Engine.LogicalOrder(Strategy.Data.SymbolInfo,Strategy);
 			orders.buyLimit.Type = OrderType.BuyLimit;
-			orders.sellLimit = Strategy.Data.CreateOrder(Strategy);
+			orders.sellLimit = Factory.Engine.LogicalOrder(Strategy.Data.SymbolInfo,Strategy);
 			orders.sellLimit.Type = OrderType.SellLimit;
 			Strategy.OrderManager.Add( orders.buyMarket);
 			Strategy.OrderManager.Add( orders.sellMarket);

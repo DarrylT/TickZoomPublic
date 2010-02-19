@@ -296,6 +296,10 @@ namespace TickZoom.TickUtil
 				}
 			}
 		}
+		
+		public int Capacity {
+			get { return maxSize; }
+		}
 	}
 }
 

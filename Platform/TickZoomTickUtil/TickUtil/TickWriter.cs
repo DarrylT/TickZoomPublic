@@ -243,10 +243,8 @@ namespace TickZoom.TickUtil
 				writeQueue.EnQueue(EntryType.Terminate, symbol);
 				appendThread.Join();
 				writeQueue = null;
-			} else {
-				throw new ApplicationException("AppendThread was null");
 			}
-			if( keepFileOpen) {
+			if( keepFileOpen && fs!=null ) {
 	    		fs.Close();
 	    		log.Debug("keepFileOpen - Close()");
 	    		fs = null;

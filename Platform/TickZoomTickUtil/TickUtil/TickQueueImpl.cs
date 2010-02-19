@@ -23,8 +23,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
+
 using TickZoom.Api;
 
 namespace TickZoom.TickUtil
@@ -55,6 +57,8 @@ namespace TickZoom.TickUtil
 	    public int Receiver;
         public ulong Symbol;
 	    public double Position;
+	    public int OrdersCount;
+	    public int OrdersMemoryId;
     }
     
 	public enum ProviderEventType {

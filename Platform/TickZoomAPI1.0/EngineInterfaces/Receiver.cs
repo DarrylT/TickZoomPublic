@@ -41,7 +41,12 @@ namespace TickZoom.Api
 	    }
 	}
 	
-	public interface ReadWritable<T> {
+	public interface Serializable {
+		void FromReader(MemoryStream reader);
+		void ToWriter(MemoryStream memory);
+	}
+	
+	public interface ReadWritable<T> : Serializable {
 		void Inject(T tick);
 		void SetSymbol(ulong lSymbol);
 		/// <summary>
@@ -51,8 +56,6 @@ namespace TickZoom.Api
 		void SetTime(TimeStamp utcTime);
 		T Extract();
 		int FromReader(byte version, BinaryReader reader);
-		void FromReader(MemoryStream reader);
-		void ToWriter(MemoryStream memory);
 		object ToPosition();
 		byte DataVersion {
 			get;
