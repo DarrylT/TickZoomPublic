@@ -28,16 +28,14 @@ using System.Reflection;
 using System.Threading;
 
 using NUnit.Framework;
-using System.Collections.Generic;
 using TickZoom.Api;
-using TickZoom.InteractiveBrokers;
+using TickZoom.MBTrading;
 
 namespace TickZoom.Test
 {
 	[TestFixture]
 	public class TestOrders
 	{
-		private List<LogicalOrder> orders = new List<LogicalOrder>();
 		private static readonly Log log = Factory.Log.GetLogger(typeof(TestOrders));
 		private static readonly bool debug = log.IsDebugEnabled;		
 		private Provider provider;
@@ -61,7 +59,7 @@ namespace TickZoom.Test
 		
 		public void CreateProvider() {
 			if( localFlag) {
-				provider = new IBInterface();
+				provider = new MbtInterface();
 			} else {
 				provider = Factory.Provider.ProviderProcess("127.0.0.1",6492,"IBProviderService.exe");
 			}
@@ -71,7 +69,6 @@ namespace TickZoom.Test
 		
 		[SetUp]
 		public void Setup() {
-			orders.Clear();
 			CreateProvider();
 		}
 		
@@ -82,13 +79,15 @@ namespace TickZoom.Test
 		}
 		
 		[Test]
-		public void TestMarkOrder() {
+		public void TestPositionChange() {
 			if(debug) log.Debug("===DemoConnectionTest===");
   			provider.StartSymbol(verify,symbol,TimeStamp.MinValue);
-  			provider.PositionChange(verify,symbol,150,null);
   			long count = verify.Verify(2,AssertTick,symbol,25);
   			Assert.GreaterOrEqual(count,2,"tick count");
   			Thread.Sleep(500);
+  			provider.PositionChange(verify,symbol,150,null);
+  			count = verify.Verify(2,AssertTick,symbol,25);
+  			Assert.GreaterOrEqual(count,2,"tick count");
   			provider.PositionChange(verify,symbol,0,null);
   			count = verify.Verify(2,AssertTick,symbol,25);
   			Assert.GreaterOrEqual(count,2,"tick count");
@@ -101,23 +100,6 @@ namespace TickZoom.Test
   			count = verify.Verify(2,AssertTick,symbol,25);
   			Assert.GreaterOrEqual(count,2,"tick count");
 		}
-		
-		[Test]
-		public void TestLogicalOrders() {
-  			provider.StartSymbol(verify,symbol,TimeStamp.MinValue);
-  			provider.PositionChange(verify,symbol,0,orders);
-			CreateLogicalEntry(OrderType.BuyLimit,15.12,1000);
-			CreateLogicalEntry(OrderType.SellLimit,34.12,1000);
-			CreateLogicalExit(OrderType.SellLimit,40.12);
-			CreateLogicalExit(OrderType.SellStop,5.12);
-			CreateLogicalExit(OrderType.BuyLimit,10.12);
-			CreateLogicalExit(OrderType.BuyStop,45.12);
-  			provider.PositionChange(verify,symbol,0,orders);
-  			long count = verify.Verify(2,AssertTick,symbol,25);
-  			Assert.GreaterOrEqual(count,2,"tick count");
-  			Thread.Sleep(2000);
-		}
-			
 		
 		public virtual void AssertTick( TickIO tick, TickIO lastTick, ulong symbol) {
         	Assert.IsFalse(tick.IsQuote);
@@ -134,27 +116,6 @@ namespace TickZoom.Test
         	}
     		Assert.IsTrue(tick.Time>=lastTick.Time,"tick.Time > lastTick.Time");
     		Assert.AreEqual(symbol,tick.lSymbol);
-		}
-			
-		public LogicalOrder CreateLogicalEntry(OrderType type, double price, int size) {
-			LogicalOrder logical = Factory.Engine.LogicalOrder(symbol,null);
-			logical.IsActive = true;
-			logical.TradeDirection = TradeDirection.Entry;
-			logical.Type = type;
-			logical.Price = price;
-			logical.Positions = size;
-			orders.Add(logical);
-			return logical;
-		}
-		
-		public LogicalOrder CreateLogicalExit(OrderType type, double price) {
-			LogicalOrder logical = Factory.Engine.LogicalOrder(symbol,null);
-			logical.IsActive = true;
-			logical.TradeDirection = TradeDirection.Exit;
-			logical.Type = type;
-			logical.Price = price;
-			orders.Add(logical);
-			return logical;
 		}
 	}
 }

@@ -461,7 +461,7 @@ namespace TickZoom.MBTrading
 	    		if( m_position != null) {
 		    		orderLog.Notice( "Starting position = " + Display(m_position));
 	    		}
-		    	MbtOpenOrders orders = m_OrderClient.OpenOrders;
+	    		MbtOpenOrders orders = m_OrderClient.OpenOrders;
 		    	orders.LockItems();
 		    	for( int i=0; i< orders.Count; i++) {
 		    		orderLog.Notice("Order " + i + ": " + Display(orders[i]));

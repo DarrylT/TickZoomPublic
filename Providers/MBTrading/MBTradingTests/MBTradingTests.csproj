@@ -57,6 +57,7 @@
     <Compile Include="ForexLevel1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SeperateProcess.cs" />
+    <Compile Include="TestOrders.cs" />
     <Compile Include="VerifyFeed.cs" />
     <None Include="app.config" />
     <None Include="Lib\nunit.framework.dll" />

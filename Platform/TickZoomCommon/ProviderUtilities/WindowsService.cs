@@ -27,14 +27,15 @@ using TickZoom.Api;
 
 namespace TickZoom.Common
 {
-	public class WindowsService : ServiceBase
+
+	public class WindowsService : ServiceBase, ProviderService
 	{
 		Log log;
 		ServiceConnection connection;
 		
 		public WindowsService()
 		{
-			this.ServiceName = Program.ServiceName;
+			this.ServiceName = AssemblyAttributes.GetTitle();
 			try { 
 				log = Factory.Log.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 			} catch( Exception problem) {
@@ -42,12 +43,8 @@ namespace TickZoom.Common
 			}
 		}
 		
-		/// <summary>
-		/// Clean up any resources being used.
-		/// </summary>
-		protected override void Dispose(bool disposing)
-		{
-			base.Dispose(disposing);
+		public void Run(string[] args) {
+			ServiceBase.Run(new ServiceBase[] { this });
 		}
 		
 		/// <summary>

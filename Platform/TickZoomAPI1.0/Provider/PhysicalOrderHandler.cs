@@ -1,4 +1,4 @@
-#region Copyright
+﻿#region Copyright
 /*
  * Copyright 2008 M. Wayne Walter
  * Software: TickZoom Trading Platform
@@ -22,33 +22,13 @@
 #endregion
 
 using System;
-using TickZoom.Api;
+using System.Collections.Generic;
 
-namespace TickZoom.Common
+namespace TickZoom.Api
 {
-	public class CommandLine
-	{
-		ServiceConnection connection;
-		
-		public CommandLine()
-		{
-		}
-		
-		/// <summary>
-		/// Run this service.
-		/// </summary>
-		public void OnRun(string[] args)
-		{
-        	if( args.Length != 1) {
-        		throw new ApplicationException("Command line must have one argument of the port number on which to listen.");
-        	}
-        	connection.SetAddress("127.0.0.1",Convert.ToUInt16(args[0]));
-        	connection.OnRun();
-		}
-		
-		public ServiceConnection Connection {
-			get { return connection; }
-			set { connection = value; }
-		}
+	public interface PhysicalOrderHandler {
+		void OnChangeBrokerOrder(PhysicalOrder order);		
+		void OnCreateBrokerOrder(PhysicalOrder order);
+		void OnCancelBrokerOrder(PhysicalOrder order);
 	}
 }

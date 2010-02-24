@@ -21,20 +21,22 @@
  */
 #endregion
 
-using Krs.Ats.IBNet.Contracts;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Threading;
 using System.Windows.Forms;
+
 using Krs.Ats.IBNet;
+using Krs.Ats.IBNet.Contracts;
 using TickZoom.Api;
 
 //using System.Data;
 namespace TickZoom.InteractiveBrokers
 {
 
-	public class IBInterface : Provider
+	public class IBInterface : Provider, PhysicalOrderHandler
 	{
 		private static readonly Log log = Factory.Log.GetLogger(typeof(IBInterface));
 		private static readonly bool debug = log.IsDebugEnabled;
@@ -42,8 +44,7 @@ namespace TickZoom.InteractiveBrokers
 	    private readonly static object listLock = new object();
         private IBClient client;
         private int nextValidId = 0;
-        
-        private List<SymbolHandler> symbolHandlers = new List<SymbolHandler>();
+        private Dictionary<ulong,SymbolHandler> symbolHandlers = new Dictionary<ulong,SymbolHandler>();
 
         public IBInterface()
 		{
@@ -60,6 +61,8 @@ namespace TickZoom.InteractiveBrokers
             client.UpdateMarketDepth += client_UpdateMktDepth;
             client.RealTimeBar += client_RealTimeBar;
             client.OrderStatus += client_OrderStatus;
+            client.OpenOrder += client_OpenOrder;
+            client.OpenOrderEnd += client_OpenOrderEnd;
             client.ExecDetails += new EventHandler<ExecDetailsEventArgs>(client_ExecDetails);
             client.UpdatePortfolio += client_UpdatePortfolio;
             client.ReportException += client_ReportException;
@@ -136,7 +139,6 @@ namespace TickZoom.InteractiveBrokers
         
 		public void StartSymbol(Receiver receiver, SymbolInfo symbol, TimeStamp lastTimeStamp)
 		{
-			
 			if( debug) log.Debug("StartSymbol " + symbol + ", " + lastTimeStamp);
             Equity equity = new Equity(symbol.Symbol);
             SymbolHandler handler = GetSymbolHandler(symbol,receiver);
@@ -153,30 +155,13 @@ namespace TickZoom.InteractiveBrokers
 		
 		public void PositionChange(Receiver receiver, SymbolInfo symbol, double signal, IList<LogicalOrder> orders)
 		{
-			try {
-				SymbolHandler handler = symbolHandlers[(int)symbol.BinaryIdentifier];
-				int delta = (int)(signal - handler.Position);
-				if( delta != 0) {
-					Contract contract = new Contract(symbol.Symbol,"SMART",SecurityType.Stock,"USD");
-					Order order = new Order();
-					order.OrderType = Krs.Ats.IBNet.OrderType.Market;
-					if( delta > 0) {
-						order.Action = ActionSide.Buy;
-					} else {
-						order.Action = ActionSide.Sell;
-					}
-					order.TotalQuantity = Math.Abs(delta);
-					while(nextValidId==0) {
-						Thread.Sleep(10);
-					}
-					nextValidId++;
-					client.PlaceOrder(nextValidId,contract,order);
-					if(debug) log.Debug("PlaceOrder: " + nextValidId + " for " + contract.Symbol + " = " + order.TotalQuantity);
-				}
-			} catch( Exception ex) {
-				log.Error(ex.Message,ex);
-				throw;
-			}
+			if( debug) log.Debug("PositionChange");
+			
+			LogicalOrderHandler handler = symbolHandlers[symbol.BinaryIdentifier].LogicalOrderHandler;
+			handler.SetDesiredPosition(signal);
+			handler.SetLogicalOrders(orders);
+			
+			client.RequestOpenOrders();
 		}
 		
 		public void Stop()
@@ -198,9 +183,132 @@ namespace TickZoom.InteractiveBrokers
 
         private void client_OrderStatus(object sender, OrderStatusEventArgs e)
         {
-        	if(debug) log.Debug("Order Status " + e.Status);
+        	if(debug) log.Debug("Order Status for Id " + e.OrderId + " is " + e.Status);
+        	bool deleteFlag = false;
+        	switch( e.Status) {
+        		case OrderStatus.Canceled:
+        		case OrderStatus.Filled:
+        		case OrderStatus.Inactive:
+        		case OrderStatus.PendingCancel:
+        			deleteFlag = true;
+        			break;
+        		case OrderStatus.PreSubmitted:
+        		case OrderStatus.PartiallyFilled:
+        		case OrderStatus.Submitted:
+        			// LogicalOrderHandler will decide what to do with these.
+        			break;
+        		default:
+        			log.Error("Unexpected order status: " + e.Status);
+        			break;
+        	}
+        	if( deleteFlag) {
+    			if( openOrders.ContainsKey(e.OrderId)) {
+    				openOrders.Remove(e.OrderId);
+    			}
+	        	if(debug) log.Debug("Removing open order id " + e.OrderId);
+        	}
         }
 
+        private void client_OpenOrder(object sender, OpenOrderEventArgs e)
+        {
+        	if( debug) log.Debug("Open Order Id " + e.Order.OrderId + " " + e.Contract.Symbol + " " + OrderToString(e.Order));
+        	openOrders[e.Order.OrderId] = e;
+        }
+        
+        public void HandleOpenOrder(OpenOrderEventArgs e) {
+        	if( debug) log.Debug("HandleOpenOrder id " + e.Order.OrderId + " " + e.Contract.Symbol + " " + OrderToString(e.Order));
+        	TickZoom.Api.OrderType type = TickZoom.Api.OrderType.BuyMarket;
+        	double price = 0;
+        	switch( e.Order.OrderType) {
+        		case Krs.Ats.IBNet.OrderType.Market:
+        			if( e.Order.Action == ActionSide.Buy) {
+	        			type = TickZoom.Api.OrderType.BuyMarket;
+        			} else {
+	        			type = TickZoom.Api.OrderType.SellMarket;
+        			}
+        			price = 0;
+        			break;
+        		case Krs.Ats.IBNet.OrderType.Limit:
+        			if( e.Order.Action == ActionSide.Buy) {
+	        			type = TickZoom.Api.OrderType.BuyLimit;
+        			} else {
+	        			type = TickZoom.Api.OrderType.SellLimit;
+        			}
+        			price = (double) e.Order.LimitPrice;
+        			break;
+        		case Krs.Ats.IBNet.OrderType.Stop:
+        			if( e.Order.Action == ActionSide.Buy) {
+	        			type = TickZoom.Api.OrderType.BuyStop;
+        			} else {
+	        			type = TickZoom.Api.OrderType.SellStop;
+        			}
+        			price = (double) e.Order.AuxPrice;
+        			break;
+        		default:
+        			log.Error( "Unknown OrderType: " + e.Order.OrderType);
+        			break;
+        	}
+        	SymbolInfo symbol = Factory.Symbol.LookupSymbol(e.Contract.Symbol);
+        	SymbolHandler handler;
+        	if( symbolHandlers.TryGetValue(symbol.BinaryIdentifier,out handler)) {
+        		handler.LogicalOrderHandler.AddPhysicalOrder(type,price,e.Order.TotalQuantity,e.Order);
+        	}
+        }
+        
+        Dictionary<int,OpenOrderEventArgs> openOrders = new Dictionary<int, OpenOrderEventArgs>();
+        
+        private string OrderToString( Order order) {
+        	StringBuilder sb = null;
+    		sb = new StringBuilder();
+        	sb.Append( order.Action);
+        	sb.Append( " " );
+        	sb.Append( order.OrderType);
+        	sb.Append( " " );
+        	switch( order.OrderType) {
+        		case Krs.Ats.IBNet.OrderType.Market:
+        			break;
+        		case Krs.Ats.IBNet.OrderType.Limit:
+        			sb.Append( " limit ");
+        			sb.Append( order.LimitPrice);
+        			break;
+        		case Krs.Ats.IBNet.OrderType.Stop:
+        			sb.Append( " stop ");
+        			sb.Append( order.AuxPrice);
+        			break;
+        		case Krs.Ats.IBNet.OrderType.StopLimit:
+        			sb.Append( " stop ");
+        			sb.Append( order.AuxPrice);
+        			sb.Append( " limit ");
+        			sb.Append( order.LimitPrice);
+        			break;
+        		default:
+        			log.Error( "Unknown OrderType: " + order.OrderType);
+        			break;
+        	}
+        	sb.Append( " size ");
+        	sb.Append( order.TotalQuantity);
+        	return sb.ToString();
+		}
+        
+        private void client_OpenOrderEnd(object sender, EventArgs e)
+        {
+        	if(debug) log.Debug("Open Order End ");
+        	foreach( var kvp in symbolHandlers) {
+        		LogicalOrderHandler handler = kvp.Value.LogicalOrderHandler;
+        		handler.ClearPhysicalOrders();
+        	}
+        	foreach( var kvp in openOrders) {
+        		HandleOpenOrder(kvp.Value);
+        	}
+        	foreach( var kvp in symbolHandlers) {
+        		ulong symbolBinaryId = kvp.Key;
+        		SymbolHandler symbolHandler = kvp.Value;
+        		LogicalOrderHandler orderHandler = symbolHandler.LogicalOrderHandler;
+	    		orderHandler.SetActualPosition(symbolHandler.Position);
+    			orderHandler.PerformCompare();
+        	}
+        }
+        
         private void client_UpdateMktDepth(object sender, UpdateMarketDepthEventArgs e)
         {
         	if(debug) log.Debug("Tick ID: " + e.TickerId + " Tick Side: " + EnumDescConverter.GetEnumDescription(e.Side) +
@@ -216,7 +324,7 @@ namespace TickZoom.InteractiveBrokers
 
         private void client_TickSize(object sender, TickSizeEventArgs e)
         {
-        	SymbolHandler buffer = symbolHandlers[e.TickerId];
+        	SymbolHandler buffer = symbolHandlers[(ulong)e.TickerId];
         	if( e.TickType == TickType.AskSize) {
         		buffer.AskSize = e.Size;
         	} else if( e.TickType == TickType.BidSize) {
@@ -227,21 +335,21 @@ namespace TickZoom.InteractiveBrokers
         }
         
         private SymbolHandler GetSymbolHandler(SymbolInfo symbol, Receiver receiver) {
-        	if( symbolHandlers.Count <= (int) symbol.BinaryIdentifier) {
-	            while( symbolHandlers.Count <= (int) symbol.BinaryIdentifier) {
-        			if( symbolHandlers.Count == 0) {
-        				symbolHandlers.Add(null);
-        			} else {
-	        			SymbolInfo tempSymbol = Factory.Symbol.LookupSymbol((ulong)symbolHandlers.Count);
-    	    			symbolHandlers.Add(new SymbolHandler(tempSymbol,receiver));
-        			}
-	            }
+        	SymbolHandler symbolHandler;
+        	if( symbolHandlers.TryGetValue(symbol.BinaryIdentifier,out symbolHandler)) {
+        		return symbolHandler;
+        	} else {
+    	    	symbolHandler = new SymbolHandler(symbol,receiver);
+    	    	symbolHandler.LogicalOrderHandler = Factory.Utility.LogicalOrderHandler(symbol,this);
+    	    	symbolHandlers.Add(symbol.BinaryIdentifier,symbolHandler);
+    	    	return symbolHandler;
         	}
-        	return symbolHandlers[(int)symbol.BinaryIdentifier];
         }
 
         private void RemoveSymbolHandler(SymbolInfo symbol) {
-        	symbolHandlers[(int)symbol.BinaryIdentifier] = null;
+        	if( symbolHandlers.ContainsKey(symbol.BinaryIdentifier) ) {
+        		symbolHandlers.Remove(symbol.BinaryIdentifier);
+        	}
         }
         
         private void client_Error(object sender, Krs.Ats.IBNet.ErrorEventArgs e)
@@ -251,7 +359,7 @@ namespace TickZoom.InteractiveBrokers
 
         private void client_TickPrice(object sender, TickPriceEventArgs e)
         {
-        	SymbolHandler buffer = symbolHandlers[e.TickerId];
+        	SymbolHandler buffer = symbolHandlers[(ulong)e.TickerId];
         	if( e.TickType == TickType.AskPrice) {
         		buffer.Ask = (double) e.Price;
         		buffer.SendQuote();
@@ -283,5 +391,80 @@ namespace TickZoom.InteractiveBrokers
   				log.Warn("UpdatePortfolio: " + ex.Message);
   			}
         }
+		
+		private Order ToBrokerOrder( PhysicalOrder physicalOrder) {
+			Order brokerOrder = new Order();
+			brokerOrder.OrderType = Krs.Ats.IBNet.OrderType.Market;
+			switch( physicalOrder.Type ) {
+				case TickZoom.Api.OrderType.BuyLimit:
+					brokerOrder.Action = ActionSide.Buy;
+					brokerOrder.OrderType = Krs.Ats.IBNet.OrderType.Limit;
+					brokerOrder.LimitPrice = (decimal) physicalOrder.Price;
+					break;
+				case TickZoom.Api.OrderType.BuyMarket:
+					brokerOrder.Action = ActionSide.Buy;
+					brokerOrder.OrderType = Krs.Ats.IBNet.OrderType.Market;
+					break;
+				case TickZoom.Api.OrderType.BuyStop:
+					brokerOrder.Action = ActionSide.Buy;
+					brokerOrder.OrderType = Krs.Ats.IBNet.OrderType.Stop;
+					brokerOrder.AuxPrice = (decimal) physicalOrder.Price;
+					break;
+				case TickZoom.Api.OrderType.SellLimit:
+					brokerOrder.Action = ActionSide.Sell;
+					brokerOrder.OrderType = Krs.Ats.IBNet.OrderType.Limit;
+					brokerOrder.LimitPrice = (decimal) physicalOrder.Price;
+					break;
+				case TickZoom.Api.OrderType.SellMarket:
+					brokerOrder.Action = ActionSide.Sell;
+					brokerOrder.OrderType = Krs.Ats.IBNet.OrderType.Market;
+					break;
+				case TickZoom.Api.OrderType.SellStop:
+					brokerOrder.Action = ActionSide.Sell;
+					brokerOrder.OrderType = Krs.Ats.IBNet.OrderType.Stop;
+					brokerOrder.AuxPrice = (decimal) physicalOrder.Price;
+					break;
+			}
+			brokerOrder.TotalQuantity = (int) physicalOrder.Size;
+			return brokerOrder;
+		}
+		
+		public void OnCreateBrokerOrder(PhysicalOrder physicalOrder)
+		{
+			if( debug) log.Debug( "OnCreateBrokerOrder " + physicalOrder);
+			SymbolInfo symbol = physicalOrder.Symbol;
+			Contract contract = new Contract(symbol.Symbol,"SMART",SecurityType.Stock,"USD");
+			Order brokerOrder = ToBrokerOrder(physicalOrder);
+			while(nextValidId==0) {
+				Thread.Sleep(10);
+			}
+			nextValidId++;
+			client.PlaceOrder(nextValidId,contract,brokerOrder);
+			if(debug) log.Debug("PlaceOrder: " + contract.Symbol + " " + OrderToString(brokerOrder));
+		}
+		
+		public void OnCancelBrokerOrder(PhysicalOrder physicalOrder)
+		{
+			if( debug) log.Debug( "OnCancelBrokerOrder " + physicalOrder);
+			Order order = physicalOrder.BrokerOrder as Order;
+			if( order != null) {
+				client.CancelOrder( order.OrderId);
+			} else {
+				throw new ApplicationException("BrokerOrder property want's an Order object.");
+			}
+		}
+		
+		public void OnChangeBrokerOrder(PhysicalOrder physicalOrder)
+		{
+			if( debug) log.Debug( "OnChangeBrokerOrder " + physicalOrder);
+			Order order = physicalOrder.BrokerOrder as Order;
+			if( order != null) {
+				client.CancelOrder(order.OrderId);
+				if(debug) log.Debug("Cancel Order (for change): " + physicalOrder.Symbol.Symbol + " " + OrderToString(order));
+				OnCreateBrokerOrder(physicalOrder);
+			} else {
+				throw new ApplicationException("BrokerOrder property want's an Order object.");
+			}
+		}
 	}
 }

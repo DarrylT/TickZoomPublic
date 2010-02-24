@@ -45,8 +45,10 @@ namespace TickZoom.InteractiveBrokers
 		public double Ask;
 		public int LastSize;
 		public double Last;
+        private LogicalOrderHandler logicalOrderHandler;
+        
 		public SymbolHandler(SymbolInfo symbol, Receiver receiver) {
-			this.symbol = symbol;
+        	this.symbol = symbol;
 			this.receiver = receiver;
 		}
 		public void SendQuote() {
@@ -84,6 +86,11 @@ namespace TickZoom.InteractiveBrokers
 			} else {
 				VerifyInitialized();
 			}
+		}
+        
+		public LogicalOrderHandler LogicalOrderHandler {
+			get { return logicalOrderHandler; }
+			set { logicalOrderHandler = value; }
 		}
 	}
 }

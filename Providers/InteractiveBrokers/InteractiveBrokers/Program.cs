@@ -22,7 +22,6 @@
 #endregion
 
 using System;
-using System.ServiceProcess;
 using TickZoom.Api;
 using TickZoom.InteractiveBrokers;
 
@@ -30,7 +29,6 @@ namespace TickZoom.Common
 {
 	static class Program
 	{
-		public static string ServiceName = "IB Provider Service";
 		/// <summary>
 		/// This method starts the service.
 		/// </summary>
@@ -41,14 +39,14 @@ namespace TickZoom.Common
 				connection.OnCreateProvider = () => new IBInterface();
 				if( args.Length > 0 ) {
 					// Connection port provided on command line.
-					CommandLine commandLine = new CommandLine();
+					ProviderService commandLine = Factory.Utility.CommandLineProcess();
 					commandLine.Connection = connection;
-					commandLine.OnRun(args);
+					commandLine.Run(args);
 				} else {
 					// Connection port set via ServicePort in app.config 
-					WindowsService service = new WindowsService();
+					ProviderService service = Factory.Utility.WindowsService();
 					service.Connection = connection;
-					ServiceBase.Run(new ServiceBase[] { service });
+					service.Run(args);
 				}
 			} catch( Exception ex) {
 				string exception = ex.GetType() + ": " + ex.Message + Environment.NewLine + ex.StackTrace;

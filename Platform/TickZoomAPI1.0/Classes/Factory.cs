@@ -46,6 +46,8 @@ namespace TickZoom.Api
 		private static ProviderFactory provider;
 		private static SymbolFactory symbolFactory;
 		private static StarterFactory starterFactory;
+		private static UtilityFactory utilityFactory;
+		
 		
 		static Factory() {
 			locker = new object();
@@ -141,6 +143,19 @@ namespace TickZoom.Api
 					}
 				}
 				return starterFactory;
+			}
+		}
+		
+		public static UtilityFactory Utility {
+			get {
+				if( utilityFactory == null) {
+					lock(Locker) {
+						if( utilityFactory == null) {
+							utilityFactory = (UtilityFactory) FactorySupport.Load( typeof(UtilityFactory), "TickZoomPluginCommon" );
+						}
+					}
+				}
+				return utilityFactory;
 			}
 		}
 		

@@ -13,6 +13,7 @@
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <SourceAnalysisOverrideSettingsFile>C:\Documents and Settings\Wayne Walter\Application Data\ICSharpCode/SharpDevelop3.0\Settings.SourceAnalysis</SourceAnalysisOverrideSettingsFile>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+    <StartArguments>6491</StartArguments>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <OutputPath>..\..\..\bin\Debug\</OutputPath>
@@ -42,7 +43,6 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
-    <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
@@ -52,13 +52,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="CommandLine.cs" />
     <Compile Include="InteractiveBrokers\Level2Collection.cs" />
     <Compile Include="InteractiveBrokers\IBInterface.cs" />
     <Compile Include="InteractiveBrokers\SymbolHandler.cs" />
     <Compile Include="Program.cs" />
-    <Compile Include="ProjectInstaller.cs" />
-    <Compile Include="WindowsService.cs" />
     <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>

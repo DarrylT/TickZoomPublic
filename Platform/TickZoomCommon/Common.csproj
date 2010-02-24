@@ -50,10 +50,12 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.Targets" />
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Drawing" />
+    <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
@@ -117,6 +119,13 @@
     <Compile Include="Performance\TradeStatsReport.cs" />
     <Compile Include="Performance\Transaction.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ProviderUtilities\DefaultOrderHandler.cs" />
+    <Compile Include="ProviderUtilities\AssemblyAttributes.cs" />
+    <Compile Include="ProviderUtilities\CommandLine.cs" />
+    <Compile Include="ProviderUtilities\PhysicalOrderDefault.cs" />
+    <Compile Include="ProviderUtilities\ProjectInstaller.cs" />
+    <Compile Include="ProviderUtilities\UtilityFactoryDefault.cs" />
+    <Compile Include="ProviderUtilities\WindowsService.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Common" />
@@ -125,6 +134,7 @@
     <Folder Include="Enums" />
     <Folder Include="Performance" />
     <Folder Include="Optimization" />
+    <Folder Include="ProviderUtilities" />
     <ProjectReference Include="..\TickZoomAPI1.0\API1.0.csproj">
       <Project>{27D6C88D-52B6-432C-820B-CD38A299830C}</Project>
       <Name>API1.0</Name>

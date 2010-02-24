@@ -40,7 +40,7 @@ namespace TickZoom.Test
 		public override void Init()
 		{
 			base.Init();
-			symbol = Factory.Symbol.LookupSymbol("IBM");
+			symbol = Factory.Symbol.LookupSymbol("GOOG");
 		}	
 		
 		public override void AssertTick( TickIO tick, TickIO lastTick, ulong symbol) {

@@ -3376,7 +3376,9 @@ namespace Krs.Ats.IBNet
             }
             catch(Exception ex)
             {
-            	exception(ex);
+            	if( ! (ex is ThreadAbortException) ) {
+            		exception(ex);
+            	}
             }
             finally
             {

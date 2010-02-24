@@ -34,7 +34,7 @@ using TickZoom.TickUtil;
 namespace TickZoom.Test
 {
 //#if FOREX
-//	[TestFixture]
+	[TestFixture]
 	public class ForexLevel1 : EquityTimeAndSales
 	{
 		[TestFixtureSetUp]
