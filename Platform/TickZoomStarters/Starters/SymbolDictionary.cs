@@ -295,6 +295,10 @@ namespace TickZoom.Common
         <property name=""TimeAndSales"" value=""None"" />
         <property name=""QuoteType"" value=""Level1"" />
       </symbol>
+      <symbol name=""GOOG"">
+        <property name=""TimeAndSales"" value=""None"" />
+        <property name=""QuoteType"" value=""Level1"" />
+      </symbol>
       <symbol name=""Design"" />
       <symbol name=""FullTick"" />
       <symbol name=""Daily4Ticks"" />

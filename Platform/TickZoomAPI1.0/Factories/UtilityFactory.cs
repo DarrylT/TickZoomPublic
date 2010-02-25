@@ -30,5 +30,7 @@ namespace TickZoom.Api
 		ProviderService CommandLineProcess();
 		ProviderService WindowsService();
 		LogicalOrderHandler LogicalOrderHandler(SymbolInfo symbol, PhysicalOrderHandler handler);
+		SymbolHandler SymbolHandler(SymbolInfo symbol, Receiver receiver);
+		VerifyFeed VerifyFeed();
 	}
 }

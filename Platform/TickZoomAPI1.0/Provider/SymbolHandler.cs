@@ -1,4 +1,4 @@
-#region Copyright
+﻿#region Copyright
 /*
  * Copyright 2008 M. Wayne Walter
  * Software: TickZoom Trading Platform
@@ -22,25 +22,44 @@
 #endregion
 
 using System;
-using NUnit.Framework;
-using TickZoom.Api;
-using TickZoom.InteractiveBrokers;
-using TickZoom.Test;
+using System.Collections.Generic;
 
-namespace Test
+namespace TickZoom.Api
 {
-	[TestFixture]
-	public class TimeAndSalesTest : ProviderTests
-	{
-		public TimeAndSalesTest()
-		{
-			SetSymbol("CSCO");
-			SetTickTest(TickTest.TimeAndSales);
+	public interface SymbolHandler {
+		void SendQuote();
+		void SendTimeAndSales();
+		void SetPosition(double position);
+		LogicalOrderHandler LogicalOrderHandler {
+			get;
+			set;
 		}
-		
-		public override Provider ProviderFactory()
-		{
-			return new IBInterface();
+		double Position {
+			get;
+		}
+		int AskSize {
+			get;
+			set;
+		}
+		int BidSize {
+			get;
+			set;
+		}
+		int LastSize {
+			get;
+			set;
+		}
+		double Ask {
+			get;
+			set;
+		}
+		double Bid {
+			get;
+			set;
+		}
+		double Last {
+			get;
+			set;
 		}
 	}
 }

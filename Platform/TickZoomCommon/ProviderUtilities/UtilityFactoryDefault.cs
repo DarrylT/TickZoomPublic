@@ -43,5 +43,11 @@ namespace TickZoom.Common
 		public LogicalOrderHandler LogicalOrderHandler(SymbolInfo symbol, PhysicalOrderHandler handler) {
 			return new DefaultOrderHandler(symbol,handler);
 		}
+		public SymbolHandler SymbolHandler(SymbolInfo symbol, Receiver receiver) {
+			return new SymbolHandlerDefault(symbol,receiver);
+		}
+		public VerifyFeed VerifyFeed() {
+			return new VerifyFeedDefault();
+		}
 	}
 }

@@ -26,6 +26,7 @@ using System.Collections.Generic;
 
 namespace TickZoom.Api
 {
+
 	public interface LogicalOrderHandler {
 		void SetActualPosition(double position);
 		void ClearPhysicalOrders();

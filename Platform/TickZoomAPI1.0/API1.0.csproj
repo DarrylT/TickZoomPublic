@@ -173,6 +173,8 @@
     <Compile Include="Provider\PhysicalOrder.cs" />
     <Compile Include="Provider\PhysicalOrderHandler.cs" />
     <Compile Include="Provider\ProviderService.cs" />
+    <Compile Include="Provider\SymbolHandler.cs" />
+    <Compile Include="Provider\VerifyFeed.cs" />
     <None Include="Lib\ICSharpCode.SharpZipLib.dll" />
   </ItemGroup>
   <ItemGroup>

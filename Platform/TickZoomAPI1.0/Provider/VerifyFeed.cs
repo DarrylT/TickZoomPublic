@@ -1,4 +1,4 @@
-#region Copyright
+﻿#region Copyright
 /*
  * Copyright 2008 M. Wayne Walter
  * Software: TickZoom Trading Platform
@@ -21,28 +21,20 @@
  */
 #endregion
 
-#define FOREX
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Windows.Forms;
 
-using NUnit.Framework;
-using TickZoom.Api;
-using TickZoom.TickUtil;
-
-namespace TickZoom.Test
+namespace TickZoom.Api
 {
-#if FOREX
-//	[TestFixture]
-//	public class ForexTrading : TimeAndSales
-//	{
-//		[TestFixtureSetUp]
-//		public override void Init()
-//		{
-//			base.Init();
-//			symbol = Factory.Symbol.LookupSymbol("USD/JPY");
-//		}	
-//	}
-#endif
+	public interface VerifyFeed : Receiver
+	{
+		long Verify(Action<TickIO, TickIO, ulong> assertTick, SymbolInfo symbol, int timeout);
+		long Verify(int expectedCount, Action<TickIO, TickIO, ulong> assertTick, SymbolInfo symbol, int timeout);
+		double VerifyPosition(double expectedPosition, SymbolInfo symbol, int timeout);
+		void StartTimeTheFeed();
+		int EndTimeTheFeed();
+		bool TimeTheFeedTask();
+		TickQueue TickQueue { get; }
+		bool IsRealTime { get; }
+	}
 }

@@ -124,7 +124,9 @@
     <Compile Include="ProviderUtilities\CommandLine.cs" />
     <Compile Include="ProviderUtilities\PhysicalOrderDefault.cs" />
     <Compile Include="ProviderUtilities\ProjectInstaller.cs" />
+    <Compile Include="ProviderUtilities\SymbolHandlerDefault.cs" />
     <Compile Include="ProviderUtilities\UtilityFactoryDefault.cs" />
+    <Compile Include="ProviderUtilities\VerifyFeedDefault.cs" />
     <Compile Include="ProviderUtilities\WindowsService.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -21,38 +21,32 @@
  */
 #endregion
 
-using Krs.Ats.IBNet.Contracts;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading;
-using System.Windows.Forms;
-using Krs.Ats.IBNet;
 using TickZoom.Api;
 
-//using System.Data;
-namespace TickZoom.InteractiveBrokers
+namespace TickZoom.Common
 {
-	public class SymbolHandler {
+	public class SymbolHandlerDefault : SymbolHandler {
 		private TickIO tickIO = Factory.TickUtil.TickIO();
 		private Receiver receiver;
 		private SymbolInfo symbol;
-		private bool isInitialized = false;
-		public int Position;
-		public int BidSize;
-		public double Bid;
-		public int AskSize;
-		public double Ask;
-		public int LastSize;
-		public double Last;
+		private bool isTradeInitialized = false;
+		private bool isQuoteInitialized = false;
+		private double position;
+		public int bidSize;
+		public double bid;
+		public int askSize;
+		public double ask;
+		public int lastSize;
+		public double last;
         private LogicalOrderHandler logicalOrderHandler;
         
-		public SymbolHandler(SymbolInfo symbol, Receiver receiver) {
+		public SymbolHandlerDefault(SymbolInfo symbol, Receiver receiver) {
         	this.symbol = symbol;
 			this.receiver = receiver;
 		}
 		public void SendQuote() {
-			if( isInitialized) {
+			if( isQuoteInitialized) {
 				if( symbol.QuoteType == QuoteType.Level1) {
 					tickIO.Initialize();
 					tickIO.SetSymbol(symbol.BinaryIdentifier);
@@ -62,35 +56,84 @@ namespace TickZoom.InteractiveBrokers
 					receiver.OnSend(ref binary);
 				}
 			} else {
-				VerifyInitialized();
+				VerifyQuote();
 			}
 		}
-		private void VerifyInitialized() {
-			if(BidSize > 0 && Bid > 0 && AskSize > 0 && Ask > 0 && LastSize > 0 & Last > 0) {
-				isInitialized = true;
+        
+        public void SetPosition( double position) {
+        	if( this.position != position) {
+	        	receiver.OnPosition(symbol,position);
+        	}
+        	this.position = position;
+        }
+        
+		private void VerifyQuote() {
+			if(BidSize > 0 && Bid > 0 && AskSize > 0 && Ask > 0) {
+				isQuoteInitialized = true;
 			}
 		}
+        
+		private void VerifyTrade() {
+			if(LastSize > 0 & Last > 0) {
+				isTradeInitialized = true;
+			}
+		}
+        
 		public void SendTimeAndSales() {
-			if( isInitialized) {
+			if( isTradeInitialized) {
 				if( symbol.TimeAndSales == TimeAndSales.ActualTrades) {
 					tickIO.Initialize();
 					tickIO.SetSymbol(symbol.BinaryIdentifier);
 					tickIO.SetTime(TimeStamp.UtcNow);
 					tickIO.SetTrade(Last,LastSize);
-					if( symbol.QuoteType == QuoteType.Level1) {
+					if( symbol.QuoteType == QuoteType.Level1 && isQuoteInitialized) {
 						tickIO.SetQuote(Bid,Ask,(ushort)BidSize,(ushort)AskSize);
 					}
 					TickBinary binary = tickIO.Extract();
 					receiver.OnSend(ref binary);
 				}
 			} else {
-				VerifyInitialized();
+				VerifyTrade();
 			}
 		}
         
 		public LogicalOrderHandler LogicalOrderHandler {
 			get { return logicalOrderHandler; }
 			set { logicalOrderHandler = value; }
+		}
+		
+		public double Position {
+			get { return position; }
+		}
+		
+		public int LastSize {
+			get { return lastSize; }
+			set { lastSize = value; }
+		}
+		
+		public int BidSize {
+			get { return bidSize; }
+			set { bidSize = value; }
+		}
+		
+		public double Bid {
+			get { return bid; }
+			set { bid = value; }
+		}
+		
+		public int AskSize {
+			get { return askSize; }
+			set { askSize = value; }
+		}
+		
+		public double Ask {
+			get { return ask; }
+			set { ask = value; }
+		}
+		
+		public double Last {
+			get { return last; }
+			set { last = value; }
 		}
 	}
 }

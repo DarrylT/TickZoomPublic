@@ -339,7 +339,7 @@ namespace TickZoom.InteractiveBrokers
         	if( symbolHandlers.TryGetValue(symbol.BinaryIdentifier,out symbolHandler)) {
         		return symbolHandler;
         	} else {
-    	    	symbolHandler = new SymbolHandler(symbol,receiver);
+    	    	symbolHandler = Factory.Utility.SymbolHandler(symbol,receiver);
     	    	symbolHandler.LogicalOrderHandler = Factory.Utility.LogicalOrderHandler(symbol,this);
     	    	symbolHandlers.Add(symbol.BinaryIdentifier,symbolHandler);
     	    	return symbolHandler;
@@ -385,7 +385,7 @@ namespace TickZoom.InteractiveBrokers
   			try {
         		SymbolInfo symbol = Factory.Symbol.LookupSymbol(e.Contract.Symbol);
         		SymbolHandler handler = GetSymbolHandler(symbol,receiver);
-	        	handler.Position = e.Position;
+        		handler.SetPosition(e.Position);
 	        	if(debug) log.Debug( "UpdatePortfolio: " + e.Contract.Symbol + " is " + e.Position);
   			} catch( ApplicationException ex) {
   				log.Warn("UpdatePortfolio: " + ex.Message);

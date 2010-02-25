@@ -23,41 +23,25 @@
 
 #define FOREX
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Windows.Forms;
-
 using NUnit.Framework;
 using TickZoom.Api;
-using TickZoom.TickUtil;
+using TickZoom.InteractiveBrokers;
+using TickZoom.Test;
 
-namespace TickZoom.Test
+namespace Test
 {
 	[TestFixture]
-	public class EquityLevel1 : TimeAndSales
+	public class EquityLevel1 : ProviderTests
 	{
-		[TestFixtureSetUp]
-		public override void Init()
+		public EquityLevel1()
 		{
-			base.Init();
-			symbol = Factory.Symbol.LookupSymbol("GOOG");
-		}	
+			SetSymbol("GOOG");
+			SetTickTest(TickTest.Level1);
+		}
 		
-		public override void AssertTick( TickIO tick, TickIO lastTick, ulong symbol) {
-        	Assert.IsTrue(tick.IsQuote);
-        	if( tick.IsQuote) {
-	        	Assert.Greater(tick.Bid,0);
-	        	Assert.Greater(tick.BidLevel(0),0);
-	        	Assert.Greater(tick.Ask,0);
-	        	Assert.Greater(tick.AskLevel(0),0);
-        	}
-        	Assert.IsFalse(tick.IsTrade);
-        	if( tick.IsTrade) {
-	        	Assert.Greater(tick.Price,0);
-    	    	Assert.Greater(tick.Size,0);
-        	}
-    		Assert.IsTrue(tick.Time>=lastTick.Time,"tick.Time > lastTick.Time");
-    		Assert.AreEqual(symbol,tick.lSymbol);
+		public override Provider ProviderFactory()
+		{
+			return new IBInterface();
 		}
 	}
 }

@@ -52,9 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="InteractiveBrokers\Level2Collection.cs" />
     <Compile Include="InteractiveBrokers\IBInterface.cs" />
-    <Compile Include="InteractiveBrokers\SymbolHandler.cs" />
     <Compile Include="Program.cs" />
     <None Include="app.config" />
   </ItemGroup>
