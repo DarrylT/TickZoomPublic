@@ -169,6 +169,7 @@
     <Compile Include="HTTP\HTTPSession.cs" />
     <Compile Include="HTTP\HTTPRequestHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Provider\FillSimulator.cs" />
     <Compile Include="Provider\LogicalOrderHandler.cs" />
     <Compile Include="Provider\PhysicalOrder.cs" />
     <Compile Include="Provider\PhysicalOrderHandler.cs" />

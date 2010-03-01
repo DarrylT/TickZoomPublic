@@ -76,23 +76,6 @@ namespace TickZoom.Common
 			Strategy.OrderManager.Add( orders.sellLimit);
 		}
 		
-		public void OnProcessOrders(Tick tick) {
-			if( IsTrace) Log.Trace("OnProcessOrders() Model.Signal="+Strategy.Position.Current);
-			if( Strategy.Position.IsFlat ||
-			   (allowReversal && Strategy.Position.IsShort) ) {
-				if( orders.buyMarket.IsActive ) ProcessBuyMarket(tick);
-				if( orders.buyStop.IsActive ) ProcessBuyStop(tick);
-				if( orders.buyLimit.IsActive ) ProcessBuyLimit(tick);
-			}
-			
-			if( Strategy.Position.IsFlat ||
-			   (allowReversal && Strategy.Position.IsLong) ) {
-				if( orders.sellMarket.IsActive ) ProcessSellMarket(tick);
-				if( orders.sellStop.IsActive ) ProcessSellStop(tick);
-				if( orders.sellLimit.IsActive ) ProcessSellLimit(tick);
-			}
-		}
-
         public void CancelOrders()
         {
         	orders.buyMarket.IsActive = false;
@@ -109,112 +92,6 @@ namespace TickZoom.Common
             orders.buyLimit.IsNextBar = false;
             orders.sellLimit.IsNextBar = false;
         }
-        
-        private void ProcessBuyMarket(Tick tick)
-        {
-			LogicalOrder order = orders.buyMarket;
-			if( order.IsActive) {
-				LogEntry("Long Market Entry at " + tick);
-				Strategy.Position.Change(order.Positions);
-				if( Strategy.Performance.GraphTrades) {
-	                Strategy.Chart.DrawTrade(order,tick.IsQuote ? tick.Ask : tick.Price,Strategy.Position.Current);
-				}
-				CancelOrders();
-			} 
-		}
-        
-		private void ProcessSellMarket(Tick tick) {
-			LogicalOrder order = orders.sellMarket;
-			if( order.IsActive) {
-				LogEntry("Short Market Entry at " + tick);
-				Strategy.Position.Change(- order.Positions);
-				if( Strategy.Performance.GraphTrades) {
-					Strategy.Chart.DrawTrade(order,tick.IsQuote ? tick.Bid : tick.Price,Strategy.Position.Current);
-				}
-				CancelOrders();
-			} 
-		}
-		
-        private void ProcessBuyLimit(Tick tick)
-        {
-			LogicalOrder order = orders.buyLimit;
-			if( order.IsActive && Strategy.Position.IsFlat)
-            {
-				double price = 0;
-				bool isFilled = false;
-				if (tick.Ask <= order.Price) {
-					price = tick.Ask;
-					isFilled = true;
-				} else if(tick.IsTrade && tick.Price < order.Price)
-                {
-					price = order.Price;
-					isFilled = true;
-				}
-				if( isFilled) {
-                    LogEntry("Long Limit Entry at " + tick);
-                    Strategy.Position.Change(order.Positions,price,tick.Time);
-                    if (Strategy.Performance.GraphTrades)
-                    {
-                        Strategy.Chart.DrawTrade(order, price, Strategy.Position.Current);
-                    }
-                    CancelOrders();
-                }
-			} 
-		}
-		
-		private void ProcessSellLimit(Tick tick) {
-			LogicalOrder order = orders.sellLimit;
-			if( order.IsActive &&
-			    Strategy.Position.IsFlat)
-            {
-				double price = 0;
-				bool isFilled = false;
-				if (tick.Bid >= order.Price) {
-					price = tick.Bid;
-					isFilled = true;
-				} else if(tick.IsTrade && tick.Price > order.Price) {
-					price = order.Price;
-					isFilled = true;
-				}
-				if( isFilled) {
-                    LogEntry("Short Limit Entry at " + tick);
-                    Strategy.Position.Change(-order.Positions,price,tick.Time);
-                    if (Strategy.Performance.GraphTrades)
-                    {
-                        Strategy.Chart.DrawTrade(order, price, Strategy.Position.Current);
-                    }
-                    CancelOrders();
-                }
-			} 
-		}
-		
-		private void ProcessBuyStop(Tick tick) {
-			LogicalOrder order = orders.buyStop;
-			if( order.IsActive &&
-			    Strategy.Position.IsFlat &&
-			    tick.Ask >= order.Price) {
-				LogEntry("Long Stop Entry at " + tick);
-				Strategy.Position.Change(order.Positions);
-				if( Strategy.Performance.GraphTrades) {
-	                Strategy.Chart.DrawTrade(order,tick.IsQuote ? tick.Ask : tick.Price,Strategy.Position.Current);
-				}
-				CancelOrders();
-			} 
-		}
-		
-		private void ProcessSellStop(Tick tick) {
-			LogicalOrder order = orders.sellStop;
-			if( order.IsActive &&
-			    Strategy.Position.IsFlat &&
-			    tick.Ask <= order.Price) {
-				LogEntry("Short Stop Entry at " + tick);
-				Strategy.Position.Change(order.Positions);
-				if( Strategy.Performance.GraphTrades) {
-	                Strategy.Chart.DrawTrade(order,tick.IsQuote ? tick.Bid : tick.Price,Strategy.Position.Current);
-				}
-				CancelOrders();
-			}
-		}
 		
 		private void LogEntry(string description) {
 			if( Strategy.Chart.IsDynamicUpdate) {

@@ -51,7 +51,6 @@ namespace TickZoom
 		
 		public override bool OnIntervalClose()
 		{
-			
 			// Example log message.
 			//Log.WriteLine( "close: " + Ticks[0] + " " + Minutes.Close[0] + " " + Minutes.Time[0]);
 			double close = Bars.Close[0];

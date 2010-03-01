@@ -81,7 +81,8 @@ namespace Loaders
 		}
 		
 		[TestFixtureSetUp]
-		public virtual void RunStrategy() {
+		public override void RunStrategy() {
+			base.RunStrategy();
 			try {
 				Starter starter = CreateStarter();
 				
@@ -186,7 +187,8 @@ namespace Loaders
 		}
 		
 		[TestFixtureSetUp]
-		public virtual void RunStrategy() {
+		public override void RunStrategy() {
+			base.RunStrategy();
 			try {
 				Starter starter = CreateStarter();
 				

@@ -138,8 +138,9 @@ namespace TickZoom.BrokerageFramework
 			pair.EntryTime = new TimeStamp(2005,5,2,8,33,34,432);
 			pair.ExitPrice = 145230;
 			pair.ExitTime = new TimeStamp(2005,5,2,8,33,34,321);
-			Assert.AreEqual("1,134230,2005-05-02 08:33:34.432,145230,2005-05-02 08:33:34.321",
-			                pair.ToString(),"ToString");
+			string expected = "1,0,134230,2005-05-02 08:33:34.432,0,145230,2005-05-02 08:33:34.321,145230,0";
+			string actual = pair.ToString();
+			Assert.AreEqual(expected,actual,"ToString");
 			
 		}
 
@@ -147,8 +148,9 @@ namespace TickZoom.BrokerageFramework
 		public void ToStringHeader()
 		{
 			Constructor();
-			Assert.AreEqual("Direction,EntryPrice,EntryTime,ExitPrice,ExitTime,ProfitLoss",
-			                pair.ToStringHeader(),"ProfitLoss");
+			string expected = "Direction,EntryBar,EntryPrice,EntryTime,ExitPrice,ExitBar,ExitTime,MaxPrice,MinPrice,ProfitLoss";
+			string actual = pair.ToStringHeader();
+			Assert.AreEqual(expected,actual,"ProfitLoss");
 		}
 	}
 }

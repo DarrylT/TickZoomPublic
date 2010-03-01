@@ -34,6 +34,7 @@ namespace TickZoom.Api
 		public const byte TimeAndSales=2;
 		public const byte DepthOfMarket=4;
 		public const byte SimulateTicks=8;
+		public const byte FakeTick=16;
 	}
 	
 	/// <summary>

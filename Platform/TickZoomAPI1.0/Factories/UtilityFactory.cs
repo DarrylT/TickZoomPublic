@@ -32,5 +32,6 @@ namespace TickZoom.Api
 		LogicalOrderHandler LogicalOrderHandler(SymbolInfo symbol, PhysicalOrderHandler handler);
 		SymbolHandler SymbolHandler(SymbolInfo symbol, Receiver receiver);
 		VerifyFeed VerifyFeed();
+		FillSimulator FillSimulator();
 	}
 }

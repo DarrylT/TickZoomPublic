@@ -154,7 +154,18 @@ namespace TickZoom.Common
 				// a price change means the list change.
 				isActiveOrdersChanged = true;
 				if( !activeOrders.Contains(order)) {
-					activeOrders.Add(order);
+					bool found = false;
+					for( int i=0; i<activeOrders.Count; i++) {
+						LogicalOrder other = activeOrders[i];
+						if( order.CompareTo(other) < 0) {
+							activeOrders.Insert(i,order);
+							found = true;
+							break;
+						}
+					}
+					if( !found) {
+						activeOrders.Add(order);
+					}
 				}
 			} else {
 				if( activeOrders.Contains(order)) {

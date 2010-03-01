@@ -63,6 +63,7 @@
     <Compile Include="Common\EnterCommon.cs" />
     <Compile Include="Common\ExitCommon.cs" />
     <Compile Include="Common\ExitStrategy.cs" />
+    <Compile Include="Common\FillSimulatorDefault.cs" />
     <Compile Include="Common\Formula.cs" />
     <Compile Include="Common\IndicatorCommon.cs" />
     <Compile Include="Common\Intervals.cs" />
@@ -114,6 +115,7 @@
     <Compile Include="Performance\RoundTurnImpl.cs" />
     <Compile Include="Performance\RoundTurnsBinary.cs" />
     <Compile Include="Performance\StrategyStats.cs" />
+    <Compile Include="Performance\TransactionPairBinary.cs" />
     <Compile Include="Performance\TransactionPairs.cs" />
     <Compile Include="Performance\TradeStats.cs" />
     <Compile Include="Performance\TradeStatsReport.cs" />

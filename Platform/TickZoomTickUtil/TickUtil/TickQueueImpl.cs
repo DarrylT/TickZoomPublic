@@ -57,6 +57,8 @@ namespace TickZoom.TickUtil
 	    public int Receiver;
         public ulong Symbol;
 	    public double Position;
+	    public double Price;
+	    public long TimeStamp;
 	    public int OrdersCount;
 	    public int OrdersMemoryId;
     }

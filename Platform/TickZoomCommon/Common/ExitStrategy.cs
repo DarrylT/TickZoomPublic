@@ -82,15 +82,17 @@ namespace TickZoom.Common
 		public void OnInitialize()
 		{
 			marketOrder = Factory.Engine.LogicalOrder(Strategy.Data.SymbolInfo,Strategy);
-			marketOrder.TradeDirection = TradeDirection.Exit;
+			marketOrder.TradeDirection = TradeDirection.ExitStrategy;
+			marketOrder.Tag = "ExitStrategy" ;
 			Strategy.OrderManager.Add(marketOrder);
 			breakEvenStopOrder = Factory.Engine.LogicalOrder(Strategy.Data.SymbolInfo,Strategy);
-			breakEvenStopOrder.TradeDirection = TradeDirection.Exit;
-			stopLossOrder = Factory.Engine.LogicalOrder(Strategy.Data.SymbolInfo,Strategy);
-			Strategy.OrderManager.Add(stopLossOrder);
-			stopLossOrder.TradeDirection = TradeDirection.Exit;
-			stopLossOrder.Tag = "ExitStrategy" ;
+			breakEvenStopOrder.TradeDirection = TradeDirection.ExitStrategy;
+			breakEvenStopOrder.Tag = "ExitStrategy" ;
 			Strategy.OrderManager.Add(breakEvenStopOrder);
+			stopLossOrder = Factory.Engine.LogicalOrder(Strategy.Data.SymbolInfo,Strategy);
+			stopLossOrder.TradeDirection = TradeDirection.ExitStrategy;
+			stopLossOrder.Tag = "ExitStrategy" ;
+			Strategy.OrderManager.Add(stopLossOrder);
 //			log.WriteFile( LogName + " chain = " + Chain.ToChainString());
 			if( IsTrace) Log.Trace(Strategy.FullName+".Initialize()");
 			Strategy.Drawing.Color = Color.Black;
@@ -98,9 +100,6 @@ namespace TickZoom.Common
 		
 		public void OnProcessPosition(Tick tick) {
 			// Handle ActiveNow orders.
-			if( Strategy.ActiveOrders.Count > 0) {
-				Strategy.OrderManager.ProcessOrders(tick);
-			}
 			
 			if( stopTradingToday || stopTradingThisWeek || stopTradingThisMonth ) {
 				return;

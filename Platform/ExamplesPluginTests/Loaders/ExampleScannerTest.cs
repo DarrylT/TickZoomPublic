@@ -67,21 +67,21 @@ namespace Loaders
 		
 		[Test]
 		public void RoundTurn0() {
-			VerifyRoundTurn( 0, "1983-04-06 15:59:00.001", 29.900,
-			                 "1983-04-12 15:59:00.001",30.25);
+			VerifyRoundTurn( 0, "1983-04-06 15:59:00.001", 29.90,
+			                 "1983-04-07 15:59:00.001",29.92);
 		}
 		
 		[Test]
 		public void RoundTurn1() {
-			VerifyRoundTurn( 1, "1983-04-13 15:59:00.001", 30.600,
-			                 "1983-04-14 15:59:00.001", 30.82);
+			VerifyRoundTurn( 1, "1983-04-08 15:59:00.001", 30.65,
+			                 "1983-04-11 15:59:00.001", 30.40);
 		}
 		
-		[Test]
-		public void RoundTurn2() {
-			VerifyRoundTurn( 2, "1983-04-18 15:59:00.001", 30.560,
-			                 "1983-04-19 15:59:00.001",30.700);
-		}
+//		[Test]
+//		public void RoundTurn2() {
+//			VerifyRoundTurn( 2, "1983-04-18 15:59:00.001", 30.560,
+//			                 "1983-04-19 15:59:00.001",30.700);
+//		}
 		
 		[Test]
 		public void CheckSymbols() {

@@ -44,17 +44,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Tests\OrderHandlerTest.cs" />
+    <Compile Include="Tests\ProviderTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Tests" />
     <ProjectReference Include="..\..\..\Platform\TickZoomAPI1.0\API1.0.csproj">
       <Project>{27D6C88D-52B6-432C-820B-CD38A299830C}</Project>
       <Name>API1.0</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\ProviderUtilities\ProviderUtilities.csproj">
-      <Project>{30FFAA11-2FC3-45DE-BFCF-7B8258C94146}</Project>
-      <Name>ProviderUtilities</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>

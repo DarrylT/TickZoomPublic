@@ -38,6 +38,7 @@ using TickZoom;
 using TickZoom.Api;
 using TickZoom.Common;
 using TickZoom.TickUtil;
+using System.IO;
 using ZedGraph;
 
 namespace Loaders
@@ -49,6 +50,15 @@ namespace Loaders
 		string dataFolder = "TestData";
 		List<ChartThread> chartThreads = new List<ChartThread>();
 		List<TickAggregator> aggregators = new List<TickAggregator>();
+		Dictionary<string,List<TradeInfo>> goodTradeMap = new Dictionary<string,List<TradeInfo>>();
+		Dictionary<string,List<TradeInfo>> testTradeMap = new Dictionary<string,List<TradeInfo>>();
+		
+		[TestFixtureSetUp]
+		public virtual void RunStrategy() {
+			string appDataFolder = Factory.Settings["AppDataFolder"];
+			string filePath = appDataFolder + @"\Logs\Trades.log";
+			File.Delete(filePath);
+		}
 		
 		[TestFixtureTearDown]
 		public void CloseCharts() {
@@ -67,6 +77,78 @@ namespace Loaders
 			}
 			aggregators.Add(aggregator);
 			return aggregator;
+		}
+		
+		public class TradeInfo {
+			public double ClosedEquity;
+			public double ProfitLoss;
+			public TransactionPairBinary Trade;
+		}
+		
+		public void LoadTrades() {
+			string fileDir = @"..\..\Platform\ExamplesPluginTests\Loaders\Trades\";
+			string filePath = fileDir + GetType().Name + "Trades.log";
+			string appDataFolder = Factory.Settings["AppDataFolder"];
+			goodTradeMap.Clear();
+			LoadTrades(filePath,goodTradeMap);
+			filePath = appDataFolder + @"\Logs\Trades.log";
+			LoadTrades(filePath,testTradeMap);
+		}
+		
+		public void LoadTrades(string filePath, Dictionary<string,List<TradeInfo>> tempTrades) {
+			using( FileStream fileStream = new FileStream(filePath,FileMode.Open,FileAccess.Read,FileShare.ReadWrite)) {
+				StreamReader file = new StreamReader(fileStream);
+				string line;
+				while( (line = file.ReadLine()) != null) {
+					string[] fields = line.Split(',');
+					int fieldIndex = 0;
+					string strategyName = fields[fieldIndex++];
+					TradeInfo testInfo = new TradeInfo();
+					
+					testInfo.ClosedEquity = double.Parse(fields[fieldIndex++]);
+					testInfo.ProfitLoss = double.Parse(fields[fieldIndex++]);
+					
+					line = string.Join(",",fields,fieldIndex,fields.Length-fieldIndex);
+					testInfo.Trade = TransactionPairBinary.Parse(line);
+					List<TradeInfo> tradeList;
+					if( tempTrades.TryGetValue(strategyName,out tradeList)) {
+						tradeList.Add(testInfo);
+					} else {
+						tradeList = new List<TradeInfo>();
+						tradeList.Add(testInfo);
+						tempTrades.Add(strategyName,tradeList);
+					}
+				}
+			}
+		}
+		
+		public void VerifyTradeCount(Strategy strategy) {
+			List<TradeInfo> goodTrades = goodTradeMap[strategy.Name];
+			List<TradeInfo> testTrades = testTradeMap[strategy.Name];
+			Assert.AreEqual(goodTrades.Count,testTrades.Count);
+		}
+		
+		public void VerifyTrades(Strategy strategy) {
+			List<TradeInfo> goodTrades = goodTradeMap[strategy.Name];
+			List<TradeInfo> testTrades = testTradeMap[strategy.Name];
+			for( int i=0; i<testTrades.Count && i<goodTrades.Count; i++) {
+				TradeInfo testInfo = testTrades[i];
+				TradeInfo goodInfo = goodTrades[i];
+				TransactionPairBinary goodTrade = goodInfo.Trade;
+				TransactionPairBinary testTrade = testInfo.Trade;
+				Assert.AreEqual(goodTrade,testTrade,"Trade at " + i);
+//				Assert.AreEqual(goodTrade.Direction,testTrade.Direction,"position at " + i);
+//				Assert.AreEqual(goodTrade.EntryBar,testTrade.EntryBar,"entry bar at " + i);
+//				Assert.AreEqual(goodTrade.EntryPrice,testTrade.EntryPrice,"EntryPrice at " + i);
+//				Assert.AreEqual(goodTrade.EntryTime,testTrade.EntryTime,"EntryTime at " + i);
+//				Assert.AreEqual(goodTrade.ExitBar,testTrade.ExitBar,"ExitBar at " + i);
+//				Assert.AreEqual(goodTrade.ExitPrice,testTrade.ExitPrice,"ExitPrice at " + i);
+//				Assert.AreEqual(goodTrade.ExitTime,testTrade.ExitTime,"ExitTime at " + i);
+//				Assert.AreEqual(goodTrade.MaxPrice,testTrade.MaxPrice,"MaxPrice at " + i);
+//				Assert.AreEqual(goodTrade.MinPrice,testTrade.MinPrice,"MinPrice at " + i);
+				Assert.AreEqual(goodInfo.ProfitLoss,testInfo.ProfitLoss,"ProfitLoss at " + i);
+				Assert.AreEqual(goodInfo.ClosedEquity,testInfo.ClosedEquity,"ClosedEquity at " + i);
+			}
 		}
 		
 		public void VerifyPair(Strategy strategy, int pairNum,

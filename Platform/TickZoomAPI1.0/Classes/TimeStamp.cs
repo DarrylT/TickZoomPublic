@@ -168,6 +168,10 @@ namespace TickZoom.Api
 		private static long stopWatchFrequency = 1L;
 		private static long lastDateTime;
 		private static long tickFrequency = 10000000L;
+		
+		public static TimeStamp Parse(string value) {
+			return new TimeStamp(value);
+		}
 
 		private static DateTime GetAdjustedDateTime() {
         	DateTime nowUtcTime = DateTime.UtcNow;

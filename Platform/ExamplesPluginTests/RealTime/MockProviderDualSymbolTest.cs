@@ -57,6 +57,7 @@ namespace RealTime
 		[TestFixtureSetUpAttribute()]
 		public override void RunStrategy()
 		{
+			ConfigurationManager.AppSettings.Set("ProviderAddress","InProcess");
 			DeleteFiles();
 			base.Symbols="MockFull,Mock4Sim";
 			base.RunStrategy();

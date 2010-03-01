@@ -62,9 +62,9 @@ namespace TickZoom.Common
         
         public void SetPosition( double position) {
         	if( this.position != position) {
-	        	receiver.OnPosition(symbol,position);
+	        	this.position = position;
+	        	receiver.OnPosition(symbol,position,tickIO.Bid,tickIO.Time);
         	}
-        	this.position = position;
         }
         
 		private void VerifyQuote() {

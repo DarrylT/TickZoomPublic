@@ -59,6 +59,8 @@ namespace TickZoom.Api
 		
 		void Change( double position, double price, TimeStamp time);
 		
+		void Change( SymbolInfo symbol, double position, double price, TimeStamp time);
+		
 		/// <summary>
 		/// Copies a Position object including all properties to this position object.
 		/// </summary>

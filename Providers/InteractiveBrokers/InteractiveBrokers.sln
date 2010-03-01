@@ -12,6 +12,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Krs.Ats.IBNet", "Krs.Ats.IB
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IBProviderService", "InteractiveBrokers\IBProviderService.csproj", "{6D1A9B7C-00EB-4F5F-AB65-A50E161AD84A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProviderUtilTests", "..\Common\ProviderUtilTests\ProviderUtilTests.csproj", "{FC143137-365B-420B-8832-FC8AE61EEC1C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -38,5 +40,9 @@ Global
 		{6D1A9B7C-00EB-4F5F-AB65-A50E161AD84A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6D1A9B7C-00EB-4F5F-AB65-A50E161AD84A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6D1A9B7C-00EB-4F5F-AB65-A50E161AD84A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC143137-365B-420B-8832-FC8AE61EEC1C}.Debug|Any CPU.Build.0 = Debug|x86
+		{FC143137-365B-420B-8832-FC8AE61EEC1C}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{FC143137-365B-420B-8832-FC8AE61EEC1C}.Release|Any CPU.Build.0 = Release|x86
+		{FC143137-365B-420B-8832-FC8AE61EEC1C}.Release|Any CPU.ActiveCfg = Release|x86
 	EndGlobalSection
 EndGlobal

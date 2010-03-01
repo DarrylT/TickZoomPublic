@@ -33,12 +33,14 @@ using TickZoom.Api;
 
 namespace TickZoom.Common
 {
+
 	/// <summary>
 	/// Description of OrderManager.
 	/// </summary>
 	public class OrderManager : StrategySupport
 	{
 		IList<LogicalOrder> orders;
+		FillSimulator fillSimulator;
 		public OrderManager(Strategy strategy) : base(strategy) {
 			orders = new List<LogicalOrder>();
 		}
@@ -58,6 +60,12 @@ namespace TickZoom.Common
 		public void OnInitialize() {
 			Strategy.AddInterceptor(EventType.Open, this);
 			Strategy.AddInterceptor(EventType.Tick, this);
+			fillSimulator = Factory.Utility.FillSimulator();
+			fillSimulator.Symbol = Strategy.Data.SymbolInfo;
+			fillSimulator.ChangePosition = Strategy.Position.Change;
+			if( Strategy.Performance.GraphTrades) {
+				fillSimulator.DrawTrade = Strategy.Chart.DrawTrade;
+			}
 		}
 		
 		public void Add(LogicalOrder order)
@@ -88,12 +96,11 @@ namespace TickZoom.Common
 			}
 			return true;
 		}
-		
 		public void ProcessOrders(Tick tick) {
-			Strategy.Orders.Enter.ActiveNow.OnProcessOrders(tick);
-			Strategy.Orders.Exit.ActiveNow.OnProcessOrders(tick);
+			fillSimulator.ProcessOrders(tick,Strategy.ActiveOrders,Strategy.Position.Current);
 		}
-		
+
+        
 		public bool AreExitsActive {
 			get { return Strategy.Position.HasPosition; }
 		}
@@ -105,5 +112,6 @@ namespace TickZoom.Common
 		public PositionInterface Position {
 			get { return Strategy.Position; }
 		}
+		
 	}
 }

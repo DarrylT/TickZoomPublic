@@ -51,7 +51,7 @@ namespace RealTime
 		[TestFixtureSetUp]
 		public override void RunStrategy()
 		{
-			ConfigurationManager.AppSettings.Set("TestProviderCutOff-Mock4Sim","1984-12-31 00:00:00.000");
+			ConfigurationManager.AppSettings.Set("ProviderAddress","InProcess");
 			DeleteFiles();
 			base.Symbols="Mock4Sim";
 			base.RunStrategy();

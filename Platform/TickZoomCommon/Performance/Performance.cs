@@ -35,6 +35,8 @@ namespace TickZoom.Common
 {
 	public class Performance : StrategyInterceptor
 	{
+		private static readonly Log tradeLog = Factory.Log.GetLogger("TradeLog");
+		private static readonly bool tradeInfo = tradeLog.IsInfoEnabled;
 		TransactionPairs comboTrades;
 		TransactionPairsBinary comboTradesBinary;
 		bool graphTrades = true;
@@ -173,6 +175,7 @@ namespace TickZoom.Common
 			comboTradesBinary.Current = comboTrade;
 			double pnl = profitLoss.CalculateProfit(comboTrade.Direction,comboTrade.EntryPrice,comboTrade.ExitPrice);
 			Equity.OnChangeClosedEquity( pnl);
+			if( tradeInfo) tradeLog.Info( model.Name + "," + Equity.ClosedEquity + "," + pnl + "," + comboTrade);
 			if( model is Strategy) {
 				Strategy strategy = (Strategy) model;
 				strategy.OnExitTrade();

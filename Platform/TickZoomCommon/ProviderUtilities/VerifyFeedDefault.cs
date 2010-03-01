@@ -93,18 +93,22 @@ namespace TickZoom.Common
 				log.Debug("VerifyFeed");
 			int startTime = Environment.TickCount;
 			count = 0;
+			double position;
 			while (Environment.TickCount - startTime < timeout * 1000) {
 				if (!tickQueue.CanDequeue)
 					Thread.Sleep(100);
 				if (tickQueue.CanDequeue) {
-					double position;
 					if( actualPositions.TryGetValue(symbol.BinaryIdentifier,out position) &&
 					   position == expectedPosition) {
 						return expectedPosition;
 					}
 				}
 			}
-			return actualPositions[symbol.BinaryIdentifier];
+			if( actualPositions.TryGetValue(symbol.BinaryIdentifier,out position)) {
+				return position;
+			} else {
+				throw new ApplicationException("Position was never set via call back.");
+			}
 		}
 
 		private bool HandleTick(int expectedCount, Action<TickIO, TickIO, ulong> assertTick, SymbolInfo symbol)
@@ -231,7 +235,7 @@ namespace TickZoom.Common
 			return actualPositions[symbol.BinaryIdentifier];
 		}
 
-		public void OnPosition(SymbolInfo symbol, double signal)
+		public void OnPosition(SymbolInfo symbol, double signal, double price, TimeStamp time)
 		{
 			actualPositions[symbol.BinaryIdentifier] = signal;
 		}

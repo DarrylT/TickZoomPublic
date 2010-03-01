@@ -52,7 +52,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EquityLevel1.cs" />
-    <Compile Include="ProviderTests.cs" />
     <Compile Include="TimeAndSales.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <None Include="app.config" />
@@ -66,6 +65,10 @@
     <ProjectReference Include="..\..\..\Platform\TickZoomTickUtil\TickUtil.csproj">
       <Project>{44135BE2-CBA4-4041-8F31-91C480302C2D}</Project>
       <Name>TickUtil</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Common\ProviderUtilTests\ProviderUtilTests.csproj">
+      <Project>{FC143137-365B-420B-8832-FC8AE61EEC1C}</Project>
+      <Name>ProviderUtilTests</Name>
     </ProjectReference>
     <ProjectReference Include="..\InteractiveBrokers\IBProviderService.csproj">
       <Project>{6D1A9B7C-00EB-4F5F-AB65-A50E161AD84A}</Project>

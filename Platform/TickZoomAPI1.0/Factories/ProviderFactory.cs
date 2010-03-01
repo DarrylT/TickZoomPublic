@@ -28,6 +28,7 @@ namespace TickZoom.Api
 {
 	public interface ProviderFactory {
 		void Release();
+		Provider InProcessProvider();
 		Provider RemoteProvider();
 		Provider ProviderProcess(string address, ushort port, string executableFileName);
 		Receiver VerifyState();

@@ -33,14 +33,16 @@ namespace TickZoom.Api
 {
 	public enum TradeDirection {
 		Entry,
-		Exit
+		Exit,
+		ExitStrategy,
 	}
 	public enum OrderType {
 		BuyMarket,
-		SellMarket,
-		BuyLimit,
-		SellLimit,
 		BuyStop,
-		SellStop
+		BuyLimit,
+		SellMarket,
+		SellStop,
+		SellLimit,
+		StopLoss,
 	}
 }

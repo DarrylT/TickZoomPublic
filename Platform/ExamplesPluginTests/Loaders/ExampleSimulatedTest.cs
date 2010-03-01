@@ -44,7 +44,8 @@ namespace Loaders
 		ExampleOrderStrategy strategy;
 			
 		[TestFixtureSetUp]
-		public void RunStrategy() {
+		public override void RunStrategy() {
+			base.RunStrategy();
 			try {
 				Starter starter = new HistoricalStarter();
 				
@@ -64,6 +65,8 @@ namespace Loaders
 	
 	    		// Get the stategy
 	    		strategy = loader.TopModel as ExampleOrderStrategy;
+	    		
+	    		LoadTrades();
 			} catch( Exception ex) {
 				log.Error("Setup error.", ex);
 				throw;
@@ -86,7 +89,17 @@ namespace Loaders
 		public void VerifyStartingEquity() {
 			Assert.AreEqual( 10000,strategy.Performance.Equity.StartingEquity,"starting equity");
 		}
+		
+		[Test]
+		public void VerifyTrades() {
+			VerifyTrades(strategy);
+		}
 
+		[Test]
+		public void VerifyTradeCount() {
+			VerifyTradeCount(strategy);
+		}
+		
 		#endregion
 		
 		[Test]

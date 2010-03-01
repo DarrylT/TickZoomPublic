@@ -411,7 +411,8 @@ namespace TickZoom
 		{
 			Color color = Color.Empty;
 			ArrowDirection direction = ArrowDirection.Up;
-			if( order.TradeDirection == TradeDirection.Exit) {
+			if( order.TradeDirection == TradeDirection.Exit ||
+			    order.TradeDirection == TradeDirection.ExitStrategy ) {
 				color = Color.Black;	
 			} else {
 				switch( order.Type) {

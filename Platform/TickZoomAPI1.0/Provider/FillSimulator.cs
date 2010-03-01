@@ -17,29 +17,30 @@
  *
  * You should have received a copy of the TickZOOM General Public
  * License along with this program.  If not, see
+ * 
+ * 
+ *
+ * User: Wayne Walter
+ * Date: 5/18/2009
+ * Time: 12:54 PM
  * <http://www.tickzoom.org/wiki/Licenses>.
  */
 #endregion
 
 using System;
-using System.Reflection;
-using System.ServiceProcess;
-
+using System.Collections.Generic;
 using TickZoom.Api;
 
-namespace TickZoom.ProviderUtilities
+namespace TickZoom.Api
 {
-	public static class AssemblyAttributes {
-		
-		public static string GetTitle() {
-			System.Reflection.Assembly thisAssembly = Assembly.GetEntryAssembly();
-			object[] attributes = thisAssembly.GetCustomAttributes(typeof(AssemblyTitleAttribute), false);
-			if (attributes.Length == 1)
-			{
-			   return (((AssemblyTitleAttribute) attributes[0]).Title);
-			} else {
-				throw new ApplicationException("Found more than one Assembly Title attribute. Unable to choose service name.");
-			}
-		}
+	public interface FillSimulator
+	{
+		void ProcessOrders(Tick tick, IList<LogicalOrder> orders, double position);
+		Func<LogicalOrder, double, double, int> DrawTrade { get; set; }
+		Action<SymbolInfo, double, double, TimeStamp> ChangePosition { get; set; }
+		bool IsSyntheticMarkets { get; set; }
+		bool IsSyntheticLimits { get; set; }
+		bool IsSyntheticStops { get; set; }
+		SymbolInfo Symbol { get; set; }
 	}
 }

@@ -528,7 +528,7 @@ namespace MBTest
 			
 		}
     	
-		public void OnPosition(SymbolInfo symbol, double signal)
+		public void OnPosition(SymbolInfo symbol, double signal, double price, TimeStamp time)
 		{
 			throw new NotImplementedException();
 		}

@@ -56,9 +56,9 @@ namespace TickZoom.TickUtil
 			readQueue.EnQueue(ref o);
 		}
 
-	    public void OnPosition(SymbolInfo symbol, double signal)
+	    public void OnPosition(SymbolInfo symbol, double signal, double price, TimeStamp time)
 	    {
-	        readQueue.EnQueue(EntryType.PositionChange, symbol);
+	    	throw new NotImplementedException();
 	    }
 
 	    public void OnRealTime(SymbolInfo symbol) {

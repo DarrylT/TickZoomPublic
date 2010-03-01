@@ -57,8 +57,10 @@ namespace TickZoom.Common
 			if( IsTrace) Log.Trace(Strategy.FullName+".Initialize()");
 			Strategy.Drawing.Color = Color.Black;
 			orders.buyMarket = Factory.Engine.LogicalOrder(Strategy.Data.SymbolInfo,Strategy);
+			orders.buyMarket.TradeDirection = TradeDirection.Exit;
 			orders.buyMarket.Type = OrderType.BuyMarket;
 			orders.sellMarket = Factory.Engine.LogicalOrder(Strategy.Data.SymbolInfo,Strategy);
+			orders.sellMarket.TradeDirection = TradeDirection.Exit;
 			orders.sellMarket.Type = OrderType.SellMarket;
 			orders.buyStop = Factory.Engine.LogicalOrder(Strategy.Data.SymbolInfo,Strategy);
 			orders.buyStop.Type = OrderType.BuyStop;
@@ -82,24 +84,6 @@ namespace TickZoom.Common
 			position = Strategy.Position;
 		}
 
-		public void OnProcessOrders(Tick tick) {
-			if( IsTrace) Log.Trace("OnProcessOrders() Model.Signal="+Strategy.Position.Current);
-			if( position.IsLong) {
-				orders.buyStop.IsActive = false;
-				orders.buyLimit.IsActive = false;
-			}
-			if( position.IsShort) {
-				orders.sellLimit.IsActive = false;
-				orders.sellStop.IsActive = false;
-			}
-			if( position.HasPosition ) {
-				if( orders.buyStop.IsActive ) ProcessBuyStop(tick);
-				if( orders.sellStop.IsActive ) ProcessSellStop(tick);
-				if( orders.buyLimit.IsActive ) ProcessBuyLimit(tick);
-				if( orders.sellLimit.IsActive ) ProcessSellLimit(tick);
-			}
-		}
-		
 		private void FlattenSignal(double price) {
 			Strategy.Position.Change(0,price,Strategy.Ticks[0].Time);
 			CancelOrders();
@@ -110,82 +94,6 @@ namespace TickZoom.Common
 			orders.sellStop.IsActive = false;
 			orders.buyLimit.IsActive = false;
 			orders.sellLimit.IsActive = false;
-		}
-		
-		private void ProcessBuyStop(Tick tick) {
-			if( orders.buyStop.IsActive &&
-			    Strategy.Position.IsShort &&
-			    tick.Ask >= orders.buyStop.Price) {
-				LogExit("Buy Stop Exit at " + tick);
-				FlattenSignal(tick.Ask);
-				if( Strategy.Performance.GraphTrades) {
-	                Strategy.Chart.DrawTrade(orders.buyStop,tick.Ask,Strategy.Position.Current);
-				}
-				CancelOrders();
-			} 
-		}
-		
-		private void ProcessBuyLimit(Tick tick) {
-			if( orders.buyLimit.IsActive && 
-			    Strategy.Position.IsShort)
-            {
-				double price = 0;
-				bool isFilled = false;
-				if (tick.Ask <= orders.buyLimit.Price) {
-					price = tick.Ask;
-					isFilled = true;
-				} else if(tick.IsTrade && tick.Price < orders.buyLimit.Price) {
-					price = orders.buyLimit.Price;
-					isFilled = true;
-				}
-				if( isFilled) {
-                    LogExit("Buy Limit Exit at " + tick);
-                    FlattenSignal(price);
-                    if (Strategy.Performance.GraphTrades)
-                    {
-                        Strategy.Chart.DrawTrade(orders.buyLimit, price, Strategy.Position.Current);
-                    }
-                    CancelOrders();
-                }
-			} 
-		}
-		
-		private void ProcessSellStop(Tick tick) {
-			if( orders.sellStop.IsActive &&
-			    Strategy.Position.IsLong &&
-			    tick.Bid <= orders.sellStop.Price) {
-				LogExit("Sell Stop Exit at " + tick);
-				FlattenSignal(tick.Bid);
-				if( Strategy.Performance.GraphTrades) {
-	                Strategy.Chart.DrawTrade(orders.sellStop,tick.Bid,Strategy.Position.Current);
-				}
-				CancelOrders();
-			}
-		}
-		
-		private void ProcessSellLimit(Tick tick) {
-			if( orders.sellLimit.IsActive &&
-			    Strategy.Position.IsLong)
-            {
-				double price = 0;
-				bool isFilled = false;
-				if (tick.Bid >= orders.sellLimit.Price) {
-					price = tick.Bid;
-					isFilled = true;
-				} else if(tick.IsTrade && tick.Price > orders.sellLimit.Price) {
-					price = orders.sellLimit.Price;
-					isFilled = true;
-				}
-				if( isFilled) {
-                    LogExit("Sell Stop Limit at " + tick);
-                    FlattenSignal(price);
-                    if (Strategy.Performance.GraphTrades)
-                    {
-                        Strategy.Chart.DrawTrade(orders.sellLimit, price, Strategy.Position.Current);
-                    }
-                    CancelOrders();
-                }
-			}
 		}
 		
 		private void LogExit(string description) {
@@ -211,10 +119,6 @@ namespace TickZoom.Common
 		       	} else {
 		        	orders.sellMarket.IsActive = true;
 	        	}
-				if( Strategy.Performance.GraphTrades) {
-	        		Strategy.Chart.DrawTrade(orders.sellMarket,Strategy.Ticks[0].Bid,Strategy.Position.Current);
-				}
-	        	FlattenSignal(Strategy.Ticks[0].Bid);
         	}
         	if( Strategy.Position.IsShort) {
 	        	orders.buyMarket.Price = 0;
@@ -224,10 +128,6 @@ namespace TickZoom.Common
 		       	} else {
 		        	orders.buyMarket.IsActive = true;
 	        	}
-				if( Strategy.Performance.GraphTrades) {
-	        		Strategy.Chart.DrawTrade(orders.buyMarket,Strategy.Ticks[0].Ask,Strategy.Position.Current);
-				}
-	        	FlattenSignal(Strategy.Ticks[0].Ask);
         	}
 		}
 	

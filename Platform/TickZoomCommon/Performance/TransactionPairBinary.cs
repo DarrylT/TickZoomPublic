@@ -1,4 +1,4 @@
-#region Copyright
+﻿#region Copyright
 /*
  * Software: TickZoom Trading Platform
  * Copyright 2009 M. Wayne Walter
@@ -26,11 +26,7 @@ using TickZoom.Api;
 
 namespace TickZoom.Common
 {
-	/// <summary>
-	/// Description of Trade.
-	/// </summary>
-	[Obsolete("Please use TransactionPairBinary instead.",true)]
-	public struct RoundTurnBinary 
+	public class TransactionPairBinary 
 	{
 		private static readonly Log log = Factory.Log.GetLogger(typeof(TransactionPair));
 		private static readonly bool debug = log.IsDebugEnabled;
@@ -47,13 +43,34 @@ namespace TickZoom.Common
 		private double minPrice;
 		private bool completed;
 		
+		public TransactionPairBinary() {
+			
+		}
+		
+		public static TransactionPairBinary Parse(string value) {
+			TransactionPairBinary pair = new TransactionPairBinary();
+			string[] fields = value.Split(',');
+			int field = 0;
+			pair.direction = double.Parse(fields[field++]);
+			pair.entryBar = int.Parse(fields[field++]);
+			pair.entryPrice = double.Parse(fields[field++]);
+			pair.entryTime = TimeStamp.Parse(fields[field++]);
+			pair.exitBar = int.Parse(fields[field++]);
+			pair.exitPrice = double.Parse(fields[field++]);
+			pair.exitTime = TimeStamp.Parse(fields[field++]);
+			pair.maxPrice = double.Parse(fields[field++]);
+			pair.minPrice = double.Parse(fields[field++]);
+			return pair;
+		}
+	
+		
 		public bool Completed {
 			get { return completed; }
 			set { completed = value; }
 		}
 		
-		public static RoundTurnBinary Create() {
-			return new RoundTurnBinary();
+		public static TransactionPairBinary Create() {
+			return new TransactionPairBinary();
 		}
 		
 		public void SetProperties(string parameters)
@@ -66,7 +83,7 @@ namespace TickZoom.Common
 			ExitTime = new TimeStamp(strings[4]);
 		}
 		
-		public RoundTurnBinary(RoundTurnBinary other) {
+		public TransactionPairBinary(TransactionPairBinary other) {
 			entryTime = other.entryTime;
 			exitTime = other.exitTime;
 			direction = other.direction;
@@ -79,9 +96,17 @@ namespace TickZoom.Common
 			completed = other.completed;
 		}
 		
-		public void UpdatePrice(Tick tick) {
-			UpdatePrice(tick.Bid);
+		public void TryUpdate(Tick tick) {
+			if( !completed) {
+				if( direction > 0) {
+					UpdatePrice(tick.IsQuote ? tick.Bid : tick.Price);
+				} else {
+					UpdatePrice(tick.IsQuote ? tick.Ask : tick.Price);
+				}
+				exitTime = tick.Time;
+			}
 		}
+		
 		
 		public void UpdatePrice(double price) {
 			if( trace ) log.Trace("UpdatePrice("+price+")");
@@ -123,21 +148,23 @@ namespace TickZoom.Common
 		}
 		
 		public string ToStringHeader() {
-			return "Direction,EntryPrice,EntryTime,ExitPrice,ExitTime,ProfitLoss";
+			return "Direction,EntryBar,EntryPrice,EntryTime,ExitPrice,ExitBar,ExitTime,MaxPrice,MinPrice,ProfitLoss";
 		}
+		
 		public override string ToString() {
-			return direction + "," + entryPrice + "," + EntryTime.ToString(TIMEFORMAT) + "," +
-				exitPrice + "," + ExitTime.ToString(TIMEFORMAT);
+			return direction + "," + entryBar + "," + entryPrice + "," + EntryTime.ToString(TIMEFORMAT) + "," +
+				exitBar + "," + exitPrice + "," + ExitTime.ToString(TIMEFORMAT) + "," + maxPrice + "," + minPrice;
 		}
+		
 		public override int GetHashCode() {
 			string hash = direction + ":" + entryPrice + EntryTime + exitPrice + ExitTime;
 			return hash.GetHashCode();
 		}
 		public override bool Equals(object obj) {
-			if( obj.GetType() != typeof(RoundTurnBinary)) {
+			if( obj.GetType() != typeof(TransactionPairBinary)) {
 				return false;
 			}
-			RoundTurnBinary trade = (RoundTurnBinary) obj;
+			TransactionPairBinary trade = (TransactionPairBinary) obj;
 			return this.direction == trade.direction &&
 				this.entryPrice == trade.entryPrice &&
 				this.EntryTime == trade.EntryTime &&
@@ -173,6 +200,4 @@ namespace TickZoom.Common
 			set { exitTime = value; }
 		}
 	}
-
-
 }

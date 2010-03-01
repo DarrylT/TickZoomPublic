@@ -49,13 +49,19 @@ namespace TickZoom.Test
 		public void Init()
 		{
 			string appData = Factory.Settings["AppDataFolder"];
-			File.Delete( appData + @"\Logs\IBProviderTests.log");
-			File.Delete( appData + @"\Logs\IBProviderService.log");
+			File.Delete( appData + @"\Logs\"+providerAssembly+"Tests.log");
+			File.Delete( appData + @"\Logs\"+providerAssembly+".log");
 			
 		}
 		
 		public void SetSymbol( string symbolString) {
 			symbol = Factory.Symbol.LookupSymbol(symbolString);
+		}
+		
+		private string providerAssembly = "TickZoomProviderMock";
+		
+		public void SetProviderAssembly( string providerAssembly) {
+			this.providerAssembly = providerAssembly;	
 		}
 		
 		public abstract Provider ProviderFactory();
@@ -64,7 +70,7 @@ namespace TickZoom.Test
 			if( inProcessFlag) {
 				provider = ProviderFactory();
 			} else {
-				provider = Factory.Provider.ProviderProcess("127.0.0.1",6492,"IBProviderService.exe");
+				provider = Factory.Provider.ProviderProcess("127.0.0.1",6492,providerAssembly+".exe");
 			}
 			verify = Factory.Utility.VerifyFeed();
 			provider.Start(verify);
@@ -78,17 +84,17 @@ namespace TickZoom.Test
 		[TearDown]
 		public void TearDown() {
 	  		provider.Stop(verify);	
-	  			provider.Stop();	
+	  		provider.Stop();	
 		}
 		
 		[Test]
 		public void DemoConnectionTest() {
 			if(debug) log.Debug("===DemoConnectionTest===");
 			if(debug) log.Debug("===StartSymbol===");
-	  			provider.StartSymbol(verify,symbol,TimeStamp.MinValue);
+	  		provider.StartSymbol(verify,symbol,TimeStamp.MinValue);
 			if(debug) log.Debug("===VerifyFeed===");
-	  			long count = verify.Verify(2,assertTick,symbol,25);
-	  			Assert.GreaterOrEqual(count,2,"tick count");
+	  		long count = verify.Verify(2,assertTick,symbol,25);
+	  		Assert.GreaterOrEqual(count,2,"tick count");
 		}
 		
 		Action<TickIO, TickIO, ulong> assertTick;
@@ -99,37 +105,37 @@ namespace TickZoom.Test
 			if(debug) log.Debug("===StartSymbol===");
 	  		provider.StartSymbol(verify,symbol,TimeStamp.MinValue);
 			if(debug) log.Debug("===VerifyFeed===");
-	  			long count = verify.Verify(2,assertTick,symbol,25);
-	  			Assert.GreaterOrEqual(count,2,"tick count");
+	  		long count = verify.Verify(2,assertTick,symbol,25);
+	  		Assert.GreaterOrEqual(count,2,"tick count");
 			if(debug) log.Debug("===StopSymbol===");
-	  			provider.StopSymbol(verify,symbol);
-	  			verify.TickQueue.Clear();
-	  			count = verify.Verify(0,assertTick,symbol,10);
-	  			Assert.AreEqual(0,count,"tick count");
+	  		provider.StopSymbol(verify,symbol);
+	  		verify.TickQueue.Clear();
+	  		count = verify.Verify(0,assertTick,symbol,10);
+	  		Assert.AreEqual(0,count,"tick count");
 		}
 	
 		[Test]
 		public void DemoReConnectionTest() {
-	  			provider.StartSymbol(verify,symbol,TimeStamp.MinValue);
-	  			long count = verify.Verify(2,assertTick,symbol,25);
-	  			Assert.GreaterOrEqual(count,2,"tick count");
-	  			provider.Stop();
-	  			CreateProvider(true);
-	  			provider.StartSymbol(verify,symbol,TimeStamp.MinValue);
-	  			count = verify.Verify(2,assertTick,symbol,25);
-	  			Assert.GreaterOrEqual(count,2,"tick count");
+	  		provider.StartSymbol(verify,symbol,TimeStamp.MinValue);
+	  		long count = verify.Verify(2,assertTick,symbol,25);
+  			Assert.GreaterOrEqual(count,2,"tick count");
+  			provider.Stop();
+  			CreateProvider(true);
+  			provider.StartSymbol(verify,symbol,TimeStamp.MinValue);
+  			count = verify.Verify(2,assertTick,symbol,25);
+  			Assert.GreaterOrEqual(count,2,"tick count");
 		}
 	
 		[Test]
 		public void TestSeperateProcess() {
 			provider.Stop();
 			CreateProvider(false);
-	  			provider.StartSymbol(verify,symbol,TimeStamp.MinValue);
+  			provider.StartSymbol(verify,symbol,TimeStamp.MinValue);
 			if(debug) log.Debug("===VerifyFeed===");
-	  			long count = verify.Verify(2,assertTick,symbol,25);
-	  			Assert.GreaterOrEqual(count,2,"tick count");
-	  			Process[] processes = Process.GetProcessesByName("IBProviderService");
-	  			Assert.AreEqual(1,processes.Length,"Number of MBTradingService processes.");
+  			long count = verify.Verify(2,assertTick,symbol,25);
+  			Assert.GreaterOrEqual(count,2,"tick count");
+  			Process[] processes = Process.GetProcessesByName(providerAssembly);
+  			Assert.AreEqual(1,processes.Length,"Number of MBTradingService processes.");
 		}
 		
 		[Test]
@@ -178,9 +184,9 @@ namespace TickZoom.Test
         	Assert.IsTrue(tick.IsQuote);
         	if( tick.IsQuote) {
 	        	Assert.Greater(tick.Bid,0);
-	        	Assert.Greater(tick.BidLevel(0),0);
+//	        	Assert.Greater(tick.BidLevel(0),0);
 	        	Assert.Greater(tick.Ask,0);
-	        	Assert.Greater(tick.AskLevel(0),0);
+//	        	Assert.Greater(tick.AskLevel(0),0);
         	}
         	Assert.IsFalse(tick.IsTrade);
         	if( tick.IsTrade) {

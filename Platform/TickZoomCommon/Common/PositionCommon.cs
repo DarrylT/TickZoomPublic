@@ -72,6 +72,10 @@ namespace TickZoom.Common
 			Change( position, price, model.Data.Ticks[0].Time);
 		}
 		
+		public virtual void Change( SymbolInfo symbol, double position, double price, TimeStamp time) {
+			Change(position,price,time);
+		}
+		
 		public virtual void Change( double position, double price, TimeStamp time) {
 			if( current != position) {
 				this.time = time;

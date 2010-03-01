@@ -49,5 +49,8 @@ namespace TickZoom.Common
 		public VerifyFeed VerifyFeed() {
 			return new VerifyFeedDefault();
 		}
+		public FillSimulator FillSimulator() {
+			return new FillSimulatorDefault();
+		}
 	}
 }

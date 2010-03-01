@@ -88,7 +88,7 @@ namespace TickZoom.TickUtil
 			tickQueue.EnQueue(ref o);
 		}
 
-	    public void OnPosition(SymbolInfo symbol, double signal)
+	    public void OnPosition(SymbolInfo symbol, double position, double price, TimeStamp time)
 	    {
 	        throw new NotImplementedException();
 	    }

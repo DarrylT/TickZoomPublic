@@ -32,7 +32,7 @@ namespace TickZoom.Api
 	    void OnRealTime(SymbolInfo symbol);
 	    void OnEndRealTime(SymbolInfo symbol);
 	    void OnSend(ref TickBinary o);
-        void OnPosition(SymbolInfo symbol, double signal);
+        void OnPosition(SymbolInfo symbol, double position, double price, TimeStamp time);
 	    void OnStop();
 	    void OnError( string error);
 	    ReceiverState OnGetReceiverState(SymbolInfo symbol);

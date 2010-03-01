@@ -29,6 +29,7 @@
 
 using System;
 using System.ComponentModel;
+using System.Threading;
 
 namespace TickZoom.Api
 {
@@ -170,6 +171,19 @@ namespace TickZoom.Api
 				}
 				return provider;
 			}
+		}
+		
+		private static int tickCount = 0;
+		
+		public static int TickCount {
+			get { return tickCount; }
+		}
+		
+		public static void IncrementTickCount() {
+			Interlocked.Increment(ref tickCount);
+		}
+		public static void DecrementTickCount() {
+			Interlocked.Decrement(ref tickCount);
 		}
 		
 		public static TickUtilFactory TickUtil {
