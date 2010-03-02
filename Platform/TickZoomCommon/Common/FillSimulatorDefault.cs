@@ -44,9 +44,9 @@ namespace TickZoom.Common
 		double position;
 		private Action<SymbolInfo, double, double, TimeStamp> changePosition;
 		private Func<LogicalOrder, double, double, int> drawTrade;
-		private bool isSyntheticMarkets = true;
-		private bool isSyntheticStops = true;
-		private bool isSyntheticLimits = true;
+		private bool useSyntheticMarkets = true;
+		private bool useSyntheticStops = true;
+		private bool useSyntheticLimits = true;
 		private SymbolInfo symbol;
 		
 		public FillSimulatorDefault()
@@ -95,17 +95,17 @@ namespace TickZoom.Common
 			if (IsLong) {
 				switch (order.Type) {
 					case OrderType.SellMarket:
-						if (isSyntheticMarkets) {
+						if (useSyntheticMarkets) {
 							ProcessSellMarket(order, tick);
 						}
 						break;
 					case OrderType.SellStop:
-						if (isSyntheticStops) {
+						if (useSyntheticStops) {
 							ProcessSellStop(order, tick);
 						}
 						break;
 					case OrderType.SellLimit:
-						if (isSyntheticLimits) {
+						if (useSyntheticLimits) {
 							ProcessSellLimit(order, tick);
 						}
 						break;
@@ -115,17 +115,17 @@ namespace TickZoom.Common
 			if (IsShort) {
 				switch (order.Type) {
 					case OrderType.BuyMarket:
-						if (isSyntheticMarkets) {
+						if (useSyntheticMarkets) {
 							ProcessBuyMarket(order, tick);
 						}
 						break;
 					case OrderType.BuyStop:
-						if (isSyntheticStops) {
+						if (useSyntheticStops) {
 							ProcessBuyStop(order, tick);
 						}
 						break;
 					case OrderType.BuyLimit:
-						if (isSyntheticLimits) {
+						if (useSyntheticLimits) {
 							ProcessBuyLimit(order, tick);
 						}
 						break;
@@ -258,25 +258,25 @@ namespace TickZoom.Common
 			if (IsTrace)
 				Log.Trace("OnProcessEnterOrder()");
 			if (IsFlat || (allowReversal && IsShort)) {
-				if (order.Type == OrderType.BuyMarket && isSyntheticMarkets) {
+				if (order.Type == OrderType.BuyMarket && useSyntheticMarkets) {
 					ProcessEnterBuyMarket(order, tick);
 				}
-				if (order.Type == OrderType.BuyStop && isSyntheticStops) {
+				if (order.Type == OrderType.BuyStop && useSyntheticStops) {
 					ProcessEnterBuyStop(order, tick);
 				}
-				if (order.Type == OrderType.BuyLimit && isSyntheticLimits) {
+				if (order.Type == OrderType.BuyLimit && useSyntheticLimits) {
 					ProcessEnterBuyLimit(order, tick);
 				}
 			}
 
 			if (IsFlat || (allowReversal && IsLong)) {
-				if (order.Type == OrderType.SellMarket && isSyntheticMarkets) {
+				if (order.Type == OrderType.SellMarket && useSyntheticMarkets) {
 					ProcessEnterSellMarket(order, tick);
 				}
-				if (order.Type == OrderType.SellStop && isSyntheticStops) {
+				if (order.Type == OrderType.SellStop && useSyntheticStops) {
 					ProcessEnterSellStop(order, tick);
 				}
-				if (order.Type == OrderType.SellLimit && isSyntheticLimits) {
+				if (order.Type == OrderType.SellLimit && useSyntheticLimits) {
 					ProcessEnterSellLimit(order, tick);
 				}
 			}
@@ -396,19 +396,19 @@ namespace TickZoom.Common
 			set { changePosition = value; }
 		}
 		
-		public bool IsSyntheticLimits {
-			get { return isSyntheticLimits; }
-			set { isSyntheticLimits = value; }
+		public bool UseSyntheticLimits {
+			get { return useSyntheticLimits; }
+			set { useSyntheticLimits = value; }
 		}
 		
-		public bool IsSyntheticStops {
-			get { return isSyntheticStops; }
-			set { isSyntheticStops = value; }
+		public bool UseSyntheticStops {
+			get { return useSyntheticStops; }
+			set { useSyntheticStops = value; }
 		}
 		
-		public bool IsSyntheticMarkets {
-			get { return isSyntheticMarkets; }
-			set { isSyntheticMarkets = value; }
+		public bool UseSyntheticMarkets {
+			get { return useSyntheticMarkets; }
+			set { useSyntheticMarkets = value; }
 		}
 		
 		public SymbolInfo Symbol {

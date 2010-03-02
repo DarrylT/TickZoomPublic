@@ -63,6 +63,10 @@ namespace TickZoom.Common
 			fillSimulator = Factory.Utility.FillSimulator();
 			fillSimulator.Symbol = Strategy.Data.SymbolInfo;
 			fillSimulator.ChangePosition = Strategy.Position.Change;
+			fillSimulator.UseSyntheticLimits = Strategy.Data.SymbolInfo.UseSyntheticLimits;
+			fillSimulator.UseSyntheticMarkets = Strategy.Data.SymbolInfo.UseSyntheticMarkets;
+			fillSimulator.UseSyntheticStops = Strategy.Data.SymbolInfo.UseSyntheticStops;
+			
 			if( Strategy.Performance.GraphTrades) {
 				fillSimulator.DrawTrade = Strategy.Chart.DrawTrade;
 			}

@@ -56,6 +56,9 @@ namespace TickZoom.Common
 		private TimeAndSales timeAndSales = TimeAndSales.ActualTrades;
 		private string displayTimeZone;
 		private string timeZone;
+		private bool useSyntheticMarkets = true;
+		private bool useSyntheticLimits = true;
+		private bool useSyntheticStops = true;
 		
 		public TimeAndSales TimeAndSales {
 			get { return timeAndSales; }
@@ -170,5 +173,19 @@ namespace TickZoom.Common
 			set { timeZone = value; }
 		}
 		
+		public bool UseSyntheticMarkets {
+			get { return useSyntheticMarkets; }
+			set { useSyntheticMarkets = value; }
+		}
+		
+		public bool UseSyntheticLimits {
+			get { return useSyntheticLimits; }
+			set { useSyntheticLimits = value; }
+		}
+		
+		public bool UseSyntheticStops {
+			get { return useSyntheticStops; }
+			set { useSyntheticStops = value; }
+		}
 	}
 }

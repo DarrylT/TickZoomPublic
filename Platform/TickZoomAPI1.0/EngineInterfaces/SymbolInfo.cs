@@ -173,6 +173,30 @@ namespace TickZoom.Api
  		string TimeZone {
  			get;
  		}
+ 		
+ 		/// <summary>
+ 		/// Determines whether limit orders will get held and converted
+ 		/// to market orders or else sent to the broker for execution.
+ 		/// </summary>
+ 		bool UseSyntheticLimits {
+ 			get;
+ 		}
+ 		
+ 		/// <summary>
+ 		/// Determines whether market orders will get held and converted
+ 		/// to market orders or else sent to the broker for execution.
+ 		/// </summary>
+ 		bool UseSyntheticMarkets {
+ 			get;
+ 		}
+ 		
+ 		/// <summary>
+ 		/// Determines whether stop orders will get held and converted
+ 		/// to market orders or else sent to the broker for execution.
+ 		/// </summary>
+ 		bool UseSyntheticStops {
+ 			get;
+ 		}
 	}
 	
 	public enum TimeAndSales {
