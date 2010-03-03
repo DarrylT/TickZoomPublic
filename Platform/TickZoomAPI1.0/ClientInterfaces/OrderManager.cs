@@ -17,6 +17,12 @@
  *
  * You should have received a copy of the TickZOOM General Public
  * License along with this program.  If not, see
+ * 
+ * 
+ *
+ * User: Wayne Walter
+ * Date: 3/16/2009
+ * Time: 2:22 PM
  * <http://www.tickzoom.org/wiki/Licenses>.
  */
 #endregion
@@ -26,29 +32,10 @@ using System.Collections.Generic;
 
 namespace TickZoom.Api
 {
-	public interface PhysicalOrder {
-		SymbolInfo Symbol {
-			get;
-		}
-		
-		OrderType Type {
-			get;
-		}
-		
-		double Price {
-			get;
-		}
-		
-		double Size {
-			get;
-		}
-		
-		int LogicalOrderId {
-			get;
-		}
-		
-		object BrokerOrder {
-			get;
-		}
+	public interface OrderManager : StrategyInterceptor
+	{
+		bool DoEntryOrders { get; set; }
+		bool DoExitOrders { get; set; }
+		bool DoExitStrategyOrders { get; set; }
 	}
 }

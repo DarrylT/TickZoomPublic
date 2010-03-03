@@ -31,12 +31,12 @@ using System;
 
 namespace TickZoom.Api
 {
-	public enum TradeDirection {
+	public enum TradeDirection : byte {
 		Entry,
 		Exit,
 		ExitStrategy,
 	}
-	public enum OrderType {
+	public enum OrderType : byte {
 		BuyMarket,
 		BuyStop,
 		BuyLimit,

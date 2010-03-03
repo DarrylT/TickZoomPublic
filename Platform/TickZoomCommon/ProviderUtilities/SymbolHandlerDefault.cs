@@ -63,7 +63,8 @@ namespace TickZoom.Common
         public void SetPosition( double position) {
         	if( this.position != position) {
 	        	this.position = position;
-	        	receiver.OnPosition(symbol,position,tickIO.Bid,tickIO.Time);
+	        	LogicalFillBinary fill = new LogicalFillBinary(position,tickIO.Bid,tickIO.Time,0);
+	        	receiver.OnPositionChange(symbol,fill);
         	}
         }
         

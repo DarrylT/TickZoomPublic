@@ -37,10 +37,15 @@ namespace TickZoom.Api
 	{
 		void ProcessOrders(Tick tick, IList<LogicalOrder> orders, double position);
 		Func<LogicalOrder, double, double, int> DrawTrade { get; set; }
-		Action<SymbolInfo, double, double, TimeStamp> ChangePosition { get; set; }
+		Action<SymbolInfo, LogicalFill> ChangePosition { get; set; }
 		bool UseSyntheticMarkets { get; set; }
 		bool UseSyntheticLimits { get; set; }
 		bool UseSyntheticStops { get; set; }
+		
+		bool DoEntryOrders { get; set; }
+		bool DoExitOrders { get; set; }
+		bool DoExitStrategyOrders { get; set; }
+		
 		SymbolInfo Symbol { get; set; }
 	}
 }

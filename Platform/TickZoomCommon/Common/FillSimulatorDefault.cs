@@ -39,15 +39,19 @@ namespace TickZoom.Common
 		private static readonly bool IsTrace = Log.IsTraceEnabled;
 		private static readonly bool IsDebug = Log.IsDebugEnabled;
 		private static readonly bool IsNotice = Log.IsNoticeEnabled;
-		IList<LogicalOrder> activeOrders;
-		List<LogicalOrder> tempOrders = new List<LogicalOrder>();
-		double position;
-		private Action<SymbolInfo, double, double, TimeStamp> changePosition;
+		private IList<LogicalOrder> activeOrders;
+		private double position;
+		private Action<SymbolInfo, LogicalFill> changePosition;
 		private Func<LogicalOrder, double, double, int> drawTrade;
 		private bool useSyntheticMarkets = true;
 		private bool useSyntheticStops = true;
 		private bool useSyntheticLimits = true;
+		private bool doEntryOrders = true;
+		private bool doExitOrders = true;
+		private bool doExitStrategyOrders = false;
 		private SymbolInfo symbol;
+		private bool allowReversal = true;
+
 		
 		public FillSimulatorDefault()
 		{
@@ -63,14 +67,18 @@ namespace TickZoom.Common
 			}
 			this.position = position;
 			this.activeOrders = orders;
-			tempOrders.Clear();
-			tempOrders.AddRange(activeOrders);
-			foreach (var order in tempOrders) {
-				if (order.IsActive && order.TradeDirection == TradeDirection.Entry) {
-					OnProcessEnterOrder(order, tick);
-				}
-				if (order.IsActive && order.TradeDirection == TradeDirection.Exit) {
-					OnProcessExitOrder(order, tick);
+			for(int i=0; i<activeOrders.Count; i++) {
+				LogicalOrder order = activeOrders[i];
+				if (order.IsActive) {
+					if (doEntryOrders && order.TradeDirection == TradeDirection.Entry) {
+						OnProcessEnterOrder(order, tick);
+					}
+					if (doExitOrders && order.TradeDirection == TradeDirection.Exit) {
+						OnProcessExitOrder(order, tick);
+					}
+					if (doExitStrategyOrders && order.TradeDirection == TradeDirection.ExitStrategy) {
+						OnProcessExitOrder(order, tick);
+					}
 				}
 			}
 		}
@@ -87,7 +95,7 @@ namespace TickZoom.Common
 				}
 			}
 			if (IsShort) {
-				if (order.Type == OrderType.SellStop || order.Type == OrderType.SellLimit) {
+				 if (order.Type == OrderType.SellStop || order.Type == OrderType.SellLimit) {
 					order.IsActive = false;
 				}
 			}
@@ -133,9 +141,10 @@ namespace TickZoom.Common
 			}
 		}
 
-		private void FlattenSignal(double price, Tick tick)
+		private void FlattenSignal(double price, Tick tick, int orderId)
 		{
-			changePosition(symbol, 0, price, tick.Time);
+			LogicalFillBinary fill = new LogicalFillBinary(0,price,tick.Time,orderId);
+			changePosition(symbol, fill);
 			CancelExitOrders();
 		}
 
@@ -152,7 +161,7 @@ namespace TickZoom.Common
 		private void ProcessBuyMarket(LogicalOrder order, Tick tick)
 		{
 			LogMsg("Buy Market Exit at " + tick);
-			FlattenSignal(tick.Ask, tick);
+			FlattenSignal(tick.Ask, tick, order.Id);
 			if (drawTrade != null) {
 				drawTrade(order, tick.Ask, position);
 			}
@@ -162,7 +171,7 @@ namespace TickZoom.Common
 		private void ProcessSellMarket(LogicalOrder order, Tick tick)
 		{
 			LogMsg("Sell Market Exit at " + tick);
-			FlattenSignal(tick.Ask, tick);
+			FlattenSignal(tick.Ask, tick, order.Id);
 			if (drawTrade != null) {
 				drawTrade(order, tick.Bid, position);
 			}
@@ -173,7 +182,7 @@ namespace TickZoom.Common
 		{
 			if (tick.Ask >= order.Price) {
 				LogMsg("Buy Stop Exit at " + tick);
-				FlattenSignal(tick.Ask, tick);
+				FlattenSignal(tick.Ask, tick, order.Id);
 				if (drawTrade != null) {
 					drawTrade(order, tick.Ask, position);
 				}
@@ -194,7 +203,7 @@ namespace TickZoom.Common
 			}
 			if (isFilled) {
 				LogMsg("Buy Limit Exit at " + tick);
-				FlattenSignal(price, tick);
+				FlattenSignal(price, tick, order.Id);
 				if (drawTrade != null) {
 					drawTrade(order, price, position);
 				}
@@ -206,7 +215,7 @@ namespace TickZoom.Common
 		{
 			if (tick.Bid <= order.Price) {
 				LogMsg("Sell Stop Exit at " + tick);
-				FlattenSignal(tick.Bid, tick);
+				FlattenSignal(tick.Bid, tick, order.Id);
 				if (drawTrade != null) {
 					drawTrade(order, tick.Bid, position);
 				}
@@ -227,7 +236,7 @@ namespace TickZoom.Common
 			}
 			if (isFilled) {
 				LogMsg("Sell Stop Limit at " + tick);
-				FlattenSignal(price, tick);
+				FlattenSignal(price, tick, order.Id);
 				if (drawTrade != null) {
 					drawTrade(order, price, position);
 				}
@@ -237,19 +246,6 @@ namespace TickZoom.Common
 
 #endregion
 		
-		private bool IsFlat {
-			get { return position == 0; }
-		}
-
-		private bool IsShort {
-			get { return position < 0; }
-		}
-
-		private bool IsLong {
-			get { return position > 0; }
-		}
-
-		bool allowReversal = true;
 
 #region EntryOrders
 
@@ -286,7 +282,8 @@ namespace TickZoom.Common
 		{
 			if (tick.Ask >= order.Price) {
 				LogMsg("Long Stop Entry at " + tick);
-				changePosition(symbol, order.Positions, tick.Ask, tick.Time);
+				
+				CreateLogicalFill(symbol, order.Positions, tick.Ask, tick.Time, order.Id);
 				if (drawTrade != null) {
 					drawTrade(order, tick.IsQuote ? tick.Ask : tick.Price, order.Positions);
 				}
@@ -298,7 +295,7 @@ namespace TickZoom.Common
 		{
 			if (tick.Ask <= order.Price) {
 				LogMsg("Short Stop Entry at " + tick);
-				changePosition(symbol, order.Positions, tick.Ask, tick.Time);
+				CreateLogicalFill(symbol, order.Positions, tick.Ask, tick.Time, order.Id);
 				if (drawTrade != null) {
 					drawTrade(order, tick.IsQuote ? tick.Bid : tick.Price, order.Positions);
 				}
@@ -314,7 +311,7 @@ namespace TickZoom.Common
 		{
 			LogMsg("Long Market Entry at " + tick);
 			double price = tick.IsQuote ? tick.Ask : tick.Price;
-			changePosition(symbol, order.Positions, price, tick.Time);
+			CreateLogicalFill(symbol, order.Positions, price, tick.Time, order.Id);
 			if (drawTrade != null) {
 				drawTrade(order, price, order.Positions);
 			}
@@ -330,7 +327,12 @@ namespace TickZoom.Common
 				}
 			}
 		}
-
+		
+		private void CreateLogicalFill(SymbolInfo symbol, double position, double price, TimeStamp time, int logicalOrderId) {
+			LogicalFillBinary fill = new LogicalFillBinary( position,price,time,logicalOrderId);
+			changePosition(symbol,fill);
+		}
+		
 		private void ProcessEnterBuyLimit(LogicalOrder order, Tick tick)
 		{
 			double price = 0;
@@ -344,7 +346,7 @@ namespace TickZoom.Common
 			}
 			if (isFilled) {
 				LogMsg("Long Limit Entry at " + tick);
-				changePosition(symbol, order.Positions, price, tick.Time);
+				CreateLogicalFill(symbol, order.Positions, price, tick.Time, order.Id);
 				if (drawTrade != null) {
 					drawTrade(order, price, order.Positions);
 				}
@@ -356,7 +358,7 @@ namespace TickZoom.Common
 		{
 			LogMsg("Short Market Entry at " + tick);
 			double price = tick.IsQuote ? tick.Bid : tick.Price;
-			changePosition(symbol, -order.Positions, price, tick.Time);
+			CreateLogicalFill(symbol, -order.Positions, price, tick.Time, order.Id);
 			if (drawTrade != null) {
 				drawTrade(order, price, -order.Positions);
 			}
@@ -376,7 +378,7 @@ namespace TickZoom.Common
 			}
 			if (isFilled) {
 				LogMsg("Short Limit Entry at " + tick);
-				changePosition(symbol, -order.Positions, price, tick.Time);
+				CreateLogicalFill(symbol, -order.Positions, price, tick.Time, order.Id);
 				if (drawTrade != null) {
 					drawTrade(order, price, -order.Positions);
 				}
@@ -386,12 +388,24 @@ namespace TickZoom.Common
 
 		#endregion
 
+		private bool IsFlat {
+			get { return position == 0; }
+		}
+
+		private bool IsShort {
+			get { return position < 0; }
+		}
+
+		private bool IsLong {
+			get { return position > 0; }
+		}
+		
 		public Func<LogicalOrder, double, double, int> DrawTrade {
 			get { return drawTrade; }
 			set { drawTrade = value; }
 		}
 		
-		public Action<SymbolInfo, double, double, TimeStamp> ChangePosition {
+		public Action<SymbolInfo, LogicalFill> ChangePosition {
 			get { return changePosition; }
 			set { changePosition = value; }
 		}
@@ -414,6 +428,21 @@ namespace TickZoom.Common
 		public SymbolInfo Symbol {
 			get { return symbol; }
 			set { symbol = value; }
+		}
+		
+		public bool DoEntryOrders {
+			get { return doEntryOrders; }
+			set { doEntryOrders = value; }
+		}
+		
+		public bool DoExitOrders {
+			get { return doExitOrders; }
+			set { doExitOrders = value; }
+		}
+		
+		public bool DoExitStrategyOrders {
+			get { return doExitStrategyOrders; }
+			set { doExitStrategyOrders = value; }
 		}
 	}
 }

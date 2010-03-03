@@ -17,38 +17,50 @@
  *
  * You should have received a copy of the TickZOOM General Public
  * License along with this program.  If not, see
+ * 
+ * 
+ *
+ * User: Wayne Walter
+ * Date: 5/18/2009
+ * Time: 12:54 PM
  * <http://www.tickzoom.org/wiki/Licenses>.
  */
 #endregion
 
 using System;
 using System.Collections.Generic;
+using TickZoom.Api;
 
 namespace TickZoom.Api
 {
-	public interface PhysicalOrder {
-		SymbolInfo Symbol {
-			get;
+	public struct LogicalFillBinary : LogicalFill
+	{
+		private double position;
+		private double price;
+		private TimeStamp time;
+		private int orderId;
+		public LogicalFillBinary(double position, double price, TimeStamp time, int orderId)
+		{
+			this.position = position;
+			this.price = price;
+			this.time = time;
+			this.orderId = orderId;
 		}
-		
-		OrderType Type {
-			get;
+
+		public int OrderId {
+			get { return orderId; }
 		}
-		
-		double Price {
-			get;
+
+		public TimeStamp Time {
+			get { return time; }
 		}
-		
-		double Size {
-			get;
+
+		public double Price {
+			get { return price; }
 		}
-		
-		int LogicalOrderId {
-			get;
-		}
-		
-		object BrokerOrder {
-			get;
+
+		public double Position {
+			get { return position; }
 		}
 	}
 }

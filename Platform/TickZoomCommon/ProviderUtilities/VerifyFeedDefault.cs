@@ -235,9 +235,9 @@ namespace TickZoom.Common
 			return actualPositions[symbol.BinaryIdentifier];
 		}
 
-		public void OnPosition(SymbolInfo symbol, double signal, double price, TimeStamp time)
+		public void OnPositionChange(SymbolInfo symbol, LogicalFillBinary fill)
 		{
-			actualPositions[symbol.BinaryIdentifier] = signal;
+			actualPositions[symbol.BinaryIdentifier] = fill.Position;
 		}
 
 		public void OnStop()

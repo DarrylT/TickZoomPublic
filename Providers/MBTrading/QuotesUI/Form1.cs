@@ -528,7 +528,7 @@ namespace MBTest
 			
 		}
     	
-		public void OnPosition(SymbolInfo symbol, double signal, double price, TimeStamp time)
+		public void OnPositionChange(SymbolInfo symbol, LogicalFillBinary fill)
 		{
 			throw new NotImplementedException();
 		}

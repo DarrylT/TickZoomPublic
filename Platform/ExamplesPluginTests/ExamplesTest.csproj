@@ -61,6 +61,7 @@
     <Compile Include="GUI\GUIThread.cs" />
     <Compile Include="Loaders\ChartThread.cs" />
     <Compile Include="Loaders\CompareSimulatedTest.cs" />
+    <Compile Include="Loaders\DualStrategyLimitOrder.cs" />
     <Compile Include="Loaders\ExampleMixedTest.cs" />
     <Compile Include="Loaders\ExampleMultiStrategyTest.cs" />
     <Compile Include="Loaders\ExampleScannerTest.cs" />
@@ -68,6 +69,7 @@
     <Compile Include="Loaders\ExampleSimulatedTest.cs" />
     <Compile Include="Loaders\ExampleSimpleTest.cs" />
     <Compile Include="Loaders\ExampleDualSymbolTest.cs" />
+    <Compile Include="Loaders\LimitOrderTest.cs" />
     <Compile Include="Loaders\StrategyTest.cs" />
     <Compile Include="Loaders\TradeOnlySimpleTest.cs" />
     <Compile Include="MiscTest\DefectsTest.cs" />
@@ -76,6 +78,7 @@
     <Compile Include="MiscTest\MQ_BadFakeTick_1.cs" />
     <Compile Include="MiscTest\MQ_BadFakeTick_2.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RealTime\BrokerLimitOrderTest.cs" />
     <Compile Include="RealTime\MockProviderDualSymbolTest.cs" />
     <Compile Include="RealTime\MockProviderSimpleTest.cs" />
     <None Include="app.config" />

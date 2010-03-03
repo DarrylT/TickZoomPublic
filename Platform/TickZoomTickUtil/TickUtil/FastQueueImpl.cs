@@ -25,12 +25,17 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
-
 using TickZoom.Api;
 
 namespace TickZoom.TickUtil
 {
-	public class FastQueueImpl<T> where T : struct
+	public class FastFillQueueImpl : FastQueueImpl<LogicalFillBinary>, FastFillQueue {
+		public FastFillQueueImpl(string name, int maxSize) : base(name, maxSize) {
+			
+		}
+	}
+	
+	public class FastQueueImpl<T> : FastQueue<T> where T : struct
 	{
 		readonly Log log;
 		readonly bool debug;

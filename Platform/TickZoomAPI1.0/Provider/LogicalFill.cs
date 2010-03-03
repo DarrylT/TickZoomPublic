@@ -1,4 +1,4 @@
-#region Copyright
+﻿#region Copyright
 /*
  * Copyright 2008 M. Wayne Walter
  * Software: TickZoom Trading Platform
@@ -21,18 +21,23 @@
  * 
  *
  * User: Wayne Walter
- * Date: 3/16/2009
- * Time: 2:22 PM
+ * Date: 5/18/2009
+ * Time: 12:54 PM
  * <http://www.tickzoom.org/wiki/Licenses>.
  */
 #endregion
 
 using System;
 using System.Collections.Generic;
+using TickZoom.Api;
 
 namespace TickZoom.Api
 {
-	public interface StrategyInterceptor : EventInterceptor
+	public interface LogicalFill
 	{
+		int OrderId { get; }
+		TimeStamp Time { get; }
+		double Price { get; }
+		double Position { get; }
 	}
 }

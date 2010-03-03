@@ -251,7 +251,8 @@ namespace TickZoom.InteractiveBrokers
         	SymbolInfo symbol = Factory.Symbol.LookupSymbol(e.Contract.Symbol);
         	SymbolHandler handler;
         	if( symbolHandlers.TryGetValue(symbol.BinaryIdentifier,out handler)) {
-        		handler.LogicalOrderHandler.AddPhysicalOrder(type,price,e.Order.TotalQuantity,e.Order);
+        		int logicalOrderId = GetLogicalOrderId( e.Order.OrderId);
+        		handler.LogicalOrderHandler.AddPhysicalOrder(type,price,e.Order.TotalQuantity,logicalOrderId,e.Order);
         	}
         }
         
@@ -428,7 +429,17 @@ namespace TickZoom.InteractiveBrokers
 			brokerOrder.TotalQuantity = (int) physicalOrder.Size;
 			return brokerOrder;
 		}
-		
+        
+        private int GetLogicalOrderId(int physicalOrderId) {
+        	int logicalOrderId;
+        	if( physicalToLogicalOrderMap.TryGetValue(physicalOrderId,out logicalOrderId)) {
+        		return logicalOrderId;
+        	} else {
+        		return 0;
+        	}
+        }
+        Dictionary<int,int> physicalToLogicalOrderMap = new Dictionary<int, int>();
+        
 		public void OnCreateBrokerOrder(PhysicalOrder physicalOrder)
 		{
 			if( debug) log.Debug( "OnCreateBrokerOrder " + physicalOrder);
@@ -440,6 +451,7 @@ namespace TickZoom.InteractiveBrokers
 			}
 			nextValidId++;
 			client.PlaceOrder(nextValidId,contract,brokerOrder);
+			physicalToLogicalOrderMap.Add(nextValidId,physicalOrder.LogicalOrderId);
 			if(debug) log.Debug("PlaceOrder: " + contract.Symbol + " " + OrderToString(brokerOrder));
 		}
 		

@@ -43,17 +43,10 @@ namespace Loaders
 		#region SetupTest
 		Log log = Factory.Log.GetLogger(typeof(ExampleSimpleTest));
 		protected Strategy strategy;
-		private string symbols = "/ESH0";
-		
-		public string Symbols {
-			get { return symbols; }
-			set { symbols = value; }
+		public ExampleSimpleTradeOnlyTest() {
+			Symbols = "/ESH0";
 		}
 		
-		public virtual Starter CreateStarter() {
-			return new HistoricalStarter();			
-		}
-			
 		[TestFixtureSetUp]
 		public override void RunStrategy() {
 			base.RunStrategy();
@@ -64,7 +57,7 @@ namespace Loaders
 				starter.ProjectProperties.Starter.StartTime = new TimeStamp("1800/1/1");
 	    		starter.ProjectProperties.Starter.EndTime = new TimeStamp("2010/2/17");
 	    		starter.DataFolder = "TestData";
-	    		starter.ProjectProperties.Starter.Symbols = symbols;
+	    		starter.ProjectProperties.Starter.Symbols = Symbols;
 				starter.ProjectProperties.Starter.IntervalDefault = Intervals.Minute1;
 				starter.ProjectProperties.Engine.RealtimeOutput = false;
 				

@@ -56,26 +56,26 @@ namespace TickZoom
 			double close = Bars.Close[0];
 			if( Bars.Close[0] > Bars.Open[0]) {
 				if( Position.IsFlat) {
-					Orders.Enter.NextBar.BuyStop(Bars.Close[0] + 0.10);
-					Orders.Exit.NextBar.SellStop(Bars.Close[0] - 0.10);
+					Orders.Enter.NextBar.BuyStop(Bars.Close[0] + 10 * Data.SymbolInfo.MinimumTick);
+					Orders.Exit.NextBar.SellStop(Bars.Close[0] - 10 * Data.SymbolInfo.MinimumTick);
 				}
 				if( Position.IsShort) {
-					Orders.Exit.NextBar.BuyLimit(Bars.Close[0] - 0.03);
+					Orders.Exit.NextBar.BuyLimit(Bars.Close[0] - 3 * Data.SymbolInfo.MinimumTick);
 				}
 			}
 			if( Position.IsLong) {
-				Orders.Exit.NextBar.SellStop(Bars.Close[0] - 0.10);
+				Orders.Exit.NextBar.SellStop(Bars.Close[0] - 10 * Data.SymbolInfo.MinimumTick);
 			}
 			if( Bars.Close[0] < Bars.Open[0]) {
 				if( Position.IsFlat) {
-					Orders.Enter.NextBar.SellLimit(Bars.Close[0] + 0.30);
-					ExitStrategy.StopLoss = 0.45;
+					Orders.Enter.NextBar.SellLimit(Bars.Close[0] + 30 * Data.SymbolInfo.MinimumTick);
+					ExitStrategy.StopLoss = 45 * Data.SymbolInfo.MinimumTick;
 				}
 			}
 			if( Bars.Close[0] < Bars.Open[0] && Bars.Open[0] < Bars.Close[1]) {
 				if( Position.IsFlat) {
 					Orders.Enter.NextBar.SellMarket();
-					ExitStrategy.StopLoss = 0.15;
+					ExitStrategy.StopLoss = 15 * Data.SymbolInfo.MinimumTick;
 				}
 			}
 			return true;

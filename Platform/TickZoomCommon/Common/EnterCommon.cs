@@ -68,12 +68,12 @@ namespace TickZoom.Common
 			orders.buyLimit.Type = OrderType.BuyLimit;
 			orders.sellLimit = Factory.Engine.LogicalOrder(Strategy.Data.SymbolInfo,Strategy);
 			orders.sellLimit.Type = OrderType.SellLimit;
-			Strategy.OrderManager.Add( orders.buyMarket);
-			Strategy.OrderManager.Add( orders.sellMarket);
-			Strategy.OrderManager.Add( orders.buyStop);
-			Strategy.OrderManager.Add( orders.sellStop);
-			Strategy.OrderManager.Add( orders.buyLimit);
-			Strategy.OrderManager.Add( orders.sellLimit);
+			Strategy.AddOrder( orders.buyMarket);
+			Strategy.AddOrder( orders.sellMarket);
+			Strategy.AddOrder( orders.buyStop);
+			Strategy.AddOrder( orders.sellStop);
+			Strategy.AddOrder( orders.buyLimit);
+			Strategy.AddOrder( orders.sellLimit);
 		}
 		
         public void CancelOrders()

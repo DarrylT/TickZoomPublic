@@ -1,4 +1,4 @@
-#region Copyright
+﻿#region Copyright
 /*
  * Copyright 2008 M. Wayne Walter
  * Software: TickZoom Trading Platform
@@ -39,35 +39,34 @@ namespace Loaders
 
 	
 	[TestFixture]
-	public class ExampleSimulatedTest : StrategyTest
+	public class LimitOrderTest : StrategyTest
 	{
 		Log log = Factory.Log.GetLogger(typeof(ExampleSimulatedTest));
-		#region SetupTest
 		ExampleOrderStrategy strategy;
+		public LimitOrderTest() {
+			Symbols = "USD/JPY";
+		}
 			
 		[TestFixtureSetUp]
 		public override void RunStrategy() {
 			base.RunStrategy();
 			try {
-				Starter starter = new HistoricalStarter();
+				Starter starter = CreateStarter();
 				
 				// Set run properties as in the GUI.
 				starter.ProjectProperties.Starter.StartTime = new TimeStamp(1800,1,1);
-	    		starter.ProjectProperties.Starter.EndTime = new TimeStamp(1990,1,1);
+	    		starter.ProjectProperties.Starter.EndTime = new TimeStamp(2009,06,10);
 	    		starter.DataFolder = "TestData";
-	    		starter.ProjectProperties.Starter.Symbols = "Daily4Sim";
-				starter.ProjectProperties.Starter.IntervalDefault = Intervals.Day1;
-				
+	    		starter.ProjectProperties.Starter.Symbols = Symbols;
+				starter.ProjectProperties.Starter.IntervalDefault = Intervals.Minute1;
 	    		starter.CreateChartCallback = new CreateChartCallback(HistoricalCreateChart);
 	    		starter.ShowChartCallback = new ShowChartCallback(HistoricalShowChart);
-				
 				// Run the loader.
 				ExampleLimitOrderLoader loader = new ExampleLimitOrderLoader();
 	    		starter.Run(loader);
 	
 	    		// Get the stategy
 	    		strategy = loader.TopModel as ExampleOrderStrategy;
-	    		
 	    		LoadTrades();
 			} catch( Exception ex) {
 				log.Error("Setup error.", ex);
@@ -77,15 +76,15 @@ namespace Loaders
 		
 		[Test]
 		public void VerifyCurrentEquity() {
-			Assert.AreEqual( -64800,strategy.Performance.Equity.CurrentEquity,"current equity");
+			Assert.AreEqual( 5920,strategy.Performance.Equity.CurrentEquity,"current equity");
 		}
 		[Test]
 		public void VerifyOpenEquity() {
-			Assert.AreEqual( -200,strategy.Performance.Equity.OpenEquity,"open equity");
+			Assert.AreEqual( -490,strategy.Performance.Equity.OpenEquity,"open equity");
 		}
 		[Test]
 		public void VerifyClosedEquity() {
-			Assert.AreEqual( -64600,strategy.Performance.Equity.ClosedEquity,"closed equity");
+			Assert.AreEqual( 6410,strategy.Performance.Equity.ClosedEquity,"closed equity");
 		}
 		[Test]
 		public void VerifyStartingEquity() {
@@ -96,53 +95,10 @@ namespace Loaders
 		public void VerifyTrades() {
 			VerifyTrades(strategy);
 		}
-
+	
 		[Test]
 		public void VerifyTradeCount() {
 			VerifyTradeCount(strategy);
-		}
-		
-		#endregion
-		
-		[Test]
-		public void CompareTradeCount() {
-			Assert.AreEqual(472,strategy.Performance.ComboTrades.Count, "trade count");
-		}
-		
-		[Test]
-		public void BuyStopSellStopTest() {
-			VerifyPair( strategy, 0, "1983-03-31 09:00:00.001", 29.500,
-			                 "1983-03-31 09:00:00.002",29.300);
-		}
-		
-		[Test]
-		public void SellLimitBuyLimitTest() {
-			VerifyPair( strategy, 1, "1983-04-04 09:00:00.001", 29.570,
-			                 "1983-04-06 09:00:00.001", 29.680);
-		}
-		
-		[Test]
-		public void BuyStopStopLossTest() {
-			VerifyPair( strategy, 2, "1983-04-08 09:00:00.000", 30.650D,
-			                 "1983-04-11 09:00:00.001",30.280D);
-		}
-		
-		[Test]
-		public void TradeAfterStopLossTest() {
-			VerifyPair( strategy, 3, "1983-04-12 09:00:00.002", 30.550D,
-			                 "1983-04-12 09:00:00.002",31.000D);
-		}
-		
-		[Test]
-		public void SellStopStopLossTest() {
-			VerifyPair( strategy, 4, "1983-04-18 09:00:00.000", 30.560D,
-			                 "1983-04-18 09:00:00.002",30.710);
-		}
-		
-		[Test]
-		public void BuyStopBreakEvenTest() {
-			VerifyPair( strategy, 44, "1983-12-16 09:00:00.000", 28.68D,
-			                 "1983-12-20 09:00:00.002",28.68d);
 		}
 		
 		[Test]

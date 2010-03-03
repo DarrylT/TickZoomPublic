@@ -266,6 +266,13 @@ namespace TickZoom.Common
 			get { return performance; }
 		}
 
+		List<LogicalOrder> allOrders = new List<LogicalOrder>();
+		public IList<LogicalOrder> AllOrders {
+			get {
+				return allOrders;
+			}
+		}
+		
 		List<LogicalOrder> activeOrders = new List<LogicalOrder>();
 		public IList<LogicalOrder> ActiveOrders {
 			get {
@@ -278,9 +285,10 @@ namespace TickZoom.Common
 		}
 		
 		public bool IsActiveOrdersChanged {
-			get {
-				return false;
-			}
+			get { return false;	}
+			set {	}
+		}
+		public void RefreshActiveOrders() {
 		}
 	}
 

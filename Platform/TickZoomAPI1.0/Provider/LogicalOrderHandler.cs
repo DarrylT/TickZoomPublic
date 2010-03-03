@@ -30,7 +30,7 @@ namespace TickZoom.Api
 	public interface LogicalOrderHandler {
 		void SetActualPosition(double position);
 		void ClearPhysicalOrders();
-		void AddPhysicalOrder( OrderType type, double price, int size, object brokerOrder);
+		void AddPhysicalOrder( OrderType type, double price, int size, int logicalOrderId, object brokerOrder);
 		
 		void SetDesiredPosition(double position);
 		void SetLogicalOrders(IList<LogicalOrder> logicalOrders);

@@ -34,7 +34,7 @@ namespace TickZoom.Api
 		Close,
 		Tick,
 		Position,
-		Fill,
+		LogicalFill,
 		EndHistorical,
 		PositionChange,
 		Max,

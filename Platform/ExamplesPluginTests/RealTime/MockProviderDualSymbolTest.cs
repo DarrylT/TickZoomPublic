@@ -38,14 +38,15 @@ using TickZoom.Api;
 using TickZoom.Common;
 using TickZoom.TickUtil;
 
-namespace RealTime
+namespace MockProvider
 {
 #if ! PROVIDER
 	[TestFixture]
-	public class MockProviderDualSymbol : ExampleDualSymbolTest
+	public class SyntheticDualSymbol : ExampleDualSymbolTest
 	{
 		public static void Main(string[] args) {
-			MockProviderDualSymbol fixture = new MockProviderDualSymbol();
+			SyntheticDualSymbol fixture = new SyntheticDualSymbol();
+			SyncTicks.Enabled = false;
 			fixture.RunStrategy();
 		}
 		

@@ -32,6 +32,7 @@ namespace TickZoom.Api
 		StartRealTime,
 		EndRealTime,
         PositionChange,
+        OnPositionChange,
         Error,
 		Terminate
 	}

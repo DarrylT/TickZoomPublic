@@ -85,7 +85,7 @@ namespace TickZoom.Common
 		}
 		
 		public void OnInitialize()
-		{
+		{ 
 			comboTrades  = new TransactionPairs(GetCurrentPrice,profitLoss,comboTradesBinary);
 			profitLoss.FullPointValue = model.Data.SymbolInfo.FullPointValue;
 
@@ -105,13 +105,13 @@ namespace TickZoom.Common
 			if( context.Position.Current != position.Current) {
 				positionChanges.Add(context.Position.Current);
 				if( position.IsFlat) {
-					EnterComboTradeInternal();
+					EnterComboTradeInternal(context.Position);
 				} else if( context.Position.IsFlat) {
-					ExitComboTradeInternal();
+					ExitComboTradeInternal(context.Position);
 				} else if( (context.Position.IsLong && position.IsShort) || (context.Position.IsShort && position.IsLong)) {
 					// The signal must be opposite. Either -1 / 1 or 1 / -1
-					ExitComboTradeInternal();
-					EnterComboTradeInternal();
+					ExitComboTradeInternal(context.Position);
+					EnterComboTradeInternal(context.Position);
 				} else {
 					// Instead it has increased or decreased position size.
 					ChangeComboSizeInternal();
@@ -137,16 +137,15 @@ namespace TickZoom.Common
 			return true;
 		}
 		
-		private void EnterComboTradeInternal() {
-			EnterComboTrade(context.Position.Price);
+		private void EnterComboTradeInternal(PositionInterface position) {
+			EnterComboTrade(position);
 		}
 
-		public void EnterComboTrade(double fillPrice) {
+		public void EnterComboTrade(PositionInterface position) {
 			TransactionPairBinary pair = TransactionPairBinary.Create();
-			pair.Direction = context.Position.Current;
-			pair.EntryPrice = fillPrice;
-			Tick tick = model.Ticks[0];
-			pair.EntryTime = tick.Time;
+			pair.Direction = position.Current;
+			pair.EntryPrice = position.Price;
+			pair.EntryTime = position.Time;
 			pair.EntryBar = model.Chart.ChartBars.BarCount;
 			comboTradesBinary.Add(pair);
 			if( model is Strategy) {
@@ -161,15 +160,14 @@ namespace TickZoom.Common
 			comboTradesBinary.Current = combo;
 		}
 		
-		private void ExitComboTradeInternal() {
-			ExitComboTrade(context.Position.Price);
+		private void ExitComboTradeInternal(PositionInterface position) {
+			ExitComboTrade(position);
 		}
 					
-		public void ExitComboTrade(double fillPrice) {
+		public void ExitComboTrade(PositionInterface position) {
 			TransactionPairBinary comboTrade = comboTradesBinary.Current;
-			Tick tick = model.Ticks[0];
-			comboTrade.ExitPrice = fillPrice;
-			comboTrade.ExitTime = tick.Time;
+			comboTrade.ExitPrice = position.Price;
+			comboTrade.ExitTime = position.Time;
 			comboTrade.ExitBar = model.Chart.ChartBars.BarCount;
 			comboTrade.Completed = true;
 			comboTradesBinary.Current = comboTrade;

@@ -320,10 +320,10 @@ namespace TickZoom.Common
     <property name=""Level2LotSizeMinimum"" value=""100"" />
     <property name=""Level2Increment"" value=""10"" />
     <property name=""FullPointValue"" value=""1"" />
-    <property name=""MinimumTick"" value=""0.01"" />
     <property name=""TimeAndSales"" value=""Extrapolated"" />
     <property name=""QuoteType"" value=""Level1"" />
     <category name=""4 Pip"">
+    <property name=""MinimumTick"" value=""0.0001"" />
       <symbol name=""USD/CHF"" universal=""USDCHF"">
         <property name=""QuoteType"" value=""Level2"" />
         <property name=""TimeAndSales"" value=""Extrapolated"" />
@@ -331,7 +331,11 @@ namespace TickZoom.Common
       <symbol name=""USD/CAD"" universal=""USDCAD"" />
       <symbol name=""AUD/USD"" universal=""AUDUSD"" />
       <symbol name=""USD/NOK"" universal=""USDNOK"" />
-      <symbol name=""EUR/USD"" universal=""EURUSD"" />
+      <symbol name=""EUR/USD"" universal=""EURUSD"" >
+        <property name=""UseSyntheticLimits"" value=""false"" />
+        <property name=""UseSyntheticStops"" value=""false"" />
+        <property name=""UseSyntheticMarkets"" value=""false"" />
+      </symbol>
       <symbol name=""USD/SEK"" universal=""USDSEK"" />
       <symbol name=""USD/DKK"" universal=""USDDKK"" />
       <symbol name=""GBP/USD"" universal=""GBPUSD"" />
@@ -345,7 +349,12 @@ namespace TickZoom.Common
       <symbol name=""AUD/CAD"" universal=""AUDCAD"" />
     </category>
     <category name=""2 Pip"">
-      <symbol name=""USD/JPY"" />
+    <property name=""MinimumTick"" value=""0.01"" />
+      <symbol name=""USD/JPY"" >
+        <property name=""UseSyntheticLimits"" value=""false"" />
+        <property name=""UseSyntheticStops"" value=""false"" />
+        <property name=""UseSyntheticMarkets"" value=""false"" />
+      </symbol>
       <category name=""Testing"">
         <symbol name=""USD_JPY"">
           <property name=""DisplayTimeZone"" value=""UTC"" />
@@ -410,7 +419,11 @@ namespace TickZoom.Common
       <property name=""TimeZone"" value=""UTC-4"" />
       <symbol name=""FullTick"" />
       <symbol name=""Daily4Sim"" />
-      <symbol name=""Mock4Sim"" />
+      <symbol name=""Mock4Sim"" >
+        <property name=""UseSyntheticLimits"" value=""true"" />
+        <property name=""UseSyntheticStops"" value=""true"" />
+        <property name=""UseSyntheticMarkets"" value=""true"" />
+      </symbol>
       <symbol name=""TXF"" />
       <symbol name=""spyTestBars"" />
     </category>

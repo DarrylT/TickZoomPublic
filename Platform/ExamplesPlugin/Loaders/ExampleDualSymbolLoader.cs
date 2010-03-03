@@ -42,18 +42,22 @@ namespace TickZoom
 		}
 		
 		public override void OnInitialize(ProjectProperties properties) {
-			if( properties.Starter.SymbolProperties.Length < 2) {
-				throw new ApplicationException( "This loader requires at least 2 symbols.");
-			}
+//			if( properties.Starter.SymbolProperties.Length < 2) {
+//				throw new ApplicationException( "This loader requires at least 2 symbols.");
+//			}
 		}
 		
 		public override void OnLoad(ProjectProperties properties) {
-			ModelInterface fullTicks = CreateStrategy("ExampleOrderStrategy","FullTicksData");
-			fullTicks.SymbolDefault = properties.Starter.SymbolInfo[0].Symbol;
-			ModelInterface fourTicks = CreateStrategy("ExampleOrderStrategy","FourTicksData");
-			fourTicks.SymbolDefault = properties.Starter.SymbolInfo[1].Symbol;
-			AddDependency("Portfolio","FullTicksData");
-			AddDependency("Portfolio","FourTicksData");
+			if( properties.Starter.SymbolProperties.Length > 0) {
+				ModelInterface fullTicks = CreateStrategy("ExampleOrderStrategy","FullTicksData");
+				fullTicks.SymbolDefault = properties.Starter.SymbolInfo[0].Symbol;
+				AddDependency("Portfolio","FullTicksData");
+			}
+			if( properties.Starter.SymbolProperties.Length > 1) {
+				ModelInterface fourTicks = CreateStrategy("ExampleOrderStrategy","FourTicksData");
+				fourTicks.SymbolDefault = properties.Starter.SymbolInfo[1].Symbol;
+				AddDependency("Portfolio","FourTicksData");
+			}
 			Portfolio portfolio = GetPortfolio("Portfolio");
 			portfolio.Performance.GraphTrades = false;
 			TopModel = portfolio;

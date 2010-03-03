@@ -48,6 +48,7 @@ namespace Loaders
 		static readonly Log log = Factory.Log.GetLogger(typeof(StrategyTest));
 		static readonly bool debug = log.IsDebugEnabled;
 		string dataFolder = "TestData";
+		string symbols;
 		List<ChartThread> chartThreads = new List<ChartThread>();
 		List<TickAggregator> aggregators = new List<TickAggregator>();
 		Dictionary<string,List<TradeInfo>> goodTradeMap = new Dictionary<string,List<TradeInfo>>();
@@ -85,6 +86,10 @@ namespace Loaders
 			public TransactionPairBinary Trade;
 		}
 		
+		public virtual Starter CreateStarter() {
+			return new HistoricalStarter();			
+		}
+			
 		public void LoadTrades() {
 			string fileDir = @"..\..\Platform\ExamplesPluginTests\Loaders\Trades\";
 			string filePath = fileDir + GetType().Name + "Trades.log";
@@ -122,13 +127,13 @@ namespace Loaders
 			}
 		}
 		
-		public void VerifyTradeCount(Strategy strategy) {
+		public void VerifyTradeCount(StrategyInterface strategy) {
 			List<TradeInfo> goodTrades = goodTradeMap[strategy.Name];
 			List<TradeInfo> testTrades = testTradeMap[strategy.Name];
 			Assert.AreEqual(goodTrades.Count,testTrades.Count);
 		}
 		
-		public void VerifyTrades(Strategy strategy) {
+		public void VerifyTrades(StrategyInterface strategy) {
 			List<TradeInfo> goodTrades = goodTradeMap[strategy.Name];
 			List<TradeInfo> testTrades = testTradeMap[strategy.Name];
 			for( int i=0; i<testTrades.Count && i<goodTrades.Count; i++) {
@@ -242,7 +247,7 @@ namespace Loaders
     		Assert.AreEqual(expectedCount,pane.CurveList[0].Points.Count,"Chart Curve");
 		}
    		
-		public static void CompareChart(Strategy strategy, ChartControl chart) {
+		public static void CompareChart(StrategyInterface strategy, ChartControl chart) {
      		GraphPane pane = chart.DataGraph.MasterPane.PaneList[0];
     		Assert.IsNotNull(pane.CurveList);
     		Assert.Greater(pane.CurveList.Count,0);
@@ -296,6 +301,11 @@ namespace Loaders
 			Assert.AreEqual(days.BarCount,bars.NPts,"Chart Points");
 		}
    		
+		
+		public string Symbols {
+			get { return symbols; }
+			set { symbols = value; }
+		}
 	}
 
 }

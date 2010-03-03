@@ -50,7 +50,7 @@ namespace Orders
 			orders.Clear();
 		}
 		
-		public LogicalOrder CreateLogicalEntry(OrderType type, double price, int size) {
+		public int CreateLogicalEntry(OrderType type, double price, int size) {
 			LogicalOrder logical = Factory.Engine.LogicalOrder(symbol,null);
 			logical.IsActive = true;
 			logical.TradeDirection = TradeDirection.Entry;
@@ -58,25 +58,25 @@ namespace Orders
 			logical.Price = price;
 			logical.Positions = size;
 			orders.Add(logical);
-			return logical;
+			return logical.Id;
 		}
 		
-		public LogicalOrder CreateLogicalExit(OrderType type, double price) {
+		public int CreateLogicalExit(OrderType type, double price) {
 			LogicalOrder logical = Factory.Engine.LogicalOrder(symbol,null);
 			logical.IsActive = true;
 			logical.TradeDirection = TradeDirection.Exit;
 			logical.Type = type;
 			logical.Price = price;
 			orders.Add(logical);
-			return logical;
+			return logical.Id;
 		}
 		
 		[Test]
 		public void Test01FlatZeroOrders() {
 			handler.ClearPhysicalOrders();
 			
-			CreateLogicalEntry(OrderType.BuyLimit,234.12,1000);
-			CreateLogicalEntry(OrderType.SellStop,154.12,1000);
+			int buyLimitId = CreateLogicalEntry(OrderType.BuyLimit,234.12,1000);
+			int buyStopId = CreateLogicalEntry(OrderType.SellStop,154.12,1000);
 			CreateLogicalExit(OrderType.SellLimit,334.12);
 			CreateLogicalExit(OrderType.SellStop,134.12);
 			CreateLogicalExit(OrderType.BuyLimit,124.12);
@@ -96,12 +96,14 @@ namespace Orders
 			Assert.AreEqual(OrderType.BuyLimit,order.Type);
 			Assert.AreEqual(234.12,order.Price);
 			Assert.AreEqual(1000,order.Size);
+			Assert.AreEqual(buyLimitId,order.LogicalOrderId);
 			Assert.IsNull(order.BrokerOrder);
 
 			order = handler.CreatedOrders[1];
 			Assert.AreEqual(OrderType.SellStop,order.Type);
 			Assert.AreEqual(154.12,order.Price);
 			Assert.AreEqual(1000,order.Size);
+			Assert.AreEqual(buyStopId,order.LogicalOrderId);
 			Assert.IsNull(order.BrokerOrder);
 		}
 		
@@ -109,17 +111,17 @@ namespace Orders
 		public void Test02FlatTwoOrders() {
 			handler.ClearPhysicalOrders();
 			
-			object buyOrder = new object();
-			handler.AddPhysicalOrder(OrderType.BuyLimit,234.12,1000,buyOrder);
-			object sellOrder = new object();
-			handler.AddPhysicalOrder(OrderType.SellStop,154.12,1000,sellOrder);
-			
-			CreateLogicalEntry(OrderType.BuyLimit,234.12,1000);
-			CreateLogicalEntry(OrderType.SellStop,154.12,1000);
+			int buyLimitId = CreateLogicalEntry(OrderType.BuyLimit,234.12,1000);
+			int sellStopId = CreateLogicalEntry(OrderType.SellStop,154.12,1000);
 			CreateLogicalExit(OrderType.SellLimit,334.12);
 			CreateLogicalExit(OrderType.SellStop,134.12);
 			CreateLogicalExit(OrderType.BuyLimit,124.12);
 			CreateLogicalExit(OrderType.BuyStop,194.12);
+			
+			object buyOrder = new object();
+			handler.AddPhysicalOrder(OrderType.BuyLimit,234.12,1000,buyLimitId,buyOrder);
+			object sellOrder = new object();
+			handler.AddPhysicalOrder(OrderType.SellStop,154.12,1000,sellStopId,sellOrder);
 			
 			double position = 0;
 			handler.SetActualPosition(position);
@@ -136,15 +138,16 @@ namespace Orders
 		public void Test03LongEntryFilled() {
 			handler.ClearPhysicalOrders();
 			
-			object sellOrder = new object();
-			handler.AddPhysicalOrder(OrderType.SellStop,154.12,1000,sellOrder);
 			
 			CreateLogicalEntry(OrderType.BuyLimit,234.12,1000);
-			CreateLogicalEntry(OrderType.SellStop,154.12,1000);
-			CreateLogicalExit(OrderType.SellLimit,334.12);
-			CreateLogicalExit(OrderType.SellStop,134.12);
+			int sellStopId = CreateLogicalEntry(OrderType.SellStop,154.12,1000);
+			int sellLimitId = CreateLogicalExit(OrderType.SellLimit,334.12);
+			int sellStop2Id = CreateLogicalExit(OrderType.SellStop,134.12);
 			CreateLogicalExit(OrderType.BuyLimit,124.12);
 			CreateLogicalExit(OrderType.BuyStop,194.12);
+			
+			object sellOrder = new object();
+			handler.AddPhysicalOrder(OrderType.SellStop,154.12,1000,sellStopId,sellOrder);
 			
 			double position = 1000; // Pretend we're flat.
 			handler.SetActualPosition(position);
@@ -160,18 +163,21 @@ namespace Orders
 			Assert.AreEqual(OrderType.SellStop,order.Type);
 			Assert.AreEqual(154.12,order.Price);
 			Assert.AreEqual(1000,order.Size);
+			Assert.AreEqual(sellStopId,order.LogicalOrderId);
 			Assert.AreEqual(sellOrder,order.BrokerOrder);
 			
 			order = handler.CreatedOrders[0];
 			Assert.AreEqual(OrderType.SellLimit,order.Type);
 			Assert.AreEqual(334.12,order.Price);
 			Assert.AreEqual(1000,order.Size);
+			Assert.AreEqual(sellLimitId,order.LogicalOrderId);
 			Assert.IsNull(order.BrokerOrder);
 			
 			order = handler.CreatedOrders[1];
 			Assert.AreEqual(OrderType.SellStop,order.Type);
 			Assert.AreEqual(134.12,order.Price);
 			Assert.AreEqual(1000,order.Size);
+			Assert.AreEqual(sellStop2Id,order.LogicalOrderId);
 			Assert.IsNull(order.BrokerOrder);
 		}
 		
@@ -179,17 +185,18 @@ namespace Orders
 		public void Test04LongTwoOrders() {
 			handler.ClearPhysicalOrders();
 			
-			object sellOrder1 = new object();
-			handler.AddPhysicalOrder(OrderType.SellStop,134.12,1000,sellOrder1);
-			object sellOrder2 = new object();
-			handler.AddPhysicalOrder(OrderType.SellLimit,334.12,1000,sellOrder2);
 			
 			CreateLogicalEntry(OrderType.BuyLimit,234.12,1000);
 			CreateLogicalEntry(OrderType.SellStop,154.12,1000);
-			CreateLogicalExit(OrderType.SellLimit,334.12);
-			CreateLogicalExit(OrderType.SellStop,134.12);
+			int sellLimitId = CreateLogicalExit(OrderType.SellLimit,334.12);
+			int sellStopId = CreateLogicalExit(OrderType.SellStop,134.12);
 			CreateLogicalExit(OrderType.BuyLimit,124.12);
 			CreateLogicalExit(OrderType.BuyStop,194.12);
+			
+			object sellOrder1 = new object();
+			handler.AddPhysicalOrder(OrderType.SellStop,134.12,1000,sellStopId,sellOrder1);
+			object sellOrder2 = new object();
+			handler.AddPhysicalOrder(OrderType.SellLimit,334.12,1000,sellLimitId,sellOrder2);
 			
 			double position = 1000; // Pretend we're flat.
 			handler.SetActualPosition(position);
@@ -210,17 +217,17 @@ namespace Orders
 			// only part of the size. 
 			// So size is 500 but order is still 500 due to original order 1000;
 			
-			object buyOrder = new object();
-			handler.AddPhysicalOrder(OrderType.BuyLimit,234.12,500,buyOrder);
-			object sellOrder = new object();
-			handler.AddPhysicalOrder(OrderType.SellStop,154.12,1000,sellOrder);
-			
-			CreateLogicalEntry(OrderType.BuyLimit,234.12,1000);
-			CreateLogicalEntry(OrderType.SellStop,154.12,1000);
-			CreateLogicalExit(OrderType.SellLimit,334.12);
-			CreateLogicalExit(OrderType.SellStop,134.12);
+			int buyLimitId = CreateLogicalEntry(OrderType.BuyLimit,234.12,1000);
+			int sellStopId = CreateLogicalEntry(OrderType.SellStop,154.12,1000);
+			int sellLimitId = CreateLogicalExit(OrderType.SellLimit,334.12);
+			int sellStop2Id = CreateLogicalExit(OrderType.SellStop,134.12);
 			CreateLogicalExit(OrderType.BuyLimit,124.12);
 			CreateLogicalExit(OrderType.BuyStop,194.12);
+			
+			object buyOrder = new object();
+			handler.AddPhysicalOrder(OrderType.BuyLimit,234.12,500,buyLimitId,buyOrder);
+			object sellOrder = new object();
+			handler.AddPhysicalOrder(OrderType.SellStop,154.12,1000,sellStopId,sellOrder);
 			
 			double position = 500; // Pretend we're flat.
 			handler.SetActualPosition(position);
@@ -237,18 +244,21 @@ namespace Orders
 			Assert.AreEqual(OrderType.SellStop,order.Type);
 			Assert.AreEqual(154.12,order.Price);
 			Assert.AreEqual(1000,order.Size);
+			Assert.AreEqual(sellStopId,order.LogicalOrderId);
 			Assert.AreEqual(sellOrder,order.BrokerOrder);
 			
 			order = handler.CreatedOrders[0];
 			Assert.AreEqual(OrderType.SellLimit,order.Type);
 			Assert.AreEqual(334.12,order.Price);
 			Assert.AreEqual(500,order.Size);
+			Assert.AreEqual(sellLimitId,order.LogicalOrderId);
 			Assert.IsNull(order.BrokerOrder);
 			
 			order = handler.CreatedOrders[1];
 			Assert.AreEqual(OrderType.SellStop,order.Type);
 			Assert.AreEqual(134.12,order.Price);
 			Assert.AreEqual(500,order.Size);
+			Assert.AreEqual(sellStop2Id,order.LogicalOrderId);
 			Assert.IsNull(order.BrokerOrder);
 		}
 		
@@ -256,15 +266,15 @@ namespace Orders
 		public void Test06LongPartialExit() {
 			handler.ClearPhysicalOrders();
 			
-			object sellOrder1 = new object();
-			handler.AddPhysicalOrder(OrderType.SellStop,134.12,1000,sellOrder1);
-			object sellOrder2 = new object();
-			handler.AddPhysicalOrder(OrderType.SellLimit,334.12,500,sellOrder2);
-			
-			CreateLogicalExit(OrderType.SellLimit,334.12);
-			CreateLogicalExit(OrderType.SellStop,134.12);
+			int sellLimitId = CreateLogicalExit(OrderType.SellLimit,334.12);
+			int sellStopId = CreateLogicalExit(OrderType.SellStop,134.12);
 			CreateLogicalExit(OrderType.BuyLimit,124.12);
 			CreateLogicalExit(OrderType.BuyStop,194.12);
+			
+			object sellOrder1 = new object();
+			handler.AddPhysicalOrder(OrderType.SellStop,134.12,1000,sellStopId,sellOrder1);
+			object sellOrder2 = new object();
+			handler.AddPhysicalOrder(OrderType.SellLimit,334.12,500,sellLimitId,sellOrder2);
 			
 			double position = 500;
 			handler.SetActualPosition(position);
@@ -281,6 +291,7 @@ namespace Orders
 			Assert.AreEqual(OrderType.SellStop,order.Type);
 			Assert.AreEqual(134.12,order.Price);
 			Assert.AreEqual(500,order.Size);
+			Assert.AreEqual(sellStopId,order.LogicalOrderId);
 			Assert.AreEqual(sellOrder1,order.BrokerOrder);
 		}
 		
@@ -288,15 +299,15 @@ namespace Orders
 		public void Test07ShortEntryFilled() {
 			handler.ClearPhysicalOrders();
 			
-			object buyOrder = new object();
-			handler.AddPhysicalOrder(OrderType.BuyLimit,234.12,1000,buyOrder);
-			
-			CreateLogicalEntry(OrderType.BuyLimit,234.12,1000);
+			int buyLimitId = CreateLogicalEntry(OrderType.BuyLimit,234.12,1000);
 			CreateLogicalEntry(OrderType.SellStop,154.12,1000);
 			CreateLogicalExit(OrderType.SellLimit,334.12);
 			CreateLogicalExit(OrderType.SellStop,134.12);
-			CreateLogicalExit(OrderType.BuyLimit,124.12);
-			CreateLogicalExit(OrderType.BuyStop,194.12);
+			int buyLimit2Id = CreateLogicalExit(OrderType.BuyLimit,124.12);
+			int buyStopId = CreateLogicalExit(OrderType.BuyStop,194.12);
+			
+			object buyOrder = new object();
+			handler.AddPhysicalOrder(OrderType.BuyLimit,234.12,1000,buyLimitId,buyOrder);
 			
 			double position = -1000; 
 			handler.SetActualPosition(position);
@@ -313,18 +324,21 @@ namespace Orders
 			Assert.AreEqual(OrderType.BuyLimit,order.Type);
 			Assert.AreEqual(234.12,order.Price);
 			Assert.AreEqual(1000,order.Size);
+			Assert.AreEqual(buyLimitId,order.LogicalOrderId);
 			Assert.AreEqual(buyOrder,order.BrokerOrder);
 			
 			order = handler.CreatedOrders[0];
 			Assert.AreEqual(OrderType.BuyLimit,order.Type);
 			Assert.AreEqual(124.12,order.Price);
 			Assert.AreEqual(1000,order.Size);
+			Assert.AreEqual(buyLimit2Id,order.LogicalOrderId);
 			Assert.IsNull(order.BrokerOrder);
 			
 			order = handler.CreatedOrders[1];
 			Assert.AreEqual(OrderType.BuyStop,order.Type);
 			Assert.AreEqual(194.12,order.Price);
 			Assert.AreEqual(1000,order.Size);
+			Assert.AreEqual(buyStopId,order.LogicalOrderId);
 			Assert.IsNull(order.BrokerOrder);
 		}
 		
@@ -332,17 +346,17 @@ namespace Orders
 		public void Test08ShortTwoOrders() {
 			handler.ClearPhysicalOrders();
 			
-			object buyOrder1 = new object();
-			handler.AddPhysicalOrder(OrderType.BuyLimit,124.12,1000,buyOrder1);
-			object buyOrder2 = new object();
-			handler.AddPhysicalOrder(OrderType.BuyStop,194.12,1000,buyOrder2);
-			
 			CreateLogicalEntry(OrderType.BuyLimit,234.12,1000);
 			CreateLogicalEntry(OrderType.SellStop,154.12,1000);
 			CreateLogicalExit(OrderType.SellLimit,334.12);
 			CreateLogicalExit(OrderType.SellStop,134.12);
-			CreateLogicalExit(OrderType.BuyLimit,124.12);
-			CreateLogicalExit(OrderType.BuyStop,194.12);
+			int buyLimitId = CreateLogicalExit(OrderType.BuyLimit,124.12);
+			int buyStopId = CreateLogicalExit(OrderType.BuyStop,194.12);
+			
+			object buyOrder1 = new object();
+			handler.AddPhysicalOrder(OrderType.BuyLimit,124.12,1000,buyLimitId,buyOrder1);
+			object buyOrder2 = new object();
+			handler.AddPhysicalOrder(OrderType.BuyStop,194.12,1000,buyStopId,buyOrder2);
 			
 			double position = -1000; 
 			handler.SetActualPosition(position);
@@ -364,17 +378,17 @@ namespace Orders
 			// only part of the size. 
 			// So size is 500 but order is still 500 due to original order 1000;
 			
-			object buyOrder = new object();
-			handler.AddPhysicalOrder(OrderType.BuyLimit,234.12,1000,buyOrder);
-			object sellOrder = new object();
-			handler.AddPhysicalOrder(OrderType.SellStop,154.12,500,sellOrder);
-			
-			CreateLogicalEntry(OrderType.BuyLimit,234.12,1000);
-			CreateLogicalEntry(OrderType.SellStop,154.12,1000);
+			int buyLimitId = CreateLogicalEntry(OrderType.BuyLimit,234.12,1000);
+			int sellStopId = CreateLogicalEntry(OrderType.SellStop,154.12,1000);
 			CreateLogicalExit(OrderType.SellLimit,334.12);
 			CreateLogicalExit(OrderType.SellStop,134.12);
-			CreateLogicalExit(OrderType.BuyLimit,124.12);
-			CreateLogicalExit(OrderType.BuyStop,194.12);
+			int buyLimit2Id = CreateLogicalExit(OrderType.BuyLimit,124.12);
+			int buyStopId = CreateLogicalExit(OrderType.BuyStop,194.12);
+			
+			object buyOrder = new object();
+			handler.AddPhysicalOrder(OrderType.BuyLimit,234.12,1000,buyLimitId,buyOrder);
+			object sellOrder = new object();
+			handler.AddPhysicalOrder(OrderType.SellStop,154.12,500,sellStopId,sellOrder);
 			
 			double position = -500; // Pretend we're flat.
 			handler.SetActualPosition(position);
@@ -391,18 +405,21 @@ namespace Orders
 			Assert.AreEqual(OrderType.BuyLimit,order.Type);
 			Assert.AreEqual(234.12,order.Price);
 			Assert.AreEqual(1000,order.Size);
+			Assert.AreEqual(buyLimitId,order.LogicalOrderId);
 			Assert.AreEqual(buyOrder,order.BrokerOrder);
 			
 			order = handler.CreatedOrders[0];
 			Assert.AreEqual(OrderType.BuyLimit,order.Type);
 			Assert.AreEqual(124.12,order.Price);
 			Assert.AreEqual(500,order.Size);
+			Assert.AreEqual(buyLimit2Id,order.LogicalOrderId);
 			Assert.IsNull(order.BrokerOrder);
 			
 			order = handler.CreatedOrders[1];
 			Assert.AreEqual(OrderType.BuyStop,order.Type);
 			Assert.AreEqual(194.12,order.Price);
 			Assert.AreEqual(500,order.Size);
+			Assert.AreEqual(buyStopId,order.LogicalOrderId);
 			Assert.IsNull(order.BrokerOrder);
 		}
 		
@@ -410,15 +427,15 @@ namespace Orders
 		public void Test10ShortPartialExit() {
 			handler.ClearPhysicalOrders();
 			
-			object buyOrder1 = new object();
-			handler.AddPhysicalOrder(OrderType.BuyLimit,124.12,1000,buyOrder1);
-			object buyOrder2 = new object();
-			handler.AddPhysicalOrder(OrderType.BuyStop,194.12,1000,buyOrder2);
-			
 			CreateLogicalExit(OrderType.SellLimit,334.12);
 			CreateLogicalExit(OrderType.SellStop,134.12);
-			CreateLogicalExit(OrderType.BuyLimit,124.12);
-			CreateLogicalExit(OrderType.BuyStop,194.12);
+			int buyLimitId = CreateLogicalExit(OrderType.BuyLimit,124.12);
+			int buyStopId = CreateLogicalExit(OrderType.BuyStop,194.12);
+			
+			object buyOrder1 = new object();
+			handler.AddPhysicalOrder(OrderType.BuyLimit,124.12,1000,buyLimitId,buyOrder1);
+			object buyOrder2 = new object();
+			handler.AddPhysicalOrder(OrderType.BuyStop,194.12,1000,buyStopId,buyOrder2);
 			
 			double position = -500; 
 			handler.SetActualPosition(position);
@@ -435,12 +452,14 @@ namespace Orders
 			Assert.AreEqual(OrderType.BuyLimit,order.Type);
 			Assert.AreEqual(124.12,order.Price);
 			Assert.AreEqual(500,order.Size);
+			Assert.AreEqual(buyLimitId,order.LogicalOrderId);
 			Assert.AreEqual(buyOrder1,order.BrokerOrder);
 			
 			order = handler.ChangedOrders[1];
 			Assert.AreEqual(OrderType.BuyStop,order.Type);
 			Assert.AreEqual(194.12,order.Price);
 			Assert.AreEqual(500,order.Size);
+			Assert.AreEqual(buyStopId,order.LogicalOrderId);
 			Assert.AreEqual(buyOrder2,order.BrokerOrder);
 		}
 		
@@ -448,17 +467,17 @@ namespace Orders
 		public void Test11FlatChangeSizes() {
 			handler.ClearPhysicalOrders();
 			
-			object buyOrder = new object();
-			handler.AddPhysicalOrder(OrderType.BuyLimit,234.12,1000,buyOrder);
-			object sellOrder = new object();
-			handler.AddPhysicalOrder(OrderType.SellStop,154.12,1000,sellOrder);
-			
-			CreateLogicalEntry(OrderType.BuyLimit,234.12,700);
-			CreateLogicalEntry(OrderType.SellStop,154.12,800);
+			int buyLimitId = CreateLogicalEntry(OrderType.BuyLimit,234.12,700);
+			int sellStopId = CreateLogicalEntry(OrderType.SellStop,154.12,800);
 			CreateLogicalExit(OrderType.SellLimit,334.12);
 			CreateLogicalExit(OrderType.SellStop,134.12);
 			CreateLogicalExit(OrderType.BuyLimit,124.12);
 			CreateLogicalExit(OrderType.BuyStop,194.12);
+			
+			object buyOrder = new object();
+			handler.AddPhysicalOrder(OrderType.BuyLimit,234.12,1000,buyLimitId,buyOrder);
+			object sellOrder = new object();
+			handler.AddPhysicalOrder(OrderType.SellStop,154.12,1000,sellStopId,sellOrder);
 			
 			double position = 0; // Pretend we're flat.
 			handler.SetActualPosition(position);
@@ -475,12 +494,14 @@ namespace Orders
 			Assert.AreEqual(OrderType.BuyLimit,order.Type);
 			Assert.AreEqual(234.12,order.Price);
 			Assert.AreEqual(700,order.Size);
+			Assert.AreEqual(buyLimitId,order.LogicalOrderId);
 			Assert.AreEqual(buyOrder,order.BrokerOrder);
 			
 			order = handler.ChangedOrders[1];
 			Assert.AreEqual(OrderType.SellStop,order.Type);
 			Assert.AreEqual(154.12,order.Price);
 			Assert.AreEqual(800,order.Size);
+			Assert.AreEqual(sellStopId,order.LogicalOrderId);
 			Assert.AreEqual(sellOrder,order.BrokerOrder);
 			
 		}
@@ -489,19 +510,19 @@ namespace Orders
 		public void Test12FlatChangePrices() {
 			handler.ClearPhysicalOrders();
 			
-			object buyOrder = new object();
-			handler.AddPhysicalOrder(OrderType.BuyLimit,234.12,1000,buyOrder);
-			object sellOrder = new object();
-			handler.AddPhysicalOrder(OrderType.SellStop,154.12,1000,sellOrder);
-			
-			CreateLogicalEntry(OrderType.BuyLimit,244.12,700);
-			CreateLogicalEntry(OrderType.SellStop,164.12,800);
+			int buyLimitId = CreateLogicalEntry(OrderType.BuyLimit,244.12,700);
+			int sellStopId = CreateLogicalEntry(OrderType.SellStop,164.12,800);
 			CreateLogicalExit(OrderType.SellLimit,374.12);
 			CreateLogicalExit(OrderType.SellStop,184.12);
 			CreateLogicalExit(OrderType.BuyLimit,194.12);
 			CreateLogicalExit(OrderType.BuyStop,104.12);
 			
-			double position = 0; // Pretend we're flat.
+			object buyOrder = new object();
+			handler.AddPhysicalOrder(OrderType.BuyLimit,234.12,1000,buyLimitId,buyOrder);
+			object sellOrder = new object();
+			handler.AddPhysicalOrder(OrderType.SellStop,154.12,1000,sellStopId,sellOrder);
+			
+			double position = 0;
 			handler.SetActualPosition(position);
 
 			handler.SetDesiredPosition(position);
@@ -516,12 +537,14 @@ namespace Orders
 			Assert.AreEqual(OrderType.BuyLimit,order.Type);
 			Assert.AreEqual(244.12,order.Price);
 			Assert.AreEqual(700,order.Size);
+			Assert.AreEqual(buyLimitId,order.LogicalOrderId);
 			Assert.AreEqual(buyOrder,order.BrokerOrder);
 			
 			order = handler.ChangedOrders[1];
 			Assert.AreEqual(OrderType.SellStop,order.Type);
 			Assert.AreEqual(164.12,order.Price);
 			Assert.AreEqual(800,order.Size);
+			Assert.AreEqual(sellStopId,order.LogicalOrderId);
 			Assert.AreEqual(sellOrder,order.BrokerOrder);
 			
 		}
@@ -530,17 +553,17 @@ namespace Orders
 		public void Test13LongChangePrices() {
 			handler.ClearPhysicalOrders();
 			
-			object sellOrder1 = new object();
-			handler.AddPhysicalOrder(OrderType.SellStop,134.12,1000,sellOrder1);
-			object sellOrder2 = new object();
-			handler.AddPhysicalOrder(OrderType.SellLimit,334.12,1000,sellOrder2);
-			
 			CreateLogicalEntry(OrderType.BuyLimit,244.12,1000);
 			CreateLogicalEntry(OrderType.SellStop,164.12,1000);
-			CreateLogicalExit(OrderType.SellLimit,374.12);
-			CreateLogicalExit(OrderType.SellStop,184.12);
+			int sellLimitId = CreateLogicalExit(OrderType.SellLimit,374.12);
+			int sellStopId = CreateLogicalExit(OrderType.SellStop,184.12);
 			CreateLogicalExit(OrderType.BuyLimit,194.12);
 			CreateLogicalExit(OrderType.BuyStop,104.12);
+			
+			object sellOrder1 = new object();
+			handler.AddPhysicalOrder(OrderType.SellStop,134.12,1000,sellStopId,sellOrder1);
+			object sellOrder2 = new object();
+			handler.AddPhysicalOrder(OrderType.SellLimit,334.12,1000,sellLimitId,sellOrder2);
 			
 			double position = 1000;
 			handler.SetActualPosition(position);
@@ -557,12 +580,14 @@ namespace Orders
 			Assert.AreEqual(OrderType.SellLimit,order.Type);
 			Assert.AreEqual(374.12,order.Price);
 			Assert.AreEqual(1000,order.Size);
+			Assert.AreEqual(sellLimitId,order.LogicalOrderId);
 			Assert.AreEqual(sellOrder2,order.BrokerOrder);
 			
 			order = handler.ChangedOrders[1];
 			Assert.AreEqual(OrderType.SellStop,order.Type);
 			Assert.AreEqual(184.12,order.Price);
 			Assert.AreEqual(1000,order.Size);
+			Assert.AreEqual(sellStopId,order.LogicalOrderId);
 			Assert.AreEqual(sellOrder1,order.BrokerOrder);
 			
 		}
@@ -586,6 +611,7 @@ namespace Orders
 			Assert.AreEqual(OrderType.SellMarket,order.Type);
 			Assert.AreEqual(0,order.Price);
 			Assert.AreEqual(1000,order.Size);
+			Assert.AreEqual(0,order.LogicalOrderId);
 			Assert.IsNull(order.BrokerOrder);
 			
 		}
@@ -609,6 +635,7 @@ namespace Orders
 			Assert.AreEqual(OrderType.BuyMarket,order.Type);
 			Assert.AreEqual(0,order.Price);
 			Assert.AreEqual(1000,order.Size);
+			Assert.AreEqual(0,order.LogicalOrderId);
 			Assert.IsNull(order.BrokerOrder);
 			
 		}
@@ -654,9 +681,9 @@ namespace Orders
 				logicalHandler.PerformCompare();
 			}
 			
-			public void AddPhysicalOrder(OrderType type, double price, int size, object brokerOrder)
+			public void AddPhysicalOrder(OrderType type, double price, int size, int logicalOrderId, object brokerOrder)
 			{
-				logicalHandler.AddPhysicalOrder(type,price,size,brokerOrder);
+				logicalHandler.AddPhysicalOrder(type,price,size,logicalOrderId,brokerOrder);
 			}
 		}
 		

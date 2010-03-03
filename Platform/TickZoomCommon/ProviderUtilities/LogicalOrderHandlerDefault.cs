@@ -38,7 +38,7 @@ using TickZoom.Api;
 
 namespace TickZoom.Common
 {
-	public class DefaultOrderHandler : LogicalOrderHandler {
+	public class LogicalOrderHandlerDefault : LogicalOrderHandler {
 		SymbolInfo symbol;
 		PhysicalOrderHandler brokerOrders;
 		List<PhysicalOrderDefault> physicalOrders;
@@ -48,7 +48,7 @@ namespace TickZoom.Common
 		double actualPosition;
 		double desiredPosition;
 		
-		public DefaultOrderHandler(SymbolInfo symbol, PhysicalOrderHandler brokerOrders) {
+		public LogicalOrderHandlerDefault(SymbolInfo symbol, PhysicalOrderHandler brokerOrders) {
 			this.symbol = symbol;
 			this.brokerOrders = brokerOrders;
 			this.physicalOrders = new List<PhysicalOrderDefault>();
@@ -62,14 +62,13 @@ namespace TickZoom.Common
 		public void SetActualPosition(double position) {
 			this.actualPosition = position;
 		}
-		public void AddPhysicalOrder( OrderType type, double price, int size, object brokerOrder) {
-			physicalOrders.Add( new PhysicalOrderDefault(symbol,type,price,size,brokerOrder));
+		public void AddPhysicalOrder( OrderType type, double price, int size, int logicalOrderId, object brokerOrder) {
+			physicalOrders.Add( new PhysicalOrderDefault(symbol,type,price,size,logicalOrderId,brokerOrder));
 		}
 
-		private bool TryMatchTypePrice( LogicalOrder logical, out PhysicalOrderDefault physicalOrder) {
+		private bool TryMatchId( LogicalOrder logical, out PhysicalOrderDefault physicalOrder) {
 			foreach( var physical in physicalOrders) {
-				if( logical.Type == physical.Type &&
-				   logical.Price == physical.Price) {
+				if( logical.Id == physical.LogicalOrderId) {
 					physicalOrder = physical;
 					return true;
 				}
@@ -190,11 +189,11 @@ namespace TickZoom.Common
 			double delta = desiredPosition - actualPosition;
 			PhysicalOrder physical;
 			if( delta > 0) {
-				physical = new PhysicalOrderDefault(symbol,OrderType.BuyMarket,0,delta,null);
+				physical = new PhysicalOrderDefault(symbol,OrderType.BuyMarket,0,delta,0,null);
 				brokerOrders.OnCreateBrokerOrder(physical);
 			}
 			if( delta < 0) {
-				physical = new PhysicalOrderDefault(symbol,OrderType.SellMarket,0,Math.Abs(delta),null);
+				physical = new PhysicalOrderDefault(symbol,OrderType.SellMarket,0,Math.Abs(delta),0,null);
 				brokerOrders.OnCreateBrokerOrder(physical);
 			}
 			actualPosition = desiredPosition;
@@ -220,7 +219,7 @@ namespace TickZoom.Common
 			extraLogicals.Clear();
 			while( logicalOrders.Count > 0) {
 				var logical = logicalOrders[0];
-				if( TryMatchTypePrice(logical, out physical)) {
+				if( TryMatchId(logical, out physical)) {
 					ProcessMatch(logical,physical);
 					physicalOrders.Remove(physical);
 				} else {
@@ -230,12 +229,7 @@ namespace TickZoom.Common
 			}
 			while( extraLogicals.Count > 0) {
 				var logical = extraLogicals[0];
-				if( TryMatchTypeOnly(logical, out physical)) {
-					ProcessMatch(logical,physical);
-					physicalOrders.Remove(physical);
-				} else {
-					ProcessMissingPhysical(logical);
-				}
+				ProcessMissingPhysical(logical);
 				extraLogicals.Remove(logical);
 			}
 			while( physicalOrders.Count > 0) {

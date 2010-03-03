@@ -31,9 +31,9 @@ namespace TickZoom
 	/// <summary>
 	/// Description of Starter.
 	/// </summary>
-	public class ExampleSimulatedLoader : ModelLoaderCommon
+	public class ExampleLimitOrderLoader : ModelLoaderCommon
 	{
-		public ExampleSimulatedLoader() {
+		public ExampleLimitOrderLoader() {
 			/// <summary>
 			/// IMPORTANT: You can personalize the name of each model loader.
 			/// </summary>

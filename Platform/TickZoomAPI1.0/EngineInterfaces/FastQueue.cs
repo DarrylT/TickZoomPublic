@@ -1,4 +1,4 @@
-#region Copyright
+﻿#region Copyright
 /*
  * Software: TickZoom Trading Platform
  * Copyright 2009 M. Wayne Walter
@@ -22,29 +22,37 @@
 #endregion
 
 using System;
-using TickZoom.Api;
 
-namespace TickZoom.TickUtil
+namespace TickZoom.Api
 {
-	/// <summary>
-	/// Description of TickUtilFactoryImpl.
-	/// </summary>
-	public class TickUtilFactoryImpl : TickUtilFactory
+	public interface FastFillQueue : FastQueue<LogicalFillBinary> {
+		
+	}
+
+    public interface FastQueue<T>
 	{
-		public TickQueue TickQueue( Type type) {
-			return new TickQueueImpl(type.Name);
-		}
-		public TickIO TickIO() {
-			return new TickImpl();
-		}
-		
-		public TickQueue TickQueue(string name)
-		{
-			return new TickQueueImpl(name);
-		}
-		
-		public FastFillQueue FastItemQueue(string name, int maxSize) {
-			return new FastFillQueueImpl(name,maxSize);
-		}
+		bool EnQueueStruct(ref T tick);
+		bool DequeueStruct(ref T tick);
+		void Clear();
+		void Flush();
+		void Terminate(Exception ex);
+		void Terminate();
+		void Pause();
+		void Resume();
+		void LogStatistics();
+		bool CanEnqueue { get; }
+		bool CanDequeue { get; }
+		int Count { get; }
+		long EnqueueConflicts { get; }
+		long DequeueConflicts { get; }
+		StartEnqueue StartEnqueue { get; set; }
+		int Timeout { get; set; }
+		bool IsStarted { get; }
+		ResumeEnqueue ResumeEnqueue { get; set; }
+		PauseEnqueue PauseEnqueue { get; set; }
+		bool IsPaused { get; }
+		int Capacity { get; }
 	}
 }
+
+

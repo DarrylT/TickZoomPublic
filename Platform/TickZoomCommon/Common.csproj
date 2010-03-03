@@ -71,7 +71,6 @@
     <Compile Include="Common\ModelEvents.cs" />
     <Compile Include="Common\ModelInvoker.cs" />
     <Compile Include="Common\ModelLoaderCommon.cs" />
-    <Compile Include="Common\OrderManager.cs" />
     <Compile Include="Common\Orders.cs" />
     <Compile Include="Common\Portfolio.cs" />
     <Compile Include="Common\PositionSize.cs" />
@@ -121,7 +120,7 @@
     <Compile Include="Performance\TradeStatsReport.cs" />
     <Compile Include="Performance\Transaction.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ProviderUtilities\DefaultOrderHandler.cs" />
+    <Compile Include="ProviderUtilities\LogicalOrderHandlerDefault.cs" />
     <Compile Include="ProviderUtilities\AssemblyAttributes.cs" />
     <Compile Include="ProviderUtilities\CommandLine.cs" />
     <Compile Include="ProviderUtilities\PhysicalOrderDefault.cs" />

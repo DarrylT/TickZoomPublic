@@ -43,6 +43,7 @@ namespace TickZoom.Common
 		private OrderType type;
 		private double price;
 		private double size;
+		private int logicalOrderId;
 		private object brokerOrder;
 		
 		public override string ToString()
@@ -55,14 +56,16 @@ namespace TickZoom.Common
 			this.type = logical.Type;
 			this.price = logical.Price;
 			this.size = size;
+			this.logicalOrderId = logical.Id;
 			this.brokerOrder = brokerOrder;
 		}
 		
-		public PhysicalOrderDefault(SymbolInfo symbol, OrderType type, double price, double size, object brokerOrder) {
+		public PhysicalOrderDefault(SymbolInfo symbol, OrderType type, double price, double size, int logicalOrderId, object brokerOrder) {
 			this.symbol = symbol;
 			this.type = type;
 			this.price = price;
 			this.size = size;
+			this.logicalOrderId = logicalOrderId;
 			this.brokerOrder = brokerOrder;
 		}
 	
@@ -84,6 +87,10 @@ namespace TickZoom.Common
 		
 		public SymbolInfo Symbol {
 			get { return symbol; }
+		}
+		
+		public int LogicalOrderId {
+			get { return logicalOrderId; }
 		}
 	}
 }

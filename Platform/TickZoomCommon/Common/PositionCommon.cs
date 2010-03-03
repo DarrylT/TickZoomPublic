@@ -40,6 +40,7 @@ namespace TickZoom.Common
 		protected double current = 0;
 		protected TimeStamp time;
 		protected double price = 0;
+		protected int orderId = 0;
 		protected ModelInterface model;
 		protected string symbol = "default";
 		Log log = Factory.Log.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -74,6 +75,11 @@ namespace TickZoom.Common
 		
 		public virtual void Change( SymbolInfo symbol, double position, double price, TimeStamp time) {
 			Change(position,price,time);
+		}
+		
+		public virtual void Change( SymbolInfo symbol, LogicalFill fill) {
+			this.orderId = fill.OrderId;	
+			Change(fill.Position,fill.Price,fill.Time);
 		}
 		
 		public virtual void Change( double position, double price, TimeStamp time) {
@@ -140,6 +146,10 @@ namespace TickZoom.Common
 
 		public double Size {
 			get { return Math.Abs(current); }
+		}
+		
+		public int OrderId {
+			get { return orderId; }
 		}
 	}
 }

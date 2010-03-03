@@ -84,15 +84,15 @@ namespace TickZoom.Common
 			marketOrder = Factory.Engine.LogicalOrder(Strategy.Data.SymbolInfo,Strategy);
 			marketOrder.TradeDirection = TradeDirection.ExitStrategy;
 			marketOrder.Tag = "ExitStrategy" ;
-			Strategy.OrderManager.Add(marketOrder);
+			Strategy.AddOrder(marketOrder);
 			breakEvenStopOrder = Factory.Engine.LogicalOrder(Strategy.Data.SymbolInfo,Strategy);
 			breakEvenStopOrder.TradeDirection = TradeDirection.ExitStrategy;
 			breakEvenStopOrder.Tag = "ExitStrategy" ;
-			Strategy.OrderManager.Add(breakEvenStopOrder);
+			Strategy.AddOrder(breakEvenStopOrder);
 			stopLossOrder = Factory.Engine.LogicalOrder(Strategy.Data.SymbolInfo,Strategy);
 			stopLossOrder.TradeDirection = TradeDirection.ExitStrategy;
 			stopLossOrder.Tag = "ExitStrategy" ;
-			Strategy.OrderManager.Add(stopLossOrder);
+			Strategy.AddOrder(stopLossOrder);
 //			log.WriteFile( LogName + " chain = " + Chain.ToChainString());
 			if( IsTrace) Log.Trace(Strategy.FullName+".Initialize()");
 			Strategy.Drawing.Color = Color.Black;

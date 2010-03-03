@@ -70,5 +70,7 @@ namespace TickZoom.Api
 		TestBars TestBars(Interval interval);
 		
 		LogicalOrder LogicalOrder(SymbolInfo symbol, StrategyInterface strategy);
+		
+		OrderManager OrderManager(StrategyInterface strategy);
 	}
 }

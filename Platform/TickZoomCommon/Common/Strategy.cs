@@ -44,12 +44,13 @@ namespace TickZoom.Common
 		private readonly bool instanceDebug;
 		private readonly bool instanceTrace;
 		private Result result;
-		List<LogicalOrder> activeOrders = new List<LogicalOrder>();
-		List<LogicalOrder> nextBarOrders = new List<LogicalOrder>();
+		private List<LogicalOrder> allOrders = new List<LogicalOrder>();
+		private List<LogicalOrder> tempActiveOrders = new List<LogicalOrder>();
+		private List<LogicalOrder> activeOrders = new List<LogicalOrder>();
+		private List<LogicalOrder> nextBarOrders = new List<LogicalOrder>();
 		private bool isActiveOrdersChanged = false;
 		
-		OrderManager orderManager;
-		OrderHandlers orderHandlers;
+		OrderHandlers orders;
 		ExitCommon exitActiveNow;
 		EnterCommon enterActiveNow;
 		ExitCommon exitNextBar;
@@ -80,10 +81,9 @@ namespace TickZoom.Common
 			enterNextBar = new EnterCommon(this);
 			enterNextBar.Orders = enterActiveNow.Orders;
 			enterNextBar.IsNextBar = true;
-			orderHandlers = new OrderHandlers(enterActiveNow,enterNextBar,exitActiveNow,exitNextBar);
+			orders = new OrderHandlers(enterActiveNow,enterNextBar,exitActiveNow,exitNextBar);
 			
 			// Interceptors.
-			orderManager = new OrderManager(this);
 			performance = new Performance(this);
 		    positionSize = new PositionSize(this);
 		    exitStrategy = new ExitStrategy(this);
@@ -98,7 +98,8 @@ namespace TickZoom.Common
 			exitNextBar.OnInitialize();
 			base.OnConfigure();
 			
-			AddInterceptor(orderManager);
+			OrderManager preOrderManager = Factory.Engine.OrderManager(this);
+			AddInterceptor(preOrderManager);
 			AddInterceptor(performance.Equity);
 			AddInterceptor(performance);
 			AddInterceptor(positionSize);
@@ -210,7 +211,7 @@ namespace TickZoom.Common
 		}
 
 		public OrderHandlers Orders {
-			get { return orderHandlers; }
+			get { return orders; }
 		}
 		
 		[Obsolete("Please user Orders.Exit instead.",true)]
@@ -246,10 +247,6 @@ namespace TickZoom.Common
 			return stats.Daily.SortinoRatio;
 		}
 		
-		public OrderManager OrderManager {
-			get { return orderManager; }
-		}
-
 		public Log Log {
 			get { return instanceLog; }
 		}
@@ -279,9 +276,26 @@ namespace TickZoom.Common
 			get { return result; }
 		}
 
+
+		public void AddOrder(LogicalOrder order)
+		{
+			allOrders.Add(order);
+		}
+		
+		public void RefreshActiveOrders() {
+			tempActiveOrders.Clear();
+			tempActiveOrders.AddRange(activeOrders);
+		}
+		
+		public IList<LogicalOrder> AllOrders {
+			get {
+				return allOrders;
+			}
+		}
+		
 		public IList<LogicalOrder> ActiveOrders {
 			get {
-				return activeOrders;
+				return tempActiveOrders;
 			}
 		}
 		

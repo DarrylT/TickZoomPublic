@@ -61,6 +61,8 @@ namespace TickZoom.Api
 		
 		void Change( SymbolInfo symbol, double position, double price, TimeStamp time);
 		
+		void Change( SymbolInfo symbol, LogicalFill fill);
+		
 		/// <summary>
 		/// Copies a Position object including all properties to this position object.
 		/// </summary>
@@ -126,5 +128,11 @@ namespace TickZoom.Api
 			get;
 		}
 
+		/// <summary>
+		/// Which logical order caused this fill?
+		/// </summary>
+		int OrderId {
+			get;
+		}
 	}
 }

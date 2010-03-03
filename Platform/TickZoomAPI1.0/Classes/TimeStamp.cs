@@ -219,6 +219,11 @@ namespace TickZoom.Api
 			_timeStamp = CalendarDateTotimeStamp( year, month, day, hour, minute, second, millis );
 		}
 		
+		public TimeStamp( long timeStamp )
+		{
+			_timeStamp = timeStamp;
+		}
+		
 		public TimeStamp( double timeStamp )
 		{
 			_timeStamp = DoubleToLong(timeStamp);

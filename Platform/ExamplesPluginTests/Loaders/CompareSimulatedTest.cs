@@ -60,7 +60,7 @@ namespace Loaders
 				fourTickStarter.ProjectProperties.Starter.IntervalDefault = Intervals.Day1;
 				
 				// Run the loader.
-				ExampleSimulatedLoader simulatedLoader = new ExampleSimulatedLoader();
+				ExampleLimitOrderLoader simulatedLoader = new ExampleLimitOrderLoader();
 	    		fourTickStarter.Run(simulatedLoader);
 	
 	    		// Get the stategy

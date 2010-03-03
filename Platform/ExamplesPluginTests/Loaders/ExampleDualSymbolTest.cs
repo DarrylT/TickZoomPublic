@@ -48,6 +48,7 @@ namespace Loaders
 			/// </summary>
 			category = "Example";
 			name = "Dual Symbol";
+			IsVisibleInGUI = false;
 		}
 		
 		public override void OnInitialize(ProjectProperties properties) {
@@ -74,10 +75,9 @@ namespace Loaders
 		ExampleSimpleStrategy exampleSimple;
 		ExampleOrderStrategy fourTickData;
 		Portfolio portfolio;
-		string symbols = "Daily4Sim";
 		
-		public virtual Starter CreateStarter() {
-			return new HistoricalStarter();
+		public ExampleDualStrategyTest() {
+			Symbols = "Daily4Sim";
 		}
 		
 		[TestFixtureSetUp]
@@ -90,7 +90,7 @@ namespace Loaders
 				starter.ProjectProperties.Starter.StartTime = new TimeStamp(1800,1,1);
 	    		starter.ProjectProperties.Starter.EndTime = new TimeStamp(1990,1,1);
 	    		starter.DataFolder = "TestData";
-	    		starter.ProjectProperties.Starter.Symbols = symbols;
+	    		starter.ProjectProperties.Starter.Symbols = Symbols;
 				starter.ProjectProperties.Starter.IntervalDefault = Intervals.Day1;
 				starter.ProjectProperties.Engine.RealtimeOutput = false;
 				
@@ -166,10 +166,6 @@ namespace Loaders
 			CompareChart(exampleSimple,GetChart(exampleSimple.SymbolDefault));
 		}
 		
-		public string Symbols {
-			get { return symbols; }
-			set { symbols = value; }
-		}
 	}
 	
 	[TestFixture]
@@ -180,10 +176,8 @@ namespace Loaders
 		ExampleOrderStrategy fourTicksPerBar;
 		ExampleOrderStrategy fullTickData;
 		Portfolio portfolio;
-		string symbols = "FullTick,Daily4Sim";
-		
-		public virtual Starter CreateStarter() {
-			return new HistoricalStarter();
+		public ExampleDualSymbolTest() {
+			Symbols = "FullTick,Daily4Sim";
 		}
 		
 		[TestFixtureSetUp]
@@ -196,7 +190,7 @@ namespace Loaders
 				starter.ProjectProperties.Starter.StartTime = new TimeStamp(1800,1,1);
 	    		starter.ProjectProperties.Starter.EndTime = new TimeStamp(1990,1,1);
 	    		starter.DataFolder = "TestData";
-	    		starter.ProjectProperties.Starter.Symbols = symbols;
+	    		starter.ProjectProperties.Starter.Symbols = Symbols;
 				starter.ProjectProperties.Starter.IntervalDefault = Intervals.Day1;
 				starter.ProjectProperties.Engine.RealtimeOutput = false;
 				
@@ -310,11 +304,6 @@ namespace Loaders
 		[Test]
 		public void CompareBars1() {
 			CompareChart(fourTicksPerBar,GetChart(fourTicksPerBar.SymbolDefault));
-		}
-		
-		public string Symbols {
-			get { return symbols; }
-			set { symbols = value; }
 		}
 	}
 

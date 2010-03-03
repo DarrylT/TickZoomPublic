@@ -29,13 +29,13 @@ namespace TickZoom.Api
     public delegate void PauseEnqueue();
     public delegate void ResumeEnqueue();
 
-    public interface TickQueue : FastQueue<TickBinary> {
+    public interface TickQueue : ItemQueue<TickBinary> {
     	
     }
 	/// <summary>
 	/// Description of Class1.
 	/// </summary>
-	public interface FastQueue<T>
+	public interface ItemQueue<T>
 	{
 		StartEnqueue StartEnqueue {
 			get; set;
