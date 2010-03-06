@@ -85,7 +85,7 @@ namespace TickZoom.TickData
 		    		Array.Copy(stream.GetBuffer(),previous,stream.Position);
 		    	}
 			} catch( QueueException ex) {
-				Assert.AreEqual(EntryType.EndHistorical,ex.EntryType);
+				Assert.AreEqual(EventType.EndHistorical,ex.EntryType);
 	    	} catch( CollectionTerminatedException) {
 	    		
 	    	}

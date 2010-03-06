@@ -44,17 +44,17 @@ namespace TickZoom.TickUtil
 	    public void EnQueue(ref TickBinary o)
 	    {
         	QueueItem item = new QueueItem();
-    		item.ItemType = 0;
+    		item.EventType = 0;
     		item.Tick = o;
     		while( !EnQueueStruct(ref item)) {
     			Factory.Parallel.Yield();
     		}
 	    }
 	    
-	    public void EnQueue(EntryType entryType, SymbolInfo symbol)
+	    public void EnQueue(EventType entryType, SymbolInfo symbol)
 	    {
         	QueueItem item = new QueueItem();
-	    	item.ItemType = (int) entryType;
+	    	item.EventType = (int) entryType;
 	    	if( symbol != null) {
 	    		item.EventChange.Symbol = symbol.BinaryIdentifier;
 	    	}
@@ -63,10 +63,10 @@ namespace TickZoom.TickUtil
 	    	}
 	    }
 	    
-	    public void EnQueue(EntryType entryType, string error)
+	    public void EnQueue(EventType entryType, string error)
 	    {
         	QueueItem item = new QueueItem();
-	    	item.ItemType = (int) entryType;
+	    	item.EventType = (int) entryType;
 //	    	item.ErrorEvent.Message = error;
 	    	while( !EnQueueStruct(ref item)) {
 	    		Factory.Parallel.Yield();
@@ -80,14 +80,14 @@ namespace TickZoom.TickUtil
         		Factory.Parallel.Yield();
 	    	}
 	    	// If not a tick
-	    	if( item.ItemType != 0) {
+	    	if( item.EventType != 0) {
 	    		string symbol;
 	    		if( item.Tick.Symbol != 0) {
 	    			symbol = item.Tick.Symbol.ToSymbol();
 	    		} else {
 	    			symbol = "";
 	    		}
-	    		throw new QueueException( (EntryType) item.ItemType, symbol);
+	    		throw new QueueException( (EventType) item.EventType, symbol);
 	    	} else {
 	    		tick = item.Tick;
 	    	}

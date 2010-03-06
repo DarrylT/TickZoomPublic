@@ -26,16 +26,10 @@ using System.Collections.Generic;
 
 namespace TickZoom.Api
 {
-	/// <summary>
-	/// Description of BrokerFeed.
-	/// </summary>
+
+	
 	public interface Provider
 	{
-        void Start(Receiver receiver);
-        void Stop(Receiver receiver);
-        void StartSymbol(Receiver receiver, SymbolInfo symbol, TimeStamp startTime);
-	    void StopSymbol(Receiver receiver, SymbolInfo symbol);
-	    void PositionChange(Receiver receiver, SymbolInfo symbol, double position, IList<LogicalOrder> orders);
-	    void Stop();
+		void SendEvent(Receiver receiver, SymbolInfo symbol, int eventType, object eventDetail);
 	}
 }

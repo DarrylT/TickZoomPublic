@@ -60,11 +60,11 @@ namespace TickZoom.TickUtil
 			this.startTime = startTime;
 			NextTick = new TickBinary();
 			NextTick.Symbol = symbol.BinaryIdentifier;
-			provider.Start(this);
+			provider.SendEvent(this,null,(int)EventType.Connect,null);
 		}
 		
 		private void Start() {
-			provider.StartSymbol(this,symbol,startTime);
+			provider.SendEvent(this,symbol,(int)EventType.StartSymbol,startTime);
 		}
 		
 		public Provider Provider {
@@ -79,50 +79,76 @@ namespace TickZoom.TickUtil
 		{
 		}
 		
-		public bool CanReceive {
-			get { return tickQueue.CanEnqueue; }
+		public bool CanReceive(SymbolInfo symbol) {
+			return tickQueue.CanEnqueue;
 		}
 		
-		public void OnSend(ref TickBinary o)
-		{
-			tickQueue.EnQueue(ref o);
+		public void OnEvent(SymbolInfo symbo, int eventType, object eventDetail) {
+			try {
+				switch( (EventType) eventType) {
+					case EventType.Tick:
+						TickBinary binary = (TickBinary) eventDetail;
+						tickQueue.EnQueue(ref binary);
+						break;
+					case EventType.EndHistorical:
+						tickQueue.EnQueue(EventType.EndHistorical, symbol);
+						break;
+					case EventType.StartRealTime:
+						tickQueue.EnQueue(EventType.StartRealTime, symbol);
+						break;
+					case EventType.EndRealTime:
+						tickQueue.EnQueue(EventType.EndRealTime, symbol);
+						break;
+					case EventType.Error:
+			    		tickQueue.EnQueue(EventType.Error, symbol);
+			    		break;
+					case EventType.Terminate:
+			    		tickQueue.EnQueue(EventType.Terminate, symbol);
+			    		break;
+					case EventType.LogicalFill:
+					case EventType.StartHistorical:
+					case EventType.Initialize:
+					case EventType.Open:
+					case EventType.Close:
+					case EventType.PositionChange:
+					default:
+						break;
+				}
+			} catch( QueueException) {
+				log.Warn("Already terminated.");
+			}
 		}
-
-        public void OnPositionChange(SymbolInfo symbol, LogicalFillBinary fill)
-	    {
-	        throw new NotImplementedException();
-	    }
-
+		
 	    public void Receive(ref TickBinary tick) {
 			tickQueue.Dequeue(ref tick);
 		}
 		
 		public void OnRealTime(SymbolInfo symbol1) {
-			tickQueue.EnQueue(EntryType.StartRealTime, symbol);
 		}
 		
 		public void OnHistorical(SymbolInfo symbol1) {
-			tickQueue.EnQueue(EntryType.StartHistorical, symbol1);
+			tickQueue.EnQueue(EventType.StartHistorical, symbol1);
 		}
 		
 		public void OnStop()
 		{
-			tickQueue.EnQueue(EntryType.Terminate, symbol);
+			tickQueue.EnQueue(EventType.Terminate, symbol);
 		}
 		
 		public void OnEndHistorical(SymbolInfo symbol1)
 		{
-			tickQueue.EnQueue(EntryType.EndHistorical, symbol);
+			tickQueue.EnQueue(EventType.EndHistorical, symbol);
 		}
 		
 		public void OnEndRealTime(SymbolInfo symbol1)
 		{
-			tickQueue.EnQueue(EntryType.EndRealTime, symbol);
+			tickQueue.EnQueue(EventType.EndRealTime, symbol);
 		}
 		
 		public void OnError(string error)
 		{
-			tickQueue.EnQueue(EntryType.Error, error);
+			tickQueue.EnQueue(EventType.Error, error);
 		}
 	}
 }
+

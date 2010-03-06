@@ -595,7 +595,7 @@ namespace TickZoom.MBTrading
 		public void StartSymbol(Receiver receiver, SymbolInfo symbol, TimeStamp lastTimeStamp)
 		{
 			if( debug) log.Debug("StartSymbol " + symbol + ", " + lastTimeStamp);
-			receiver.OnRealTime(symbol);
+			receiver.OnEvent(symbol,(int)EventType.StartRealTime,null);
 			instrumentReaders.AddDepth(symbol);
 		}
 		
@@ -603,7 +603,7 @@ namespace TickZoom.MBTrading
 		{
 			if( debug) log.Debug("StartSymbol");
 			instrumentReaders.Remove(symbol.Symbol);
-			receiver.OnEndRealTime(symbol);
+			receiver.OnEvent(symbol,(int)EventType.EndRealTime,null);
 		}
 		
 		public void PositionChange(Receiver receiver, SymbolInfo symbol, double signal, IList<LogicalOrder> orders)
@@ -611,11 +611,36 @@ namespace TickZoom.MBTrading
 			instrumentReaders.Signal(symbol.Symbol,signal);
 		}
 		
-		
 		public void Stop()
 		{	
 			if( receiver != null) 
 			LogoutInternal();
+		}
+		
+		public void SendEvent( Receiver receiver, SymbolInfo symbol, int eventType, object eventDetail) {
+			switch( (EventType) eventType) {
+				case EventType.Connect:
+					Start(receiver);
+					break;
+				case EventType.Disconnect:
+					Stop(receiver);
+					break;
+				case EventType.StartSymbol:
+					StartSymbol(receiver,symbol, (TimeStamp) eventDetail);
+					break;
+				case EventType.StopSymbol:
+					StopSymbol(receiver,(SymbolInfo)eventDetail);
+					break;
+				case EventType.PositionChange:
+					PositionChangeDetail positionChange = (PositionChangeDetail) eventDetail;
+					PositionChange(receiver,symbol,positionChange.Position,positionChange.Orders);
+					break;
+				case EventType.Terminate:
+					Stop();
+					break;
+				default:
+					throw new ApplicationException("Unexpected event type: " + (EventType) eventType);
+			}
 		}
 	}
 }

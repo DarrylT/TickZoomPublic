@@ -78,17 +78,19 @@ namespace TickZoom.TickUtil
             Stop();
         }
 
-        public void StartSymbol(Receiver receiver, SymbolInfo symbol, TimeStamp startTime)
+        public void StartSymbol(Receiver receiver, SymbolInfo symbol, object eventDetail)
 		{
 //			receiverInternal = receiver;
 //			if( receiverInternal != receiver) {
 //				throw new ApplicationException( "TickReader only supports one receiver.");
 //			}
+        	StartSymbolDetail detail = (StartSymbolDetail) eventDetail;
+        	
         	if( !symbol.Equals(Symbol)) {
 				throw new ApplicationException( "Mismatching symbol.");
 			}
-			if( startTime != StartTime) {
-				throw new ApplicationException( "Mismatching start time.");
+			if( detail.LastTime != StartTime) {
+				throw new ApplicationException( "Mismatching start time. Expectd: " + StartTime + " but was " + detail.LastTime);
 			}
 		}
 		
@@ -101,7 +103,31 @@ namespace TickZoom.TickUtil
 		{
 			throw new NotImplementedException();
 		}
+		
+		public void SendEvent( Receiver receiver, SymbolInfo symbol, int eventType, object eventDetail) {
+			switch( (EventType) eventType) {
+				case EventType.Connect:
+					Start(receiver);
+					break;
+				case EventType.Disconnect:
+					Stop(receiver);
+					break;
+				case EventType.StartSymbol:
+					StartSymbol(receiver, symbol, eventDetail);
+					break;
+				case EventType.StopSymbol:
+					StopSymbol(receiver, symbol);
+					break;
+				case EventType.PositionChange:
+					PositionChangeDetail positionChange = (PositionChangeDetail) eventDetail;
+					PositionChange(receiver,symbol,positionChange.Position,positionChange.Orders);
+					break;
+				case EventType.Terminate:
+					Stop();
+					break;
+				default:
+					throw new ApplicationException("Unexpected event type: " + (EventType) eventType);
+			}
+		}
 	}
-	
-
 }

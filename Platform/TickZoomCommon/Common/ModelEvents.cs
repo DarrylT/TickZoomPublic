@@ -78,9 +78,6 @@ namespace TickZoom.Common
 			return false;
 		}
 		
-		public virtual void OnGetPosition(EventContext context) {
-			
-		}
 		
 		public virtual bool OnProcessTick(Tick tick) {
 			return true;

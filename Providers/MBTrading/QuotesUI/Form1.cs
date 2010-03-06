@@ -481,10 +481,8 @@ namespace MBTest
 
     public class StubReceiver : Receiver {
     	
-		public bool CanReceive {
-			get {
-				return true;;
-			}
+    	public bool CanReceive(SymbolInfo symbol) {
+			return true;;
 		}
     	
 		public ReceiverState ReceiverState {
@@ -530,12 +528,15 @@ namespace MBTest
     	
 		public void OnPositionChange(SymbolInfo symbol, LogicalFillBinary fill)
 		{
-			throw new NotImplementedException();
 		}
     	
 		public ReceiverState OnGetReceiverState(SymbolInfo symbol)
 		{
-			throw new NotImplementedException();
+			return ReceiverState.Ready;
+		}
+		
+		public void OnEvent( SymbolInfo symbol, int eventType, object eventDetail) {
+			
 		}
     }
 }

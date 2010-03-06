@@ -62,5 +62,6 @@ namespace TickZoom.Api
 		public double Position {
 			get { return position; }
 		}
+		
 	}
 }

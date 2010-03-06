@@ -51,9 +51,9 @@ namespace TickZoom.Api
 		
 	    void EnQueue(ref T o);
 	    
-	    void EnQueue(EntryType queueItemType, SymbolInfo symbol);
+	    void EnQueue(EventType queueItemType, SymbolInfo symbol);
 	    
-	    void EnQueue(EntryType queueItemType, string error);
+	    void EnQueue(EventType queueItemType, string error);
 	    
 	    void Dequeue(ref T tick);
 	    

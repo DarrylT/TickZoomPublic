@@ -64,7 +64,7 @@ namespace TickZoom.Test
 				provider = Factory.Provider.ProviderProcess("127.0.0.1",6492,"IBProviderService.exe");
 			}
 			verify = new VerifyFeed();
-			provider.Start(verify);
+			provider.SendEvent(verify,null,(int)EventType.Connect,null);
 		}
 		
 		[SetUp]
@@ -74,29 +74,29 @@ namespace TickZoom.Test
 		
 		[TearDown]
 		public void TearDown() { 
-	  		provider.Stop(verify);	
-	  		provider.Stop();	
+  			provider.SendEvent(verify,null,(int)EventType.Disconnect,null);
+  			provider.SendEvent(verify,null,(int)EventType.Terminate,null);
 		}
 		
 		[Test]
 		public void TestPositionChange() {
 			if(debug) log.Debug("===DemoConnectionTest===");
-  			provider.StartSymbol(verify,symbol,TimeStamp.MinValue);
+			provider.SendEvent(verify,symbol,(int)EventType.StartSymbol,TimeStamp.MinValue);
   			long count = verify.Verify(2,AssertTick,symbol,25);
   			Assert.GreaterOrEqual(count,2,"tick count");
   			Thread.Sleep(500);
-  			provider.PositionChange(verify,symbol,150,null);
+  			provider.SendEvent(verify,symbol,(int)EventType.PositionChange,new PositionChangeDetail( 150,null));
   			count = verify.Verify(2,AssertTick,symbol,25);
   			Assert.GreaterOrEqual(count,2,"tick count");
-  			provider.PositionChange(verify,symbol,0,null);
-  			count = verify.Verify(2,AssertTick,symbol,25);
-  			Assert.GreaterOrEqual(count,2,"tick count");
-  			Thread.Sleep(500);
-  			provider.PositionChange(verify,symbol,100,null);
+  			provider.SendEvent(verify,symbol,(int)EventType.PositionChange,new PositionChangeDetail( 0,null));
   			count = verify.Verify(2,AssertTick,symbol,25);
   			Assert.GreaterOrEqual(count,2,"tick count");
   			Thread.Sleep(500);
-  			provider.PositionChange(verify,symbol,0,null);
+  			provider.SendEvent(verify,symbol,(int)EventType.PositionChange,new PositionChangeDetail( 100,null));
+  			count = verify.Verify(2,AssertTick,symbol,25);
+  			Assert.GreaterOrEqual(count,2,"tick count");
+  			Thread.Sleep(500);
+  			provider.SendEvent(verify,symbol,(int)EventType.PositionChange,new PositionChangeDetail( 0,null));
   			count = verify.Verify(2,AssertTick,symbol,25);
   			Assert.GreaterOrEqual(count,2,"tick count");
 		}

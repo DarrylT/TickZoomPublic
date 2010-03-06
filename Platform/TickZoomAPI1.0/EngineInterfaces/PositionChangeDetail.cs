@@ -1,4 +1,4 @@
-#region Copyright
+﻿#region Copyright
 /*
  * Software: TickZoom Trading Platform
  * Copyright 2009 M. Wayne Walter
@@ -22,18 +22,26 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 
 namespace TickZoom.Api
 {
-	public enum EntryType : byte {
-		Tick = 0,
-		StartHistorical,
-		EndHistorical,
-		StartRealTime,
-		EndRealTime,
-        PositionChange,
-        OnPositionChange,
-        Error,
-		Terminate
+
+	
+	public class PositionChangeDetail {
+		public double position;
+		public IList<LogicalOrder> orders;
+		public PositionChangeDetail(double position, IList<LogicalOrder> orders) {
+			this.position = position;
+			this.orders = orders;
+		}
+		
+		public double Position {
+			get { return position; }
+		}
+		
+		public IList<LogicalOrder> Orders {
+			get { return orders; }
+		}
 	}
 }

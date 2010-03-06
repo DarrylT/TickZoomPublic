@@ -28,15 +28,30 @@ using System.Drawing;
 
 namespace TickZoom.Api
 {
-	public enum EventType {
-		Initialize,
-		Open,
+	public enum EventType : int {
+		None=0,
+		// Provider/Receiver Connection Events.
+		Initialize=1000,
+		Terminate,
+		Connect,
+		Disconnect,
+		StartSymbol,
+		StopSymbol,
+		StartHistorical,
+		EndRealTime,
+		EndHistorical,
+		StartRealTime,
+		
+		// TCP/IP Events
+		Acknowledgment=2000,
+		Heartbeat,
+		
+		// Events visible to Platform
+		Open=3000,
 		Close,
 		Tick,
-		Position,
+        PositionChange,
 		LogicalFill,
-		EndHistorical,
-		PositionChange,
-		Max,
+        Error,
 	}
 }

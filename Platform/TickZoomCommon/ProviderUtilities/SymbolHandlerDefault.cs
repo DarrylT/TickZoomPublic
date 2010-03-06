@@ -53,7 +53,7 @@ namespace TickZoom.Common
 					tickIO.SetTime(TimeStamp.UtcNow);
 					tickIO.SetQuote(Bid,Ask,(ushort)BidSize,(ushort)AskSize);
 					TickBinary binary = tickIO.Extract();
-					receiver.OnSend(ref binary);
+					receiver.OnEvent(symbol,(int)EventType.Tick,binary);
 				}
 			} else {
 				VerifyQuote();
@@ -64,7 +64,7 @@ namespace TickZoom.Common
         	if( this.position != position) {
 	        	this.position = position;
 	        	LogicalFillBinary fill = new LogicalFillBinary(position,tickIO.Bid,tickIO.Time,0);
-	        	receiver.OnPositionChange(symbol,fill);
+	        	receiver.OnEvent(symbol,(int)EventType.LogicalFill,fill);
         	}
         }
         
@@ -91,7 +91,7 @@ namespace TickZoom.Common
 						tickIO.SetQuote(Bid,Ask,(ushort)BidSize,(ushort)AskSize);
 					}
 					TickBinary binary = tickIO.Extract();
-					receiver.OnSend(ref binary);
+					receiver.OnEvent(symbol,(int)EventType.Tick,binary);
 				}
 			} else {
 				VerifyTrade();

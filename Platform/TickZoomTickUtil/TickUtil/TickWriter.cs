@@ -150,7 +150,7 @@ namespace TickZoom.TickUtil
 				WriteToFile(memory, tickIO);
 	    		return true;
 		    } catch (QueueException ex) {
-				if( ex.EntryType == EntryType.Terminate) {
+				if( ex.EntryType == EventType.Terminate) {
 					log.Debug("Exiting, queue terminated.");
 					if( fs != null) {
 						fs.Close();
@@ -240,7 +240,7 @@ namespace TickZoom.TickUtil
 			}
 			if( debug) log.Debug("Entering Close()");
     		if( appendThread != null && writeQueue != null) {
-				writeQueue.EnQueue(EntryType.Terminate, symbol);
+				writeQueue.EnQueue(EventType.Terminate, symbol);
 				appendThread.Join();
 				writeQueue = null;
 			}

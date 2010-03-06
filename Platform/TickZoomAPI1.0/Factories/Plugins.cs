@@ -35,6 +35,7 @@ namespace TickZoom.Api
 	{
 		List<Type> modelLoaders;
 		List<Type> models;
+		List<Type> serializers;
 		int errorCount = 0;
 		Log log = Factory.Log.GetLogger(typeof(Plugins));
 		[ThreadStatic]
@@ -62,8 +63,8 @@ namespace TickZoom.Api
 				throw new ApplicationException("AppDataFolder was not set in app.config.");
 			}
 			PluginFolder = appData + @"\Plugins";
-       		Directory.CreateDirectory( PluginFolder);
-       		LoadAssemblies( PluginFolder);
+			Directory.CreateDirectory( PluginFolder);
+			LoadAssemblies( PluginFolder);
 		}
 		
 		public ModelLoaderInterface GetLoader( string name) {
@@ -74,7 +75,18 @@ namespace TickZoom.Api
 					return loader;
 				}
 			}
-			throw new Exception("ModelLoader '"+name+"' not found.");
+			throw new ApplicationException("ModelLoader '"+name+"' not found.");
+		}
+		
+		public Serializer GetSerializer( int eventType) {
+			for( int i=0; i<serializers.Count; i++) {
+				Type type = serializers[i];
+				Serializer serializer = (Serializer)Activator.CreateInstance(type);
+				if( serializer.EventType == eventType) {
+					return serializer;
+				}
+			}
+			throw new ApplicationException("Serializer for " + (EventType) eventType + " not found.");
 		}
 		
 		public ModelInterface GetModel( string name) {
@@ -88,69 +100,69 @@ namespace TickZoom.Api
 		
 		private void LoadAssemblies(String path)
 		{
+			string currentDirectory = System.Environment.CurrentDirectory;
 			errorCount = 0;
-		    modelLoaders = new List<Type>();
-		    models = new List<Type>();
-		
-		    // This loads plugins from the plugin folder
-		    List<string> files = new List<string>();
-		    files.AddRange( Directory.GetFiles(path, "*plugin*.dll", SearchOption.AllDirectories));
-		    files.AddRange( Directory.GetFiles(path, "*plugin*.dll", SearchOption.AllDirectories));
-	        // This loads plugins from the installation folder
-	        // so all the common models and modelloaders get loaded.
-	        files.AddRange( Directory.GetFiles(System.Environment.CurrentDirectory, "*plugin*.dll", SearchOption.AllDirectories));
-	        files.AddRange( Directory.GetFiles(System.Environment.CurrentDirectory, "*test*.dll", SearchOption.AllDirectories));
-	        files.AddRange( Directory.GetFiles(System.Environment.CurrentDirectory, "*test*.exe", SearchOption.AllDirectories));
-	        
-	        
-		    foreach (String filename in files)
-		    {
-		        log.Info("Loading " + filename);
-		        Type t2 = typeof(object);
-		        try
-		        {
-		            Assembly assembly = Assembly.LoadFrom(filename);
-		
-		            foreach (Type t in assembly.GetTypes())
-		            {
-		            	t2 = t;
-		            	if (t.IsClass && !t.IsAbstract) {
-		            		if( t.GetInterface("ModelLoaderInterface") != null)
-			                {
-		            			try {
-		            				ModelLoaderInterface loader = (ModelLoaderInterface)Activator.CreateInstance(t);
-			                		modelLoaders.Add(t);
-		            			} catch( MissingMethodException) {
-		            				errorCount++;
-						            log.Notice("ModelLoader '" + t.Name + "' in '" + filename + "' failed to load due to missing default constructor" );
-		            			}
-			                }
-		            		if( t.GetInterface("ModelInterface") != null)
-			                {
-		            			// Exit and Enter Common aren't directly accessible.
-		            			// They provide support for custom strategies.
-		            			try {
-			                		models.Add(t);
-		            			} catch( MissingMethodException) {
-		            				errorCount++;
-						            log.Notice("Model '" + t.Name + "' in '" + filename + "' failed to load due to missing default constructor" );
-		            			}
-			                }
-		            	}
-		            }
-		        } catch (ReflectionTypeLoadException ex) {
-		        	log.Warn("Plugin load failed for '" + t2.Name + "' in '"+ filename +"' with loader exceptions:");
-		        	for( int i=0; i<ex.LoaderExceptions.Length; i++) {
-		        		Exception lex = ex.LoaderExceptions[i];
-		        		log.Warn( lex.ToString());
-		        	}
-		        } catch (Exception err) {
-		            log.Warn("Plugin load failed for '" + t2.Name + "' in '"+ filename +"': " + err.ToString());
-		        }
-		    }
-		    if( modelLoaders.Count == 0) {
-		    	log.Warn("Zero plugins found in " + PluginFolder );
-		    }
+			modelLoaders = new List<Type>();
+			models = new List<Type>();
+			serializers = new List<Type>();
+			
+			// This loads plugins from the plugin folder
+			List<string> files = new List<string>();
+			files.AddRange( Directory.GetFiles(path, "*plugin*.dll", SearchOption.AllDirectories));
+			files.AddRange( Directory.GetFiles(path, "*plugin*.dll", SearchOption.AllDirectories));
+			// This loads plugins from the installation folder
+			// so all the common models and modelloaders get loaded.
+			files.AddRange( Directory.GetFiles(currentDirectory, "*plugin*.dll", SearchOption.AllDirectories));
+			files.AddRange( Directory.GetFiles(currentDirectory, "*test*.dll", SearchOption.AllDirectories));
+			files.AddRange( Directory.GetFiles(currentDirectory, "*test*.exe", SearchOption.AllDirectories));
+			
+			
+			foreach (String filename in files)
+			{
+				LoadImplementations(filename,"ModelLoaderInterface",modelLoaders);
+				LoadImplementations(filename,"ModelInterface",models);
+				LoadImplementations(filename,"Serializer",serializers);
+			}
+			if( modelLoaders.Count == 0) {
+				log.Warn("Zero ModelLoader plugins found in " + PluginFolder + " or " + currentDirectory);
+			}
+			if( serializers.Count == 0) {
+				log.Warn("Zero Serializer plugins found in " + PluginFolder + " or " + currentDirectory);
+			}
+		}
+
+
+		// Exit and Enter Common aren't directly accessible.
+		// They provide support for custom strategies.
+
+		void LoadImplementations(String filename, string typeName, List<Type> list)
+		{
+			log.Info("Loading " + filename);
+			Type t2 = typeof(object);
+			try {
+				Assembly assembly = Assembly.LoadFrom(filename);
+				foreach (Type t in assembly.GetTypes()) {
+					t2 = t;
+					if (t.IsClass && !t.IsAbstract) {
+						if (t.GetInterface(typeName) != null) {
+							try {
+								list.Add(t);
+							} catch (MissingMethodException) {
+								errorCount++;
+								log.Notice("ModelLoader '" + t.Name + "' in '" + filename + "' failed to load due to missing default constructor");
+							}
+						}
+					}
+				}
+			} catch (ReflectionTypeLoadException ex) {
+				log.Warn("Plugin load failed for '" + t2.Name + "' in '" + filename + "' with loader exceptions:");
+				for (int i = 0; i < ex.LoaderExceptions.Length; i++) {
+					Exception lex = ex.LoaderExceptions[i];
+					log.Warn(lex.ToString());
+				}
+			} catch (Exception err) {
+				log.Warn("Plugin load failed for '" + t2.Name + "' in '" + filename + "': " + err.ToString());
+			}
 		}
 		
 		public int ErrorCount {

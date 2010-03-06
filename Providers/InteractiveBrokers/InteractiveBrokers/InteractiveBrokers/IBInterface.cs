@@ -143,14 +143,14 @@ namespace TickZoom.InteractiveBrokers
             Equity equity = new Equity(symbol.Symbol);
             SymbolHandler handler = GetSymbolHandler(symbol,receiver);
             client.RequestMarketData((int)symbol.BinaryIdentifier, equity, null, false, false);
-			receiver.OnRealTime(symbol);
+            receiver.OnEvent(symbol,(int)EventType.StartRealTime,null);
 		}
 		
 		public void StopSymbol(Receiver receiver, SymbolInfo symbol)
 		{
 			if( debug) log.Debug("StartSymbol");
             client.CancelMarketData((int)symbol.BinaryIdentifier);
-			receiver.OnEndRealTime(symbol);
+			receiver.OnEvent(symbol,(int)EventType.EndRealTime,null);
 		}
 		
 		public void PositionChange(Receiver receiver, SymbolInfo symbol, double signal, IList<LogicalOrder> orders)
@@ -476,6 +476,32 @@ namespace TickZoom.InteractiveBrokers
 				OnCreateBrokerOrder(physicalOrder);
 			} else {
 				throw new ApplicationException("BrokerOrder property want's an Order object.");
+			}
+		}
+		
+		public void SendEvent( Receiver receiver, SymbolInfo symbol, int eventType, object eventDetail) {
+			switch( (EventType) eventType) {
+				case EventType.Connect:
+					Start(receiver);
+					break;
+				case EventType.Disconnect:
+					Stop(receiver);
+					break;
+				case EventType.StartSymbol:
+					StartSymbol(receiver,symbol, (TimeStamp) eventDetail);
+					break;
+				case EventType.StopSymbol:
+					StopSymbol(receiver,(SymbolInfo)eventDetail);
+					break;
+				case EventType.PositionChange:
+					PositionChangeDetail positionChange = (PositionChangeDetail) eventDetail;
+					PositionChange(receiver,symbol,positionChange.Position,positionChange.Orders);
+					break;
+				case EventType.Terminate:
+					Stop();
+					break; 
+				default:
+					throw new ApplicationException("Unexpected event type: " + (EventType) eventType);
 			}
 		}
 	}

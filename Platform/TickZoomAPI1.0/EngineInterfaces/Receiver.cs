@@ -27,23 +27,22 @@ using System.IO;
 namespace TickZoom.Api
 {
 	public interface Receiver {
-	    void OnHistorical(SymbolInfo symbol);
-	    void OnEndHistorical(SymbolInfo symbol);
-	    void OnRealTime(SymbolInfo symbol);
-	    void OnEndRealTime(SymbolInfo symbol);
-	    void OnSend(ref TickBinary o);
-        void OnPositionChange(SymbolInfo symbol, LogicalFillBinary fill);
-	    void OnStop();
-	    void OnError( string error);
+		void OnEvent(SymbolInfo symbol, int eventType, object eventDetail);
 	    ReceiverState OnGetReceiverState(SymbolInfo symbol);
-	    bool CanReceive {
-	    	get;
-	    }
+	    bool CanReceive(SymbolInfo symbol);
 	}
 	
 	public interface Serializable {
 		void FromReader(MemoryStream reader);
 		void ToWriter(MemoryStream memory);
+	}
+	
+	public interface Serializer  {
+		object FromReader(MemoryStream reader);
+		void ToWriter(object eventDetail, MemoryStream memory);
+		int EventType {
+			get;
+		}
 	}
 	
 	public interface ReadWritable<T> : Serializable {

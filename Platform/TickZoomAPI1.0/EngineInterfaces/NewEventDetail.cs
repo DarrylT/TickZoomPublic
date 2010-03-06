@@ -22,41 +22,11 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 
 namespace TickZoom.Api
 {
-	public interface FastEventQueue : FastQueue<QueueItem> {
-		
-	}
-	
-	public interface FastFillQueue : FastQueue<LogicalFillBinary> {
-		
-	}
-
-    public interface FastQueue<T>
-	{
-		bool EnQueueStruct(ref T tick);
-		bool DequeueStruct(ref T tick);
-		void Clear();
-		void Flush();
-		void Terminate(Exception ex);
-		void Terminate();
-		void Pause();
-		void Resume();
-		void LogStatistics();
-		bool CanEnqueue { get; }
-		bool CanDequeue { get; }
-		int Count { get; }
-		long EnqueueConflicts { get; }
-		long DequeueConflicts { get; }
-		StartEnqueue StartEnqueue { get; set; }
-		int Timeout { get; set; }
-		bool IsStarted { get; }
-		ResumeEnqueue ResumeEnqueue { get; set; }
-		PauseEnqueue PauseEnqueue { get; set; }
-		bool IsPaused { get; }
-		int Capacity { get; }
+	public class NewEventDetail {
+		public int Id;
 	}
 }
-
-

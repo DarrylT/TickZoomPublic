@@ -28,6 +28,7 @@ namespace TickZoom.Api
 {
 	public interface VerifyFeed : Receiver
 	{
+		long VerifyEvent(Action<SymbolInfo,int,object> assertEvent, SymbolInfo symbol, int timeout);
 		long Verify(Action<TickIO, TickIO, ulong> assertTick, SymbolInfo symbol, int timeout);
 		long Verify(int expectedCount, Action<TickIO, TickIO, ulong> assertTick, SymbolInfo symbol, int timeout);
 		double VerifyPosition(double expectedPosition, SymbolInfo symbol, int timeout);

@@ -90,14 +90,14 @@ namespace TickZoom.Test
             	if( count >= expectedCount) return true;
 			} catch( QueueException ex) {
 				switch( ex.EntryType) {
-					case EntryType.EndHistorical:
-					case EntryType.StartRealTime:
-					case EntryType.EndRealTime:
+					case EventType.EndHistorical:
+					case EventType.StartRealTime:
+					case EventType.EndRealTime:
 						break;
-					case EntryType.Terminate:
+					case EventType.Terminate:
 						return true;
 					default:
-	            		throw new ApplicationException("Unexpected QueueException: " + ex.EntryType);
+						throw new ApplicationException("Unexpected QueueException: " + (EventType)ex.EntryType);
 				}
 			}
     		return false;
@@ -138,7 +138,7 @@ namespace TickZoom.Test
 				}
 				return true;
            	} catch( QueueException ex) {
-       			if( EntryType.EndHistorical != ex.EntryType) {
+       			if( EventType.EndHistorical != ex.EntryType) {
        				throw new ApplicationException( "Unexpected QueueException: " + ex.EntryType);
        			}
             	log.Debug("Queue Terminated");
@@ -153,8 +153,8 @@ namespace TickZoom.Test
 		public void OnHistorical(SymbolInfo symbol) {
 		}
 		
-		public bool CanReceive {
-			get { return tickQueue != null && tickQueue.CanEnqueue; }
+       	public bool CanReceive( SymbolInfo symbol) {
+       		return tickQueue != null && tickQueue.CanEnqueue;
 		}
 	 		
 		public void OnSend(ref TickBinary o)
@@ -166,7 +166,7 @@ namespace TickZoom.Test
 			}
 		}
 
-	    public void OnPositionChange(SymbolInfo symbol, LogicalFillBinary fill)
+	    public void OnPositionChange(LogicalFillBinary fill)
 	    {
 	        throw new NotImplementedException();
 	    }
@@ -174,7 +174,7 @@ namespace TickZoom.Test
 	    public void OnStop()
 		{
 			try {
-	    		tickQueue.EnQueue(EntryType.Terminate, (SymbolInfo) null);
+	    		tickQueue.EnQueue(EventType.Terminate, (SymbolInfo) null);
 			} catch( QueueException) {
 				// Queue already terminated.
 			}
@@ -190,16 +190,55 @@ namespace TickZoom.Test
 		
 		public void OnEndHistorical(SymbolInfo symbol)
 		{
-			tickQueue.EnQueue(EntryType.EndHistorical, symbol);
+			tickQueue.EnQueue(EventType.EndHistorical, symbol);
 		}
 		
 		public void OnEndRealTime(SymbolInfo symbol)
 		{
        		try {
-				tickQueue.EnQueue(EntryType.EndRealTime, symbol);
+				tickQueue.EnQueue(EventType.EndRealTime, symbol);
        		} catch ( QueueException) {
        			// Queue was already ended.
        		}
+		}
+		public void OnEvent(SymbolInfo symbol, int eventType, object eventDetail) {
+			try {
+				switch( (EventType) eventType) {
+					case EventType.Tick:
+						TickBinary binary = (TickBinary) eventDetail;
+						OnSend(ref binary);
+						break;
+					case EventType.EndHistorical:
+						OnEndHistorical(symbol);
+						break;
+					case EventType.StartRealTime:
+						OnRealTime(symbol);
+						break;
+					case EventType.StartHistorical:
+						OnHistorical(symbol);
+						break;
+					case EventType.EndRealTime:
+						OnEndRealTime(symbol);
+						break;
+					case EventType.Error:
+						OnError((string)eventDetail);
+						break;
+					case EventType.LogicalFill:
+						OnPositionChange((LogicalFillBinary)eventDetail);
+						break;
+					case EventType.Terminate:
+						OnStop();
+			    		break;
+					case EventType.Initialize:
+					case EventType.Open:
+					case EventType.Close:
+					case EventType.PositionChange:
+					default:
+			    		throw new ApplicationException("Unexpected EventType: " + eventType);
+				}
+			} catch( QueueException) {
+				log.Warn("Already terminated.");
+			}
 		}
 	}
 }

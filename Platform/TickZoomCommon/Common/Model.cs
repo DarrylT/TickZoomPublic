@@ -71,7 +71,6 @@ namespace TickZoom.Common
 			RequestEvent( EventType.Open);
 			RequestEvent( EventType.Close);
 			RequestEvent( EventType.Tick);
-			RequestEvent( EventType.Position);
 			RequestEvent( EventType.EndHistorical);
 		}
 
@@ -309,9 +308,6 @@ namespace TickZoom.Common
 					break;
 				case EventType.EndHistorical:
 					OnEndHistorical();
-					break;
-				case EventType.Position:
-					OnGetPosition(context);
 					break;
 			}
 		}

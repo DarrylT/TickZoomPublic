@@ -109,7 +109,7 @@ namespace TickZoom.Common
 
 	public class DesignProvider : Provider {
 		
-		public void StartSymbol(Receiver receiver, SymbolInfo symbol, TimeStamp startTime)
+		public void StartSymbol(Receiver receiver, SymbolInfo symbol, object eventDetail)
 		{
 			TickImpl tickImpl = new TickImpl();
 			tickImpl.Initialize();
@@ -117,15 +117,15 @@ namespace TickZoom.Common
 			tickImpl.SetTime( new TimeStamp(2000,1,1));
 			tickImpl.SetQuote(100D, 100D);
 			TickBinary tickBinary = tickImpl.Extract();
-			receiver.OnHistorical(symbol);
-			receiver.OnSend(ref tickBinary );
+			receiver.OnEvent(symbol,(int)EventType.StartHistorical,symbol);
+			receiver.OnEvent(symbol,(int)EventType.Tick, tickBinary );
 			tickImpl.Initialize();
 			tickImpl.SetSymbol( symbol.BinaryIdentifier);
 			tickImpl.SetTime( new TimeStamp(2000,1,2));
 			tickImpl.SetQuote(101D, 101D);
 			tickBinary = tickImpl.Extract();
-			receiver.OnSend(ref tickBinary);
-			receiver.OnEndHistorical(symbol);
+			receiver.OnEvent(symbol,(int)EventType.Tick, tickBinary );
+			receiver.OnEvent(symbol,(int)EventType.EndHistorical,symbol);
 		}
 		
 		public void StopSymbol(Receiver receiver, SymbolInfo symbol)
@@ -151,6 +151,31 @@ namespace TickZoom.Common
 		
 		public void Stop()
 		{
+		}
+		public void SendEvent( Receiver receiver, SymbolInfo symbol, int eventType, object eventDetail) {
+			switch( (EventType) eventType) {
+				case EventType.Connect:
+					Start(receiver);
+					break;
+				case EventType.Disconnect:
+					Stop(receiver);
+					break;
+				case EventType.StartSymbol:
+					StartSymbol(receiver, symbol, eventDetail);
+					break;
+				case EventType.StopSymbol:
+					StopSymbol(receiver,(SymbolInfo)eventDetail);
+					break;
+				case EventType.PositionChange:
+					PositionChangeDetail positionChange = (PositionChangeDetail) eventDetail;
+					PositionChange(receiver,symbol,positionChange.Position,positionChange.Orders);
+					break;
+				case EventType.Terminate:
+					Stop();
+					break;
+				default:
+					throw new ApplicationException("Unexpected event type: " + (EventType) eventType);
+			}
 		}
 	}
 		

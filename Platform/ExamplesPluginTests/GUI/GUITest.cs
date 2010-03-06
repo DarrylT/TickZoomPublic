@@ -178,7 +178,7 @@ namespace MiscTest
 					Assert.AreEqual(tick1,tick2);
 				}
 			} catch( QueueException ex) {
-				Assert.AreEqual(ex.EntryType,EntryType.EndHistorical);
+				Assert.AreEqual(ex.EntryType,EventType.EndHistorical);
 			}
 			reader1.Stop();
 			reader2.Stop();

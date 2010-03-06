@@ -248,7 +248,7 @@ namespace TickZoom.TickUtil
 		}
 		
 		private bool FileReader() {
-			if( terminate || !receiver.CanReceive) {
+			if( terminate || !receiver.CanReceive(symbol)) {
 				return false;
 			}
 			try {
@@ -272,7 +272,7 @@ namespace TickZoom.TickUtil
 	    
 	    			if( IsAtStart(tick)) {
 		    			if( isFirstTick) {
-							receiver.OnHistorical(symbol);
+							receiver.OnEvent(symbol,(int)EventType.StartHistorical,null);
 							if( !quietMode) {
 								log.Symbol = symbol.Symbol;
 								LogInfo("Starting loading for " + symbol + " from " + tickIO.ToPosition());
@@ -290,7 +290,7 @@ namespace TickZoom.TickUtil
 	    					}
 	    					log.Trace("Read a tick " + tickIO);
 	    				}
-	    				receiver.OnSend(ref tick);
+	    				receiver.OnEvent(symbol,(int)EventType.Tick,tick);
 					}
 					
 					if( position > nextUpdate) {
@@ -330,9 +330,9 @@ namespace TickZoom.TickUtil
 				} catch( Exception ex) {
 					log.Debug( "Exception on progressCallback: " + ex.Message);
 				}
-				if( debug) log.Debug("calling receiver.OnEndHistorical()");
+				if( debug) log.Debug("calling receiver.OnEvent(symbol,(int)EventType.EndHistorical,)");
 				if( count > 0) {
-					receiver.OnEndHistorical(symbol);
+					receiver.OnEvent(symbol,(int)EventType.EndHistorical,null);
 				}
 		    	fileReaderTask.Stop();
 		    		} catch ( ThreadAbortException) {
@@ -361,8 +361,8 @@ namespace TickZoom.TickUtil
 			lock(locker) {
 				readerList.Remove(this);
 			}
-			if( receiver != null && receiver.CanReceive) {
-				receiver.OnStop();
+			if( receiver != null && receiver.CanReceive(symbol)) {
+				receiver.OnEvent(null,(int)EventType.Terminate,null);
 			}
 		}
 		

@@ -124,7 +124,7 @@ namespace TickZoom.TickUtil
 	    		if( exception != null) {
 	    			throw new ApplicationException("Enqueue failed.",exception);
 	    		} else {
-            		throw new QueueException(EntryType.Terminate);
+            		throw new QueueException(EventType.Terminate);
 	    		}
             }
             // If the queue is full, wait for an item to be removed
@@ -141,14 +141,14 @@ namespace TickZoom.TickUtil
 	    		if( exception != null) {
 	    			throw new ApplicationException("Dequeue failed.",exception);
 	    		} else {
-	            	throw new QueueException(EntryType.Terminate);
+	            	throw new QueueException(EventType.Terminate);
 	    		}
             }
 	    	tick = empty;
 	    	if( !isStarted) { 
 	    		if( !StartDequeue()) return false;
 	    	}
-	        if( queue.Count==0) return false;
+	        if( queue == null || queue.Count==0) return false;
 	    	if( !SpinLockNB()) return false;
             tick = queue.Dequeue();
             SpinUnLock();

@@ -61,6 +61,12 @@ namespace TickZoom.Common
 		public void Start()
 		{
 		}
+		
+		public long VerifyEvent(Action<SymbolInfo,int,object> assertTick, SymbolInfo symbol, int timeout)
+		{
+			return VerifyEvent(1, assertTick, symbol, timeout);
+		}
+		
 		public long Verify(Action<TickIO, TickIO, ulong> assertTick, SymbolInfo symbol, int timeout)
 		{
 			return Verify(2, assertTick, symbol, timeout);
@@ -87,6 +93,23 @@ namespace TickZoom.Common
 			return count;
 		}
 
+		public long VerifyEvent(int expectedCount, Action<SymbolInfo,int,object> assertEvent, SymbolInfo symbol, int timeout)
+		{
+			if (debug) log.Debug("VerifyEvent");
+			int startTime = Environment.TickCount;
+			count = 0;
+			while (Environment.TickCount - startTime < timeout * 1000) {
+				if (!tickQueue.CanDequeue)
+					Thread.Sleep(100);
+				if (tickQueue.CanDequeue) {
+					if (HandleEvent(expectedCount, assertEvent, symbol)) {
+						break;
+					}
+				}
+			}
+			return count;
+		}
+		
 		public double VerifyPosition(double expectedPosition, SymbolInfo symbol, int timeout)
 		{
 			if (debug)
@@ -99,7 +122,9 @@ namespace TickZoom.Common
 					Thread.Sleep(100);
 				if (tickQueue.CanDequeue) {
 					if( actualPositions.TryGetValue(symbol.BinaryIdentifier,out position) &&
-					   position == expectedPosition) {
+					   position == expectedPosition)
+					
+					{
 						return expectedPosition;
 					}
 				}
@@ -129,24 +154,48 @@ namespace TickZoom.Common
 				if (count >= expectedCount)
 					return true;
 			} catch (QueueException ex) {
-				switch (ex.EntryType) {
-					case EntryType.StartRealTime:
-						isRealTime = true;
-						break;
-					case EntryType.EndHistorical:
-						break;
-					case EntryType.EndRealTime:
-						isRealTime = false;
-						break;
-					case EntryType.Terminate:
-						return true;
-					default:
-						throw new ApplicationException("Unexpected QueueException: " + ex.EntryType);
-				}
+				return( HandleQueueException(ex));
 			}
 			return false;
 		}
 
+		private bool HandleEvent(int expectedCount, Action<SymbolInfo,int,object> assertEvent, SymbolInfo symbol)
+		{
+			try {
+				// Remove ticks just so as to get to the event we want to see.
+				tickQueue.Dequeue(ref tickBinary);
+				if (customEventType> 0) {
+					assertEvent(customEventSymbol,customEventType,customEventDetail);
+					count++;
+				} else {
+					Thread.Sleep(10);
+				}
+				if (count >= expectedCount)
+					return true;
+			} catch (QueueException ex) {
+				return HandleQueueException(ex);
+			}
+			return false;
+		}
+		
+		private bool HandleQueueException( QueueException ex) {
+			switch (ex.EntryType) {
+				case EventType.StartRealTime:
+					isRealTime = true;
+					break;
+				case EventType.EndHistorical:
+					break;
+				case EventType.EndRealTime:
+					isRealTime = false;
+					break;
+				case EventType.Terminate:
+					return true;
+				default:
+					throw new ApplicationException("Unexpected QueueException: " + ex.EntryType);
+			}
+			return false;
+		}
+		
 		long count = 0;
 		Task task;
 		int startTime;
@@ -185,27 +234,14 @@ namespace TickZoom.Common
 				}
 				return true;
 			} catch (QueueException ex) {
-				switch (ex.EntryType) {
-					case EntryType.StartRealTime:
-						isRealTime = true;
-						break;
-					case EntryType.EndHistorical:
-						break;
-					case EntryType.EndRealTime:
-						isRealTime = false;
-						break;
-					case EntryType.Terminate:
-						return true;
-					default:
-						throw new ApplicationException("Unexpected QueueException: " + ex.EntryType);
+				if( HandleQueueException(ex)) {
+					return true;
+				} else {
+					Factory.Parallel.CurrentTask.Stop();
 				}
-				log.Debug("Queue Terminated");
-				Factory.Parallel.CurrentTask.Stop();
-				return false;
 			}
+			return false;
 		}
-		
-		
 
 		public void OnRealTime(SymbolInfo symbol)
 		{
@@ -215,8 +251,8 @@ namespace TickZoom.Common
 		{
 		}
 
-		public bool CanReceive {
-			get { return tickQueue != null && tickQueue.CanEnqueue; }
+		public bool CanReceive( SymbolInfo symbol) {
+			return tickQueue != null && tickQueue.CanEnqueue;
 		}
 
 		public void OnSend(ref TickBinary o)
@@ -243,7 +279,7 @@ namespace TickZoom.Common
 		public void OnStop()
 		{
 			try {
-				tickQueue.EnQueue(EntryType.Terminate, (SymbolInfo)null);
+				tickQueue.EnQueue(EventType.Terminate, (SymbolInfo)null);
 			} catch (QueueException) {
 				// Queue already terminated.
 			}
@@ -261,13 +297,13 @@ namespace TickZoom.Common
 
 		public void OnEndHistorical(SymbolInfo symbol)
 		{
-			tickQueue.EnQueue(EntryType.EndHistorical, symbol);
+			tickQueue.EnQueue(EventType.EndHistorical, symbol);
 		}
 
 		public void OnEndRealTime(SymbolInfo symbol)
 		{
 			try {
-				tickQueue.EnQueue(EntryType.EndRealTime, symbol);
+				tickQueue.EnQueue(EventType.EndRealTime, symbol);
 			} catch (QueueException) {
 				// Queue was already ended.
 			}
@@ -275,6 +311,57 @@ namespace TickZoom.Common
 		
 		public bool IsRealTime {
 			get { return isRealTime; }
+		}
+		
+		SymbolInfo customEventSymbol;
+		int customEventType;
+		object customEventDetail;
+		public void OnCustomEvent(SymbolInfo symbol, int eventType, object eventDetail) {
+			customEventSymbol = symbol;
+			customEventType = eventType;
+			customEventDetail = eventDetail;
+		}
+		
+		public void OnEvent(SymbolInfo symbol, int eventType, object eventDetail) {
+			try {
+				switch( (EventType) eventType) {
+					case EventType.Tick:
+						TickBinary binary = (TickBinary) eventDetail;
+						OnSend(ref binary);
+						break;
+					case EventType.EndHistorical:
+						OnEndHistorical(symbol);
+						break;
+					case EventType.StartRealTime:
+						OnRealTime(symbol);
+						break;
+					case EventType.StartHistorical:
+						OnHistorical(symbol);
+						break;
+					case EventType.EndRealTime:
+						OnEndRealTime(symbol);
+						break;
+					case EventType.Error:
+						OnError((string)eventDetail);
+						break;
+					case EventType.LogicalFill:
+						OnPositionChange(symbol,(LogicalFillBinary)eventDetail);
+						break;
+					case EventType.Terminate:
+						OnStop();
+			    		break;
+					case EventType.Initialize:
+					case EventType.Open:
+					case EventType.Close:
+					case EventType.PositionChange:
+			    		throw new ApplicationException("Unexpected EventType: " + eventType);
+					default:
+			    		OnCustomEvent(symbol,eventType,eventDetail);
+			    		break;
+				}
+			} catch( QueueException) {
+				log.Warn("Already terminated.");
+			}
 		}
 	}
 }

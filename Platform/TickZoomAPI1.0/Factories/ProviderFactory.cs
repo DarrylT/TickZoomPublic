@@ -34,6 +34,7 @@ namespace TickZoom.Api
 		Receiver VerifyState();
 		ServiceConnection ProviderService();
 		ServiceConnection ConnectionManager();
+		Serializers Serializers();
 	}
 }
 	

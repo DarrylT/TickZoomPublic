@@ -329,7 +329,7 @@ namespace TickZoom.Common
 		}
 		
 		private void CreateLogicalFill(SymbolInfo symbol, double position, double price, TimeStamp time, int logicalOrderId) {
-			LogicalFillBinary fill = new LogicalFillBinary( position,price,time,logicalOrderId);
+			LogicalFillBinary fill = new LogicalFillBinary(position,price,time,logicalOrderId);
 			changePosition(symbol,fill);
 		}
 		

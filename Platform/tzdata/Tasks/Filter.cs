@@ -108,7 +108,7 @@ namespace tzdata
 					}
 				}
 			} catch( QueueException ex) {
-				if( ex.EntryType != EntryType.EndHistorical) {
+				if( ex.EntryType != EventType.EndHistorical) {
 					throw new ApplicationException("Unexpected QueueException: " + ex);
 				}
 			}

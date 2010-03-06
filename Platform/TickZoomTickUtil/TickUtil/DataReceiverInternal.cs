@@ -45,70 +45,52 @@ namespace TickZoom.TickUtil
 		}
 		
 		private void Start() {
-			sender.Start(this);
+			sender.SendEvent(this,null,(int)EventType.Connect,null);
 		}
 		
-		public bool CanReceive {
-			get { return readQueue.CanEnqueue; }
+		public bool CanReceive( SymbolInfo symbol) {
+			return readQueue.CanEnqueue;
 		}
 		
-		public void OnSend(ref TickBinary o) {
-			readQueue.EnQueue(ref o);
-		}
-
-        public void OnPositionChange(SymbolInfo symbol, LogicalFillBinary fill)
-	    {
-	    	throw new NotImplementedException();
-	    }
-
-	    public void OnRealTime(SymbolInfo symbol) {
+		public void OnEvent(SymbolInfo symbol, int eventType, object eventDetail) {
 			try {
-				readQueue.EnQueue(EntryType.StartRealTime, symbol);
+				switch( (EventType) eventType) {
+					case EventType.Tick:
+						TickBinary binary = (TickBinary) eventDetail;
+						readQueue.EnQueue(ref binary);
+						break;
+					case EventType.EndHistorical:
+						readQueue.EnQueue(EventType.EndHistorical, symbol);
+						break;
+					case EventType.StartRealTime:
+						readQueue.EnQueue(EventType.StartRealTime, symbol);
+						break;
+					case EventType.EndRealTime:
+						readQueue.EnQueue(EventType.EndRealTime, symbol);
+						break;
+					case EventType.Error:
+			    		readQueue.EnQueue(EventType.Error, symbol);
+			    		break;
+					case EventType.Terminate:
+			    		readQueue.EnQueue(EventType.Terminate, symbol);
+			    		break;
+					case EventType.LogicalFill:
+					case EventType.StartHistorical:
+					case EventType.Initialize:
+					case EventType.Open:
+					case EventType.Close:
+					case EventType.PositionChange:
+					default:
+						break;
+				}
 			} catch( QueueException) {
 				log.Warn("Already terminated.");
 			}
 		}
-		
-		public void OnHistorical(SymbolInfo symbol) {
-			// ignore for tickreader
-		}
-	
-		public void OnStop() {
-			try {
-	    		readQueue.EnQueue(EntryType.Terminate, (SymbolInfo) null);
-			} catch( QueueException) {
-				log.Warn("Already terminated.");
-			}
-		}
-	    
-	    public void OnError(string error) {
-	    	try {
-	    		readQueue.EnQueue(EntryType.Error, error);
-	    	} catch( QueueException) {
-	    		log.Warn("Already terminated.");
-	    	}
-	    }
 		
 		public TickQueue ReadQueue {
 			get { return readQueue; }
 		}
 		
-		public void OnEndHistorical(SymbolInfo symbol)
-		{
-			try {
-				readQueue.EnQueue(EntryType.EndHistorical, symbol);
-			} catch( QueueException) {
-				log.Warn("QueueException. Already terminated.");
-			}
-		}
-		
-		public void OnEndRealTime(SymbolInfo symbol)
-		{
-			try {
-				readQueue.EnQueue(EntryType.EndRealTime, symbol);
-			} catch( QueueException) {
-				log.Warn("Already terminated.");
-			}
-		}
 	}
 }

@@ -69,7 +69,7 @@ namespace TickZoom.Test
 				provider = Factory.Provider.ProviderProcess("127.0.0.1",6492,"MBTradingService.exe");
 			}
 			verify = new VerifyFeed();
-			provider.Start(verify);
+			provider.SendEvent(verify,null,(int)EventType.Connect,null);
 		}
 		
 		[SetUp]
@@ -79,15 +79,15 @@ namespace TickZoom.Test
 		
 		[TearDown]
 		public void TearDown() {
-			provider.Stop(verify);
-  			provider.Stop();	
+			provider.SendEvent(verify,null,(int)EventType.Disconnect,null);
+			provider.SendEvent(verify,null,(int)EventType.Terminate,null);
 		}
 		
 		[Test]
 		public void DemoConnectionTest() {
 			if(debug) log.Debug("===DemoConnectionTest===");
 			if(debug) log.Debug("===StartSymbol===");
-  			provider.StartSymbol(verify,symbol,TimeStamp.MinValue);
+			provider.SendEvent(verify,symbol,(int)EventType.StartSymbol,TimeStamp.MinValue);
 			if(debug) log.Debug("===VerifyFeed===");
   			long count = verify.Verify(AssertTick,symbol,25);
   			Assert.GreaterOrEqual(count,2,"tick count");
@@ -97,25 +97,25 @@ namespace TickZoom.Test
 		public void DemoStopSymbolTest() {
 			if(debug) log.Debug("===DemoConnectionTest===");
 			if(debug) log.Debug("===StartSymbol===");
-  			provider.StartSymbol(verify,symbol,TimeStamp.MinValue);
+			provider.SendEvent(verify,symbol,(int)EventType.StartSymbol,TimeStamp.MinValue);
 			if(debug) log.Debug("===VerifyFeed===");
   			long count = verify.Verify(AssertTick,symbol,35);
   			Assert.GreaterOrEqual(count,2,"tick count");
 			if(debug) log.Debug("===StopSymbol===");
-  			provider.StopSymbol(verify,symbol);
+			provider.SendEvent(verify,symbol,(int)EventType.StopSymbol,null);
   			count = verify.Verify(AssertTick,symbol,10);
   			Assert.AreEqual(count,0,"tick count");
 		}
 
 		[Test]
 		public void DemoReConnectionTest() {
-  			provider.StartSymbol(verify,symbol,TimeStamp.MinValue);
+			provider.SendEvent(verify,symbol,(int)EventType.StartSymbol,TimeStamp.MinValue);
   			long count = verify.Verify(AssertTick,symbol,25);
   			Assert.GreaterOrEqual(count,2,"tick count");
-  			provider.Stop(verify);
-  			provider.Stop();
+  			provider.SendEvent(verify,null,(int)EventType.Disconnect,null);
+  			provider.SendEvent(verify,null,(int)EventType.Terminate,null);
   			CreateProvider();
-  			provider.StartSymbol(verify,symbol,TimeStamp.MinValue);
+			provider.SendEvent(verify,symbol,(int)EventType.StartSymbol,TimeStamp.MinValue);
   			count = verify.Verify(AssertTick,symbol,25);
   			Assert.GreaterOrEqual(count,2,"tick count");
 		}

@@ -123,7 +123,7 @@ namespace TickZoom.MBTrading
     		TickBinary binary = new TickBinary();
     		binary = tick.Extract();
     		lastChangeTime = Environment.TickCount;
-    		receiver.OnSend( ref binary);
+    		receiver.OnEvent(symbol,(int)EventType.Tick,binary);
         	if( debug) log.Debug( "Sent Tick: " + tick);
         }
         

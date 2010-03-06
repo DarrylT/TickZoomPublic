@@ -89,7 +89,7 @@ namespace TickZoom.TickUtil
 				symbolQueue.NextTick.Symbol = symbolQueue.Symbol.BinaryIdentifier;
 				if( debug) log.Debug("Initial tick has symbol '" + symbolQueue.NextTick.Symbol +"'");
 	   		}
-			receiver.OnRealTime(null);
+			receiver.OnEvent(null,(int)EventType.StartRealTime,null);
 		}
 		
 		int countLog = 0;
@@ -99,7 +99,7 @@ namespace TickZoom.TickUtil
 				isProcessStarted = false;
 			}
 			if( symbolQueues.Count == 0 ||
-			   !receiver.CanReceive) {
+			   !receiver.CanReceive(null)) {
 				return false;
 			}
 			int nextQueue = 0;
@@ -110,17 +110,13 @@ namespace TickZoom.TickUtil
 	   		}
 			tick = symbolQueues[nextQueue].NextTick;
 			if( debug && countLog < 5) {
-				log.Symbol = tick.Symbol.ToString();
-				log.TimeStamp = tick.UtcTime;
 				log.Debug("Queuing tick with symbol=" + tick.Symbol.ToString() + " " + tick);
 				countLog++;
 			} else if( trace) {
-				log.Symbol = tick.Symbol.ToString();
-				log.TimeStamp = tick.UtcTime;
 				log.Trace("Queuing tick with symbol=" + tick.Symbol + ", " + tick);
 			}
-			
-			receiver.OnSend(ref tick);
+			SymbolInfo symbol = Factory.Symbol.LookupSymbol(tick.Symbol);
+			receiver.OnEvent(symbol,(int)EventType.Tick,tick);
 			try {
 				SymbolQueue inputQueue = symbolQueues[nextQueue];
 				inputQueue.Receive(ref tick);
@@ -128,9 +124,9 @@ namespace TickZoom.TickUtil
 				inputQueue.NextTick.Symbol = inputQueue.Symbol.BinaryIdentifier;
 				return true;
 			} catch( QueueException ex) {
-				if( ex.EntryType == EntryType.EndHistorical) {
+				if( ex.EntryType == EventType.EndHistorical) {
 					if( symbolQueues.Count <= 1) {
-						receiver.OnStop();
+						receiver.OnEvent(null,(int)EventType.Terminate,null);
 						Factory.Parallel.CurrentTask.Stop();
 					} else {
 						symbolQueues.RemoveAt(nextQueue);
@@ -146,7 +142,7 @@ namespace TickZoom.TickUtil
 		{
 			runTask.Stop();
 			for( int i=0; i<symbolQueues.Count; i++) {
-				symbolQueues[i].Provider.Stop(symbolQueues[i]);
+				symbolQueues[i].Provider.SendEvent(symbolQueues[i],symbolQueues[i].Symbol,(int)EventType.StopSymbol,null);
 			}
 			runTask.Join();
 		}
@@ -174,6 +170,32 @@ namespace TickZoom.TickUtil
 		public void Stop()
 		{
 			throw new NotImplementedException();
+		}
+		
+		public void SendEvent( Receiver receiver, SymbolInfo symbol, int eventType, object eventDetail) {
+			switch( (EventType) eventType) {
+				case EventType.Connect:
+					Start(receiver);
+					break;
+				case EventType.Disconnect:
+					Stop(receiver);
+					break;
+				case EventType.StartSymbol:
+					StartSymbol(receiver, symbol, (TimeStamp) eventDetail);
+					break;
+				case EventType.StopSymbol:
+					StopSymbol(receiver,symbol);
+					break;
+				case EventType.PositionChange:
+					PositionChangeDetail positionChange = (PositionChangeDetail) eventDetail;
+					PositionChange(receiver,symbol,positionChange.Position,positionChange.Orders);
+					break;
+				case EventType.Terminate:
+					Stop();
+					break;
+				default:
+					throw new ApplicationException("Unexpected event type: " + (EventType) eventType);
+			}
 		}
 	}
 }

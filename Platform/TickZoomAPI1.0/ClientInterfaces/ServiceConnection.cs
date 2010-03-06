@@ -31,6 +31,12 @@ using System;
 
 namespace TickZoom.Api
 {
+	public interface Serializers
+	{
+		void Register(int eventType, Serializer serializer);
+		Serializer Get(int eventType);
+	}
+	
 	public interface ServiceConnection
 	{
 		Func<Provider> OnCreateProvider {

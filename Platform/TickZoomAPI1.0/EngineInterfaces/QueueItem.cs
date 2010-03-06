@@ -28,10 +28,11 @@ namespace TickZoom.Api
 {
     [StructLayout(LayoutKind.Explicit)]
 	public struct QueueItem {
-	    [FieldOffset(0)] public int ItemType;
+	    [FieldOffset(0)] public int EventType;
 	    [FieldOffset(4)] public TickBinary Tick;
 	    [FieldOffset(4)] public PositionChange PositionChange;
 	    [FieldOffset(4)] public OnPositionChange OnPositionChange;
+	    [FieldOffset(4)] public CustomEvent CustomEvent;
 	    [FieldOffset(4)] public PositionChange EventChange;
 	    [FieldOffset(4)] public ErrorEvent ErrorEvent;
     }
@@ -43,6 +44,7 @@ namespace TickZoom.Api
 	    [FieldOffset(4)] public StartSymbol StartSymbol;
 	    [FieldOffset(4)] public StartSymbol StopSymbol;
 	    [FieldOffset(4)] public PositionChange PositionChange;
+	    [FieldOffset(4)] public CustomEvent CustomEvent;
     }
     
     public struct PositionChange {
@@ -51,6 +53,12 @@ namespace TickZoom.Api
 	    public double Position;
 	    public int OrdersCount;
 	    public int OrdersMemoryId;
+    }
+    
+    public struct CustomEvent {
+	    public int Receiver;
+        public ulong Symbol;
+	    public int DetailMemoryId;
     }
     
     public struct OnPositionChange {

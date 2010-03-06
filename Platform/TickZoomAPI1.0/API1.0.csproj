@@ -103,8 +103,11 @@
     <Compile Include="EngineInterfaces\ArrowDirection.cs" />
     <Compile Include="EngineInterfaces\Bars.cs" />
     <Compile Include="EngineInterfaces\FastQueue.cs" />
+    <Compile Include="EngineInterfaces\NewEventDetail.cs" />
+    <Compile Include="EngineInterfaces\PositionChangeDetail.cs" />
     <Compile Include="EngineInterfaces\Provider.cs" />
     <Compile Include="EngineInterfaces\QueueItem.cs" />
+    <Compile Include="EngineInterfaces\StartSymbolDetail.cs" />
     <Compile Include="EngineInterfaces\SymbolInfo.cs" />
     <Compile Include="EngineInterfaces\Task.cs" />
     <Compile Include="EngineInterfaces\Receiver.cs" />
@@ -144,7 +147,6 @@
     <Compile Include="Enums\OrderType.cs" />
     <Compile Include="Enums\PaneType.cs" />
     <Compile Include="Enums\PortfolioType.cs" />
-    <Compile Include="Enums\QueueItemType.cs" />
     <Compile Include="Enums\RunMode.cs" />
     <Compile Include="Enums\Side.cs" />
     <Compile Include="Enums\Positioning.cs" />
