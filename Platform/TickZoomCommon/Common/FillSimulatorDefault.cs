@@ -51,12 +51,18 @@ namespace TickZoom.Common
 		private bool doExitStrategyOrders = false;
 		private SymbolInfo symbol;
 		private bool allowReversal = true;
-
+		private bool graphTrades = false;
 		
 		public FillSimulatorDefault()
 		{
 		}
 
+		public FillSimulatorDefault(StrategyInterface strategyInterface)
+		{
+			Strategy strategy = (Strategy) strategyInterface;
+			graphTrades = strategy.Performance.GraphTrades;
+		}
+		
 		public void ProcessOrders(Tick tick, IList<LogicalOrder> orders, double position)
 		{
 			if( changePosition == null) {
@@ -162,19 +168,21 @@ namespace TickZoom.Common
 		{
 			LogMsg("Buy Market Exit at " + tick);
 			FlattenSignal(tick.Ask, tick, order.Id);
-			if (drawTrade != null) {
-				drawTrade(order, tick.Ask, position);
-			}
+			TryDrawTrade(order, tick.Ask, position);
 			CancelExitOrders();
+		}
+		
+		private void TryDrawTrade(LogicalOrder order, double price, double position) {
+			if (drawTrade != null && graphTrades == true) {
+				drawTrade(order, price, position);
+			}
 		}
 
 		private void ProcessSellMarket(LogicalOrder order, Tick tick)
 		{
 			LogMsg("Sell Market Exit at " + tick);
 			FlattenSignal(tick.Ask, tick, order.Id);
-			if (drawTrade != null) {
-				drawTrade(order, tick.Bid, position);
-			}
+			TryDrawTrade(order, tick.Bid, position);
 			CancelExitOrders();
 		}
 
@@ -183,9 +191,7 @@ namespace TickZoom.Common
 			if (tick.Ask >= order.Price) {
 				LogMsg("Buy Stop Exit at " + tick);
 				FlattenSignal(tick.Ask, tick, order.Id);
-				if (drawTrade != null) {
-					drawTrade(order, tick.Ask, position);
-				}
+				TryDrawTrade(order, tick.Ask, position);
 				CancelExitOrders();
 			}
 		}
@@ -204,9 +210,7 @@ namespace TickZoom.Common
 			if (isFilled) {
 				LogMsg("Buy Limit Exit at " + tick);
 				FlattenSignal(price, tick, order.Id);
-				if (drawTrade != null) {
-					drawTrade(order, price, position);
-				}
+				TryDrawTrade(order, price, position);
 				CancelExitOrders();
 			}
 		}
@@ -216,9 +220,7 @@ namespace TickZoom.Common
 			if (tick.Bid <= order.Price) {
 				LogMsg("Sell Stop Exit at " + tick);
 				FlattenSignal(tick.Bid, tick, order.Id);
-				if (drawTrade != null) {
-					drawTrade(order, tick.Bid, position);
-				}
+				TryDrawTrade(order, tick.Bid, position);
 				CancelExitOrders();
 			}
 		}
@@ -237,9 +239,7 @@ namespace TickZoom.Common
 			if (isFilled) {
 				LogMsg("Sell Stop Limit at " + tick);
 				FlattenSignal(price, tick, order.Id);
-				if (drawTrade != null) {
-					drawTrade(order, price, position);
-				}
+				TryDrawTrade(order, price, position);
 				CancelExitOrders();
 			}
 		}
@@ -284,9 +284,7 @@ namespace TickZoom.Common
 				LogMsg("Long Stop Entry at " + tick);
 				
 				CreateLogicalFill(symbol, order.Positions, tick.Ask, tick.Time, order.Id);
-				if (drawTrade != null) {
-					drawTrade(order, tick.IsQuote ? tick.Ask : tick.Price, order.Positions);
-				}
+				TryDrawTrade(order, tick.IsQuote ? tick.Ask : tick.Price, order.Positions);
 				CancelEnterOrders();
 			}
 		}
@@ -296,9 +294,7 @@ namespace TickZoom.Common
 			if (tick.Ask <= order.Price) {
 				LogMsg("Short Stop Entry at " + tick);
 				CreateLogicalFill(symbol, order.Positions, tick.Ask, tick.Time, order.Id);
-				if (drawTrade != null) {
-					drawTrade(order, tick.IsQuote ? tick.Bid : tick.Price, order.Positions);
-				}
+				TryDrawTrade(order, tick.IsQuote ? tick.Bid : tick.Price, order.Positions);
 				CancelEnterOrders();
 			}
 		}
@@ -385,6 +381,57 @@ namespace TickZoom.Common
 				CancelEnterOrders();
 			}
 		}
+		
+		public void ProcessFill(StrategyInterface strategyInterface, LogicalFill fill) {
+			Strategy strategy = (Strategy) strategyInterface;
+			bool cancelAllEntries = false;
+			bool cancelAllExits = false;
+			bool cancelAllExitStrategies = false;
+			int orderId = fill.OrderId;
+			LogicalOrder filledOrder = null;
+			foreach( var order in strategy.ActiveOrders) {
+				if( order.Id == orderId) {
+					filledOrder = order;
+					if (drawTrade != null) {
+						drawTrade(filledOrder,fill.Price,fill.Position);
+					}
+					strategy.Position.Change(strategy.Data.SymbolInfo,fill);
+				}
+			}
+			if( filledOrder != null) {
+				bool clean = false;
+				if( filledOrder.TradeDirection == TradeDirection.Entry &&
+				   doEntryOrders ) {
+					cancelAllEntries = true;
+					clean = true;
+				}
+				if( filledOrder.TradeDirection == TradeDirection.Exit &&
+				   doExitOrders ) {
+					cancelAllExits = true;
+					clean = true;
+				}
+				if( filledOrder.TradeDirection == TradeDirection.ExitStrategy &&
+				   doExitStrategyOrders ) {
+					cancelAllExitStrategies = true;
+					clean = true;
+				}
+				if( clean) {
+					strategy.RefreshActiveOrders();
+					foreach( var order in strategy.ActiveOrders) {
+						if( order.TradeDirection == TradeDirection.Entry && cancelAllEntries) {
+							order.IsActive = false;
+						}
+						if( order.TradeDirection == TradeDirection.Exit && cancelAllExits) {
+							order.IsActive = false;
+						}
+						if( order.TradeDirection == TradeDirection.ExitStrategy && cancelAllExitStrategies) {
+							order.IsActive = false;
+						}
+					}
+				}
+			}
+		}
+		
 
 		#endregion
 
@@ -443,6 +490,11 @@ namespace TickZoom.Common
 		public bool DoExitStrategyOrders {
 			get { return doExitStrategyOrders; }
 			set { doExitStrategyOrders = value; }
+		}
+		
+		public bool GraphTrades {
+			get { return graphTrades; }
+			set { graphTrades = value; }
 		}
 	}
 }

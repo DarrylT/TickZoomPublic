@@ -40,7 +40,7 @@ namespace TickZoom.Api
 		}		
 		
 		/// <summary>
-		/// This is the totaly number of bars including the current bar.
+		/// This is the total number of bars including the current bar.
 		/// That makes the first bar number equal to 1.
 		/// This number matches what you see are the charts.
 		/// BarCount can be greater than Count since Bars

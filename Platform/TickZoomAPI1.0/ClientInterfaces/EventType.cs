@@ -41,6 +41,7 @@ namespace TickZoom.Api
 		EndRealTime,
 		EndHistorical,
 		StartRealTime,
+		TimeSync,
 		
 		// TCP/IP Events
 		Acknowledgment=2000,

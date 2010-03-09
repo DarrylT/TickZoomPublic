@@ -24,13 +24,9 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing;
-using System.IO;
-using System.Reflection;
 using System.Text;
 
 using TickZoom.Api;
-
 
 namespace TickZoom.Common
 {
@@ -97,7 +93,8 @@ namespace TickZoom.Common
 			enterNextBar.OnInitialize();
 			exitNextBar.OnInitialize();
 			base.OnConfigure();
-			
+
+			BreakPoint.TrySetStrategy(this);
 			OrderManager preOrderManager = Factory.Engine.OrderManager(this);
 			AddInterceptor(preOrderManager);
 			AddInterceptor(performance.Equity);

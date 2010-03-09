@@ -22,32 +22,12 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
 
 namespace TickZoom.Api
 {
-
-	
-	public class PositionChangeDetail {
-		private SymbolInfo symbol;
-		public double position;
-		public IList<LogicalOrder> orders;
-		public PositionChangeDetail(SymbolInfo symbol, double position, IList<LogicalOrder> orders) {
-			this.symbol = symbol;
-			this.position = position;
-			this.orders = orders;
-		}
-		
-		public double Position {
-			get { return position; }
-		}
-		
-		public IList<LogicalOrder> Orders {
-			get { return orders; }
-		}
-		
-		public SymbolInfo Symbol {
-			get { return symbol; }
-		}
+	public interface TimeSyncGenerator {
+		void AddInterval( Interval interval);
+		void Initialize(ref TickBinary tick);
+		bool CheckNewPeriod( ref TickBinary tick);
 	}
 }

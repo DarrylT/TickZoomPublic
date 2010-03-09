@@ -27,9 +27,8 @@ using System.ComponentModel;
 
 namespace TickZoom.Api
 {
-	/// <summary>
-	/// Description of Bars.
-	/// </summary>
+
+	
 	public interface Data
 	{
 		Ticks Ticks {

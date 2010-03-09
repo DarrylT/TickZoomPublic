@@ -101,6 +101,7 @@
     <Compile Include="Converters\IntervalTypeConverter.cs" />
     <Compile Include="Converters\TimestampTypeConverter.cs" />
     <Compile Include="EngineInterfaces\ArrowDirection.cs" />
+    <Compile Include="EngineInterfaces\AsyncProviderAware.cs" />
     <Compile Include="EngineInterfaces\Bars.cs" />
     <Compile Include="EngineInterfaces\FastQueue.cs" />
     <Compile Include="EngineInterfaces\NewEventDetail.cs" />
@@ -139,6 +140,8 @@
     <Compile Include="EngineInterfaces\TickQueue.cs" />
     <Compile Include="EngineInterfaces\Ticks.cs" />
     <Compile Include="EngineInterfaces\Times.cs" />
+    <Compile Include="EngineInterfaces\TimeSyncDetail.cs" />
+    <Compile Include="EngineInterfaces\TimeSyncGenerator.cs" />
     <Compile Include="Enums\Audio.cs" />
     <Compile Include="Enums\ChartType.cs" />
     <Compile Include="Enums\GraphType.cs" />
@@ -175,6 +178,7 @@
     <Compile Include="HTTP\HTTPSession.cs" />
     <Compile Include="HTTP\HTTPRequestHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Provider\BreakPointInterface.cs" />
     <Compile Include="Provider\FillSimulator.cs" />
     <Compile Include="Provider\LogicalFill.cs" />
     <Compile Include="Provider\LogicalFillBinary.cs" />

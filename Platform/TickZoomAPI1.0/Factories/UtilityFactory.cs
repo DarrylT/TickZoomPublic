@@ -33,5 +33,7 @@ namespace TickZoom.Api
 		SymbolHandler SymbolHandler(SymbolInfo symbol, Receiver receiver);
 		VerifyFeed VerifyFeed();
 		FillSimulator FillSimulator();
+		FillSimulator FillSimulator(StrategyInterface strategy);
+		BreakPointInterface BreakPoint();
 	}
 }

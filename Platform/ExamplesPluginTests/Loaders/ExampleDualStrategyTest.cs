@@ -138,6 +138,11 @@ namespace Loaders
 		}
 		
 		[Test]
+		public void VerifyPortfolioTrades() {
+			VerifyTrades(portfolio);
+		}
+		
+		[Test]
 		public void VerifyStrategy1Trades() {
 			VerifyTrades(fourTicksStrategy);
 		}
@@ -145,6 +150,11 @@ namespace Loaders
 		[Test]
 		public void VerifyStrategy2Trades() {
 			VerifyTrades(exampleSimple);
+		}
+		
+		[Test]
+		public void VerifyPortfolioTradeCount() {
+			VerifyTradeCount(portfolio);
 		}
 		
 		[Test]

@@ -87,7 +87,7 @@ namespace TickZoom.Test
 		public void DemoConnectionTest() {
 			if(debug) log.Debug("===DemoConnectionTest===");
 			if(debug) log.Debug("===StartSymbol===");
-			provider.SendEvent(verify,symbol,(int)EventType.StartSymbol,TimeStamp.MinValue);
+			provider.SendEvent(verify,symbol,(int)EventType.StartSymbol,new StartSymbolDetail(TimeStamp.MinValue));
 			if(debug) log.Debug("===VerifyFeed===");
   			long count = verify.Verify(AssertTick,symbol,25);
   			Assert.GreaterOrEqual(count,2,"tick count");
@@ -97,7 +97,7 @@ namespace TickZoom.Test
 		public void DemoStopSymbolTest() {
 			if(debug) log.Debug("===DemoConnectionTest===");
 			if(debug) log.Debug("===StartSymbol===");
-			provider.SendEvent(verify,symbol,(int)EventType.StartSymbol,TimeStamp.MinValue);
+			provider.SendEvent(verify,symbol,(int)EventType.StartSymbol,new StartSymbolDetail(TimeStamp.MinValue));
 			if(debug) log.Debug("===VerifyFeed===");
   			long count = verify.Verify(AssertTick,symbol,35);
   			Assert.GreaterOrEqual(count,2,"tick count");
@@ -109,13 +109,13 @@ namespace TickZoom.Test
 
 		[Test]
 		public void DemoReConnectionTest() {
-			provider.SendEvent(verify,symbol,(int)EventType.StartSymbol,TimeStamp.MinValue);
+			provider.SendEvent(verify,symbol,(int)EventType.StartSymbol,new StartSymbolDetail(TimeStamp.MinValue));
   			long count = verify.Verify(AssertTick,symbol,25);
   			Assert.GreaterOrEqual(count,2,"tick count");
   			provider.SendEvent(verify,null,(int)EventType.Disconnect,null);
   			provider.SendEvent(verify,null,(int)EventType.Terminate,null);
   			CreateProvider();
-			provider.SendEvent(verify,symbol,(int)EventType.StartSymbol,TimeStamp.MinValue);
+  			provider.SendEvent(verify,symbol,(int)EventType.StartSymbol,new StartSymbolDetail(TimeStamp.MinValue));
   			count = verify.Verify(AssertTick,symbol,25);
   			Assert.GreaterOrEqual(count,2,"tick count");
 		}

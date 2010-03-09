@@ -592,9 +592,9 @@ namespace TickZoom.MBTrading
 			get { return quotesHealth; }
 		}
 		
-		public void StartSymbol(Receiver receiver, SymbolInfo symbol, TimeStamp lastTimeStamp)
+		public void StartSymbol(Receiver receiver, SymbolInfo symbol, StartSymbolDetail detail)
 		{
-			if( debug) log.Debug("StartSymbol " + symbol + ", " + lastTimeStamp);
+			if( debug) log.Debug("StartSymbol " + symbol + ", " + detail.LastTime);
 			receiver.OnEvent(symbol,(int)EventType.StartRealTime,null);
 			instrumentReaders.AddDepth(symbol);
 		}
@@ -626,10 +626,10 @@ namespace TickZoom.MBTrading
 					Stop(receiver);
 					break;
 				case EventType.StartSymbol:
-					StartSymbol(receiver,symbol, (TimeStamp) eventDetail);
+					StartSymbol(receiver, symbol, (StartSymbolDetail) eventDetail);
 					break;
 				case EventType.StopSymbol:
-					StopSymbol(receiver,(SymbolInfo)eventDetail);
+					StopSymbol(receiver,symbol);
 					break;
 				case EventType.PositionChange:
 					PositionChangeDetail positionChange = (PositionChangeDetail) eventDetail;

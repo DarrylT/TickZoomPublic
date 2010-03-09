@@ -72,6 +72,7 @@ namespace TickZoom.Common
 			return Verify(2, assertTick, symbol, timeout);
 		}
 		TickImpl lastTick = new TickImpl();
+		
 		int countLog = 0;
 		TickBinary tickBinary = new TickBinary();
 		TickImpl tick = new TickImpl();
@@ -117,14 +118,21 @@ namespace TickZoom.Common
 			int startTime = Environment.TickCount;
 			count = 0;
 			double position;
+			TickBinary binary = new TickBinary();
 			while (Environment.TickCount - startTime < timeout * 1000) {
-				if (!tickQueue.CanDequeue)
-					Thread.Sleep(100);
 				if (tickQueue.CanDequeue) {
-					if( actualPositions.TryGetValue(symbol.BinaryIdentifier,out position) &&
-					   position == expectedPosition)
-					
-					{
+					try { 
+						tickQueue.Dequeue(ref binary);
+					} catch (QueueException ex) {
+						if( HandleQueueException(ex)) {
+							break;
+						}
+					}
+				} else {
+					Thread.Sleep(10);
+				}
+				if( actualPositions.TryGetValue(symbol.BinaryIdentifier,out position)) {
+					if( position == expectedPosition) {
 						return expectedPosition;
 					}
 				}
@@ -362,6 +370,10 @@ namespace TickZoom.Common
 			} catch( QueueException) {
 				log.Warn("Already terminated.");
 			}
+		}
+		
+		public TickIO LastTick {
+			get { return lastTick; }
 		}
 	}
 }

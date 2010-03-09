@@ -23,25 +23,26 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Text;
 using System.Threading;
-using System.ComponentModel;
-using TickZoom.Api;
 
+using TickZoom.Api;
 
 namespace TickZoom.Common
 {
 	public class Performance : StrategyInterceptor
 	{
+		private static readonly Log barDataLog = Factory.Log.GetLogger("BarDataLog");
+		private static readonly bool barDataInfo = barDataLog.IsInfoEnabled;
 		private static readonly Log tradeLog = Factory.Log.GetLogger("TradeLog");
 		private static readonly bool tradeInfo = tradeLog.IsInfoEnabled;
 		TransactionPairs comboTrades;
 		TransactionPairsBinary comboTradesBinary;
 		bool graphTrades = true;
-		bool graphAveragePrice = false;
-		IndicatorCommon avgPrice;
 		Equity equity;
 		TradeProfitLoss profitLoss;
 		List<double> positionChanges = new List<double>();
@@ -78,6 +79,9 @@ namespace TickZoom.Common
 				model.AddInterceptor( EventType.Tick, this);
 				OnInitialize();
 			}
+			if( EventType.Close == eventType && eventDetail == null) {
+				OnIntervalClose();
+			}
 			context.Invoke();
 			if( EventType.Tick == eventType) {
 				OnProcessTick((Tick)eventDetail);
@@ -89,15 +93,6 @@ namespace TickZoom.Common
 			comboTrades  = new TransactionPairs(GetCurrentPrice,profitLoss,comboTradesBinary);
 			profitLoss.FullPointValue = model.Data.SymbolInfo.FullPointValue;
 
-			if( graphAveragePrice) {
-				avgPrice = new IndicatorCommon();
-				avgPrice.Drawing.IsVisible = true;
-				avgPrice.Drawing.PaneType = PaneType.Primary;
-				avgPrice.Drawing.Color = Color.Green;
-				avgPrice.Drawing.GroupName = "Avg Price";
-				avgPrice.Name = "Avg Price";
-				model.AddIndicator(avgPrice);
-			}
 		}
 		
 		public bool OnProcessTick(Tick tick)
@@ -190,15 +185,22 @@ namespace TickZoom.Common
 		
 		public bool OnIntervalClose()
 		{
-			if( graphAveragePrice) {
-				if( comboTradesBinary.Count > 0) {
-					TransactionPairBinary combo = comboTradesBinary.Current;
-					if( !combo.Completed) {
-						avgPrice[0] = combo.EntryPrice;
-					} else {
-						avgPrice[0] = double.NaN;
-					}
-				}
+			if( barDataInfo) {
+				Bars bars = model.Bars;
+				TimeStamp time = bars.Time[0];
+				StringBuilder sb = new StringBuilder();
+				sb.Append(model.Name);
+				sb.Append(",");
+				sb.Append(time);
+				sb.Append(",");
+				sb.Append(bars.Open[0]);
+				sb.Append(",");
+				sb.Append(bars.High[0]);
+				sb.Append(",");
+				sb.Append(bars.Low[0]);
+				sb.Append(",");
+				sb.Append(bars.Close[0]);
+				barDataLog.Info( sb.ToString());
 			}
 			return true;
 		}
@@ -365,11 +367,6 @@ namespace TickZoom.Common
 		public bool GraphEquity {
 			get { return Equity.GraphEquity; }
 			set { Equity.GraphEquity = value; }
-		}
-		
-		public bool GraphAveragePrice {
-			get { return graphAveragePrice; }
-			set { graphAveragePrice = value; }
 		}
 		
 		[Obsolete("Please use Slippage and Commission properties on Performance.",true)]

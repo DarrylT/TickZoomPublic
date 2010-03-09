@@ -1,4 +1,4 @@
-#region Copyright
+﻿#region Copyright
 /*
  * Copyright 2008 M. Wayne Walter
  * Software: TickZoom Trading Platform
@@ -36,45 +36,38 @@ using System.IO;
 using TickZoom;
 using TickZoom.Api;
 using TickZoom.Common;
-using TickZoom.TickUtil;
+using ZedGraph;
 
 namespace MockProvider
 {
-#if ! PROVIDER
+	
 	[TestFixture]
-	public class SyntheticDualSymbol : ExampleDualSymbolTest
-	{
+	public class ExperimentWithEnums {
+		
 		public static void Main(string[] args) {
-			SyntheticDualSymbol fixture = new SyntheticDualSymbol();
-			SyncTicks.Enabled = false;
-			fixture.RunStrategy();
+			
 		}
 		
-		public override Starter CreateStarter()
-		{
-			return new RealTimeStarter();
-		}
-		
-		[TestFixtureSetUpAttribute()]
-		public override void RunStrategy()
-		{
-			ConfigurationManager.AppSettings.Set("ProviderAddress","InProcess");
-			DeleteFiles();
-			base.Symbols="MockFull,Mock4Sim";
-			base.RunStrategy();
-		}
-		
-		private void DeleteFiles() {
-			while( true) {
-				try {
-					string appData = Factory.Settings["AppDataFolder"];
-		 			File.Delete( appData + @"\TestServerCache\MockFull_Tick.tck");
-		 			File.Delete( appData + @"\TestServerCache\Mock4Sim_Tick.tck");
+		[Test]
+		public void TestCastingEnum() {
+			EventType eventType = (EventType) 405;
+			
+			switch( eventType) {
+				case EventType.EndHistorical:
 					break;
-				} catch( Exception) {
-				}
+				default:
+					break;
+			}
+			
+			eventType = (EventType) 3;
+			
+			switch( eventType) {
+				case EventType.EndHistorical:
+					break;
+				default:
+					break;
 			}
 		}
 	}
-#endif
+
 }

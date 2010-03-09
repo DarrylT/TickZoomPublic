@@ -112,13 +112,6 @@ namespace TickZoom.Common
 			engine.Run();
 
 			if(CancelPending) return;
-			
-			if( engine.TickCount > 0 &&
-			    ProjectProperties.Engine.BarReplaySpeed == 0 &&
-			    ProjectProperties.Engine.TickReplaySpeed == 0 &&
-			    ShowChartCallback!=null) {
-				ShowChartCallback();
-			}
 		}
 		
 		public override void Wait() {

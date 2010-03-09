@@ -32,25 +32,28 @@ namespace TickZoom.Common
 {
 	public class Portfolio : Model, PortfolioInterface
 	{
-		List<Strategy> strategies = new List<Strategy>();
-		List<Portfolio> portfolios = new List<Portfolio>();
-		List<StrategyWatcher> watchers = new List<StrategyWatcher>();
-		PortfolioType portfolioType = PortfolioType.None;
-		double closedEquity = 0;
-		Result result;
-		PositionCommon position;
-		Performance performance;
+		private List<Strategy> strategies = new List<Strategy>();
+		private List<Portfolio> portfolios = new List<Portfolio>();
+		private List<StrategyWatcher> watchers = new List<StrategyWatcher>();
+		private PortfolioType portfolioType = PortfolioType.None;
+		private double closedEquity = 0;
+		private Result result;
+		private PositionCommon position;
+		private Performance performance;
+		private bool isActiveOrdersChanged;
+		
 		
 		public Portfolio()
 		{
-		    result = new Result(this);
-		    position = new PositionCommon(this);
+			result = new Result(this);
+			position = new PositionCommon(this);
 			performance = new Performance(this);
 			FullName = this.GetType().Name;
 			Performance.GraphTrades = false;
 		}
-	
+		
 		public sealed override void OnConfigure() {
+			BreakPoint.TrySetStrategy(this);
 			base.OnConfigure();
 			AddInterceptor(performance.Equity);
 			AddInterceptor(performance);
@@ -122,13 +125,23 @@ namespace TickZoom.Common
 		private class StrategyWatcher {
 			private double previousPosition = 0;
 			private PositionInterface position;
+			private StrategyInterface strategy;
 			
 			public StrategyWatcher(StrategyInterface strategy) {
+				this.strategy = strategy;
 				this.position = strategy.Result.Position;
 			}
 			
 			public bool PositionChanged {
 				get { return previousPosition != position.Current; }
+			}
+			
+			public IList<LogicalOrder> ActiveOrders {
+				get { return strategy.ActiveOrders; }
+			}
+			
+			public bool ActiveOrdersChanged {
+				get { return strategy.IsActiveOrdersChanged; }
 			}
 			
 			public void Refresh() {
@@ -139,7 +152,7 @@ namespace TickZoom.Common
 				get { return position; }
 			}
 		}
-	
+		
 		public override void OnEvent(EventContext context, EventType eventType, object eventDetail)
 		{
 			base.OnEvent(context, eventType, eventDetail);
@@ -153,42 +166,66 @@ namespace TickZoom.Common
 		
 		public override bool OnProcessTick(Tick tick)
 		{
-			if( portfolioType == PortfolioType.SingleSymbol) {
+			MergeSignals();
+			MergeOrders();
+			return true;
+		}
+
+		private void MergeOrders() {
+			if (portfolioType == PortfolioType.SingleSymbol) {
+				bool mergeOrders = false;
+				foreach (var watcher in watchers) {
+					if (watcher.ActiveOrdersChanged) {
+						mergeOrders = true;
+						break;
+					}
+				}
+				if( mergeOrders) { 
+					activeOrders.Clear();
+					foreach (var watcher in watchers) {
+						activeOrders.AddRange(watcher.ActiveOrders);
+					}
+					IsActiveOrdersChanged = true;
+				}
+			}
+		}
+
+		private void MergeSignals()
+		{
+			if (portfolioType == PortfolioType.SingleSymbol) {
 				double internalSignal = 0;
 				double totalPrice = 0;
 				int changeCount = 0;
-				foreach( var watcher in watchers) {
+				foreach (var watcher in watchers) {
 					internalSignal += watcher.Position.Current;
-					if( watcher.PositionChanged) {
+					if (watcher.PositionChanged) {
 						totalPrice += watcher.Position.Price;
 						changeCount++;
 						watcher.Refresh();
 					}
 				}
-				if( changeCount > 0) {
+				if (changeCount > 0) {
 					double averagePrice = (totalPrice / changeCount).Round();
-					Position.Change(internalSignal,averagePrice,Ticks[0].Time);
+					Position.Change(internalSignal, averagePrice, Ticks[0].Time);
 				}
-				return true;
-			} else if( portfolioType == PortfolioType.MultiSymbol) {
+			} else if (portfolioType == PortfolioType.MultiSymbol) {
 				double tempClosedEquity = 0;
 				double tempOpenEquity = 0;
-				foreach( var strategy in strategies) {
+				foreach (var strategy in strategies) {
 					tempOpenEquity += strategy.Performance.Equity.OpenEquity;
 					tempClosedEquity += strategy.Performance.Equity.ClosedEquity;
 					tempClosedEquity -= strategy.Performance.Equity.StartingEquity;
 				}
-				foreach( var portfolio in portfolios) {
+				foreach (var portfolio in portfolios) {
 					tempOpenEquity += portfolio.Performance.Equity.OpenEquity;
 					tempClosedEquity += portfolio.Performance.Equity.ClosedEquity;
 					tempClosedEquity -= portfolio.Performance.Equity.StartingEquity;
 				}
-				if( tempClosedEquity != closedEquity) {
+				if (tempClosedEquity != closedEquity) {
 					double change = tempClosedEquity - closedEquity;
 					Performance.Equity.OnChangeClosedEquity(change);
 					closedEquity = tempClosedEquity;
 				}
-				return true;
 			} else {
 				throw new ApplicationException("PortfolioType was never set.");
 			}
@@ -285,8 +322,8 @@ namespace TickZoom.Common
 		}
 		
 		public bool IsActiveOrdersChanged {
-			get { return false;	}
-			set {	}
+			get { return isActiveOrdersChanged; }
+			set { isActiveOrdersChanged = value; }
 		}
 		public void RefreshActiveOrders() {
 		}

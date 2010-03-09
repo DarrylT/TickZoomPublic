@@ -442,7 +442,9 @@ namespace MBTest
                 	mbt = new MbtInterface();
                 	mbt.Start(receiver);
                 	SymbolInfo symbol = Factory.Symbol.LookupSymbol("MSFT");
-                	mbt.StartSymbol(receiver,symbol,new TimeStamp(DateTime.Now));
+                	StartSymbolDetail detail = new StartSymbolDetail();
+                	detail.LastTime = new TimeStamp(DateTime.Now);
+                	mbt.StartSymbol(receiver,symbol,detail);
                 }
                 catch (Exception problem)
                 {

@@ -67,14 +67,6 @@ namespace TickZoom.Api
         public LogicalFillBinary Fill;
     }
     
-	public enum ProviderEventType {
-    	Start,
-    	Stop,
-    	StartSymbol,
-    	StopSymbol,
-    	PositionChange
-    }
-    
     public struct StartStop {
 	    public int Receiver;
     }

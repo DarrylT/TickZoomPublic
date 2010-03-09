@@ -40,19 +40,19 @@ namespace TickZoom
 			Performance.GraphTrades = true;
 			Performance.Equity.GraphEquity = true;
 			ExitStrategy.ControlStrategy = false;
-			ExitStrategy.BreakEven = 0.30;
-			ExitStrategy.StopLoss = 0.45;
-			PositionSize.Size = 10000;
 		}
 		
 		public override void OnInitialize()
 		{
+			ExitStrategy.BreakEven = 30 * Data.SymbolInfo.MinimumTick;
+			ExitStrategy.StopLoss = 45 * Data.SymbolInfo.MinimumTick;
+			PositionSize.Size = 10000;
 		}
 		
 		public override bool OnIntervalClose()
 		{
 			// Example log message.
-			//Log.WriteLine( "close: " + Ticks[0] + " " + Minutes.Close[0] + " " + Minutes.Time[0]);
+			Log.Info( "close: " + Ticks[0] + " " + Bars.Close[0] + " " + Bars.Time[0]);
 			double close = Bars.Close[0];
 			if( Bars.Close[0] > Bars.Open[0]) {
 				if( Position.IsFlat) {

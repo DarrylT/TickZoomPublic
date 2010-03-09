@@ -100,7 +100,6 @@
     <Compile Include="Optimization\OptimizeRange.cs" />
     <Compile Include="Optimization\OptimizerVar.cs" />
     <Compile Include="Performance\BaseStats.cs" />
-    <Compile Include="Performance\ComboTrade.cs" />
     <Compile Include="Performance\Equity.cs" />
     <Compile Include="Performance\EquityStats.cs" />
     <Compile Include="Performance\EquityStatsReport.cs" />
@@ -125,6 +124,7 @@
     <Compile Include="ProviderUtilities\CommandLine.cs" />
     <Compile Include="ProviderUtilities\PhysicalOrderDefault.cs" />
     <Compile Include="ProviderUtilities\ProjectInstaller.cs" />
+    <Compile Include="ProviderUtilities\BreakPoint.cs" />
     <Compile Include="ProviderUtilities\SymbolHandlerDefault.cs" />
     <Compile Include="ProviderUtilities\UtilityFactoryDefault.cs" />
     <Compile Include="ProviderUtilities\VerifyFeedDefault.cs" />

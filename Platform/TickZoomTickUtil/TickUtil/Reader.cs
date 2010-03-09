@@ -290,6 +290,7 @@ namespace TickZoom.TickUtil
 	    					}
 	    					log.Trace("Read a tick " + tickIO);
 	    				}
+	    				tick.Symbol = symbol.BinaryIdentifier;
 	    				receiver.OnEvent(symbol,(int)EventType.Tick,tick);
 					}
 					

@@ -462,8 +462,8 @@ namespace TickZoom
         	FlushChartsInvoke();
     		starter.ProjectProperties.Starter.StartTime = (TimeStamp) startTime;
     		starter.BackgroundWorker = bw;
-    		starter.ShowChartCallback = new ShowChartCallback(ShowChartInvoke);
     		starter.CreateChartCallback = new CreateChartCallback(CreateChartInvoke);
+    		starter.ShowChartCallback = new ShowChartCallback(ShowChartInvoke);
 	    	starter.ProjectProperties.Chart.ChartType = chartType;
 	    	starter.ProjectProperties.Starter.Symbols = txtSymbol.Text;
 			starter.ProjectProperties.Starter.IntervalDefault = intervalDefault;

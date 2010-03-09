@@ -195,6 +195,7 @@ namespace TickZoom.Api
 		}
 		
 		public TimeStamp( string timeString) {
+			timeString = timeString.Replace("  "," ");
 			string[] strings = timeString.Split(new char[] {' '});
 			string date = strings[0];
 			int hour=0, minute=0, second=0, millis=0;
@@ -212,6 +213,13 @@ namespace TickZoom.Api
 			strings = date.Split(new char[] {'-'});
 			if( strings.Length == 1) {
 				strings = date.Split(new char[] {'/'});
+			}
+			if( strings.Length == 1 && strings[0].Length == 8) {
+				string wholeDate = strings[0];
+				strings = new string[3];
+				strings[0] = wholeDate.Substring(0,4);
+				strings[1] = wholeDate.Substring(4,2);
+				strings[2] = wholeDate.Substring(6,2);
 			}
 			int year = Convert.ToInt32(strings[0]);
 			int month = Convert.ToInt32(strings[1]);

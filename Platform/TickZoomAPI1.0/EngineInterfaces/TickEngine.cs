@@ -176,6 +176,13 @@ namespace TickZoom.Api
     		set;
     	}
     	
+    	/// <summary>
+    	/// Used in automated tests to disable real time output
+    	/// like writing statistics and updating charts for every tick
+    	/// for faster performance during simulation of real time 
+    	/// environment for integration test. Default is true.
+    	/// Setting to false disables real time output.
+    	/// </summary>
     	bool RealtimeOutput {
     		get;
     		set;

@@ -61,15 +61,20 @@ namespace Loaders
 			log.Debug("Returning Chart Created by Thread");
 		}
 		
+		private void ClosedEvent(object sender, EventArgs args) {
+			stop = true;
+		}
+		
 		public void Run() {
 			try {
    				log.Debug("Chart Thread Started");
    				portfolioDoc = new PortfolioDoc();
-   				Thread.CurrentThread.IsBackground = true;
-   				while( !stop) {
+   				portfolioDoc.Closed += ClosedEvent;
+   				while( !stop ) {
    					Application.DoEvents();
    					Thread.Sleep(10);
    				}
+   				stop = true;
 			} catch( Exception ex) {
 				log.Error("ERROR: Thread had an exception:",ex);
 			}
@@ -79,13 +84,17 @@ namespace Loaders
 		
 		public void Stop() {
 			if(portfolioDoc!=null) {
-		   				portfolioDoc.Invoke(new MethodInvoker(portfolioDoc.Hide));
-		   				portfolioDoc=null;
+		   		portfolioDoc.Invoke(new MethodInvoker(portfolioDoc.Hide));
+		   		portfolioDoc=null;
 			}
 			if( thread!=null) {
 				stop = true;
 				thread.Join();
 			}
+		}
+		
+		public bool IsAlive {
+			get { return !stop; }
 		}
 		
 		public PortfolioDoc PortfolioDoc {

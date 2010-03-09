@@ -39,6 +39,8 @@ using TickZoom.Api;
 namespace TickZoom.Common
 {
 	public class LogicalOrderHandlerDefault : LogicalOrderHandler {
+		private static readonly Log log = Factory.Log.GetLogger(typeof(LogicalOrderHandlerDefault));
+		private static readonly bool debug = log.IsDebugEnabled;
 		SymbolInfo symbol;
 		PhysicalOrderHandler brokerOrders;
 		List<PhysicalOrderDefault> physicalOrders;
@@ -99,32 +101,47 @@ namespace TickZoom.Common
 			return false;
 		}
 		
+		private void CancelBrokerOrder(PhysicalOrder physical) {
+			log.Info("Cancel Broker Order " + physical);
+			brokerOrders.OnCancelBrokerOrder(physical);
+		}
+		
+		private void ChangeBrokerOrder(PhysicalOrder physical) {
+			log.Info("Change Broker Order " + physical);
+			brokerOrders.OnChangeBrokerOrder(physical);
+		}
+		
+		private void CreateBrokerOrder(PhysicalOrder physical) {
+			log.Info("Create Broker Order " + physical);
+			brokerOrders.OnCreateBrokerOrder(physical);
+		}
+		
 		private void ProcessMatchPhysicalEntry( LogicalOrder logical, PhysicalOrderDefault physical) {
 			double difference = logical.Positions - Math.Abs(actualPosition);
 			if( difference == 0) {
-				brokerOrders.OnCancelBrokerOrder(physical);
+				CancelBrokerOrder(physical);
 			} else if( difference != physical.Size) {
 				if( actualPosition == 0) {
 					physicalOrders.Remove(physical);
 					physical = new PhysicalOrderDefault(symbol,logical,difference,physical.BrokerOrder);
-					brokerOrders.OnChangeBrokerOrder(physical);
+					ChangeBrokerOrder(physical);
 				} else {
 					if( actualPosition > 0) {
 						if( logical.Type == OrderType.BuyStop || logical.Type == OrderType.BuyLimit) {
 							physicalOrders.Remove(physical);
 							physical = new PhysicalOrderDefault(symbol,logical,difference,physical.BrokerOrder);
-							brokerOrders.OnChangeBrokerOrder(physical);
+							ChangeBrokerOrder(physical);
 						} else {
-							brokerOrders.OnCancelBrokerOrder(physical);
+							CancelBrokerOrder(physical);
 						}
 					}
 					if( actualPosition < 0) {
 						if( logical.Type == OrderType.SellStop || logical.Type == OrderType.SellLimit) {
 							physicalOrders.Remove(physical);
 							physical = new PhysicalOrderDefault(symbol,logical,difference,physical.BrokerOrder);
-							brokerOrders.OnChangeBrokerOrder(physical);
+							ChangeBrokerOrder(physical);
 						} else {
-							brokerOrders.OnCancelBrokerOrder(physical);
+							CancelBrokerOrder(physical);
 						}
 					}
 				}
@@ -133,11 +150,11 @@ namespace TickZoom.Common
 		
 		private void ProcessMatchPhysicalExit( LogicalOrder logical, PhysicalOrderDefault physical) {
 			if( actualPosition == 0) {
-				brokerOrders.OnCancelBrokerOrder(physical);
+				CancelBrokerOrder(physical);
 			} else if( Math.Abs(actualPosition) != physical.Size || logical.Price != physical.Price) {
 				physicalOrders.Remove(physical);
 				physical = new PhysicalOrderDefault(symbol,logical,Math.Abs(actualPosition),physical.BrokerOrder);
-				brokerOrders.OnChangeBrokerOrder(physical);
+				ChangeBrokerOrder(physical);
 			}
 		}
 		
@@ -155,7 +172,7 @@ namespace TickZoom.Common
 			if( actualPosition == 0) {
 				if( logical.TradeDirection == TradeDirection.Entry) {
 					PhysicalOrder physical = new PhysicalOrderDefault(symbol,logical,logical.Positions,null);
-					brokerOrders.OnCreateBrokerOrder(physical);
+					CreateBrokerOrder(physical);
 				}
 			} else {
 				if( logical.TradeDirection == TradeDirection.Exit) {
@@ -169,20 +186,20 @@ namespace TickZoom.Common
 				if( logical.Type == OrderType.SellLimit ||
 				  logical.Type == OrderType.SellStop) {
 					PhysicalOrder physical = new PhysicalOrderDefault(symbol,logical,actualPosition,null);
-					brokerOrders.OnCreateBrokerOrder(physical);
+					CreateBrokerOrder(physical);
 				}
 			}
 			if( actualPosition < 0 ) {
 				if( logical.Type == OrderType.BuyLimit ||
 				  logical.Type == OrderType.BuyStop) {
 					PhysicalOrder physical = new PhysicalOrderDefault(symbol,logical,Math.Abs(actualPosition),null);
-					brokerOrders.OnCreateBrokerOrder(physical);
+					CreateBrokerOrder(physical);
 				}
 			}
 		}
 		
 		private void ProcessMissingLogical(PhysicalOrder physical) {
-			brokerOrders.OnCancelBrokerOrder( physical);
+			CancelBrokerOrder( physical);
 		}
 		
 		private void ComparePosition() {
@@ -190,16 +207,18 @@ namespace TickZoom.Common
 			PhysicalOrder physical;
 			if( delta > 0) {
 				physical = new PhysicalOrderDefault(symbol,OrderType.BuyMarket,0,delta,0,null);
-				brokerOrders.OnCreateBrokerOrder(physical);
+				CreateBrokerOrder(physical);
 			}
 			if( delta < 0) {
 				physical = new PhysicalOrderDefault(symbol,OrderType.SellMarket,0,Math.Abs(delta),0,null);
-				brokerOrders.OnCreateBrokerOrder(physical);
+				CreateBrokerOrder(physical);
 			}
 			actualPosition = desiredPosition;
 		}
 		
 		public void SetLogicalOrders( IList<LogicalOrder> originalLogicals) {
+			int orderCount = originalLogicals == null ? 0 : originalLogicals.Count;
+			if( debug) log.Debug("SetLogicalOrders() order count = " + orderCount);
 			this.originalLogicals = originalLogicals;
 		}
 		
@@ -208,6 +227,12 @@ namespace TickZoom.Common
 		}
 		
 		public void PerformCompare() {
+			int orderCount = originalLogicals == null ? 0 : originalLogicals.Count;
+			if( debug) log.Debug( "PerformCompare() for " + symbol + " with " +
+			                     actualPosition + " actual " + 
+			                     desiredPosition + " desired and " +
+			                     orderCount + " logical, " +
+			                     physicalOrders.Count + " physical.");
 			ComparePosition(); // First synchronize the position.
 			
 			// Now synchronize the orders.
@@ -227,11 +252,13 @@ namespace TickZoom.Common
 				}
 				logicalOrders.Remove(logical);
 			}
+			if( debug) log.Debug("Found " + extraLogicals.Count + " extra logicals.");
 			while( extraLogicals.Count > 0) {
 				var logical = extraLogicals[0];
 				ProcessMissingPhysical(logical);
 				extraLogicals.Remove(logical);
 			}
+			if( debug) log.Debug("Found " + physicalOrders.Count + " extra physicals.");
 			while( physicalOrders.Count > 0) {
 				physical = physicalOrders[0];
 				ProcessMissingLogical(physical);

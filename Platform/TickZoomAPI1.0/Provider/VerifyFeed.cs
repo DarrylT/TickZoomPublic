@@ -37,5 +37,6 @@ namespace TickZoom.Api
 		bool TimeTheFeedTask();
 		TickQueue TickQueue { get; }
 		bool IsRealTime { get; }
+		TickIO LastTick { get; }
 	}
 }

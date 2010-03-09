@@ -51,19 +51,31 @@ namespace Loaders
 		string symbols;
 		List<ChartThread> chartThreads = new List<ChartThread>();
 		List<TickAggregator> aggregators = new List<TickAggregator>();
+		Dictionary<string,List<BarInfo>> goodBarDataMap = new Dictionary<string,List<BarInfo>>();
+		Dictionary<string,List<BarInfo>> testBarDataMap = new Dictionary<string,List<BarInfo>>();
 		Dictionary<string,List<TradeInfo>> goodTradeMap = new Dictionary<string,List<TradeInfo>>();
 		Dictionary<string,List<TradeInfo>> testTradeMap = new Dictionary<string,List<TradeInfo>>();
+		public bool ShowCharts = false;
 		
 		[TestFixtureSetUp]
 		public virtual void RunStrategy() {
 			string appDataFolder = Factory.Settings["AppDataFolder"];
 			string filePath = appDataFolder + @"\Logs\Trades.log";
 			File.Delete(filePath);
+			filePath = appDataFolder + @"\Logs\BarData.log";
+			File.Delete(filePath);
+			SyncTicks.MockTradeCount = 0;
 		}
 		
 		[TestFixtureTearDown]
 		public void CloseCharts() {
-   			HistoricalCloseCharts();
+			if( !ShowCharts) {
+	   			HistoricalCloseCharts();
+			} else {
+				while( TryCloseCharts() == false) {
+					Thread.Sleep(100);
+				}
+			}
 		}
 		
 		public virtual Provider LoadHistoricalDataAsFakeRealTimeData(string[] symbols, TimeStamp startTime, TimeStamp endTime) {
@@ -86,6 +98,14 @@ namespace Loaders
 			public TransactionPairBinary Trade;
 		}
 		
+		public class BarInfo {
+			public TimeStamp Time;
+			public double Open;
+			public double High;
+			public double Low;
+			public double Close;
+		}
+		
 		public virtual Starter CreateStarter() {
 			return new HistoricalStarter();			
 		}
@@ -97,6 +117,7 @@ namespace Loaders
 			goodTradeMap.Clear();
 			LoadTrades(filePath,goodTradeMap);
 			filePath = appDataFolder + @"\Logs\Trades.log";
+			testTradeMap.Clear();
 			LoadTrades(filePath,testTradeMap);
 		}
 		
@@ -127,10 +148,55 @@ namespace Loaders
 			}
 		}
 		
+		public void LoadBarData() {
+			string fileDir = @"..\..\Platform\ExamplesPluginTests\Loaders\Trades\";
+			string filePath = fileDir + GetType().Name + "BarData.log";
+			string appDataFolder = Factory.Settings["AppDataFolder"];
+			goodBarDataMap.Clear();
+			LoadBarData(filePath,goodBarDataMap);
+			filePath = appDataFolder + @"\Logs\BarData.log";
+			testBarDataMap.Clear();
+			LoadBarData(filePath,testBarDataMap);
+		}
+		
+		public void LoadBarData(string filePath, Dictionary<string,List<BarInfo>> tempBarData) {
+			using( FileStream fileStream = new FileStream(filePath,FileMode.Open,FileAccess.Read,FileShare.ReadWrite)) {
+				StreamReader file = new StreamReader(fileStream);
+				string line;
+				while( (line = file.ReadLine()) != null) {
+					string[] fields = line.Split(',');
+					int fieldIndex = 0;
+					string strategyName = fields[fieldIndex++];
+					BarInfo barInfo = new BarInfo();
+					
+					barInfo.Time = new TimeStamp(fields[fieldIndex++]);
+					barInfo.Open = double.Parse(fields[fieldIndex++]);
+					barInfo.High = double.Parse(fields[fieldIndex++]);
+					barInfo.Low = double.Parse(fields[fieldIndex++]);
+					barInfo.Close = double.Parse(fields[fieldIndex++]);
+					
+					List<BarInfo> barList;
+					if( tempBarData.TryGetValue(strategyName,out barList)) {
+						barList.Add(barInfo);
+					} else {
+						barList = new List<BarInfo>();
+						barList.Add(barInfo);
+						tempBarData.Add(strategyName,barList);
+					}
+				}
+			}
+		}
+		
 		public void VerifyTradeCount(StrategyInterface strategy) {
 			List<TradeInfo> goodTrades = goodTradeMap[strategy.Name];
 			List<TradeInfo> testTrades = testTradeMap[strategy.Name];
 			Assert.AreEqual(goodTrades.Count,testTrades.Count);
+		}
+		
+		public void VerifyBarDataCount(StrategyInterface strategy) {
+			List<BarInfo> goodBarData = goodBarDataMap[strategy.Name];
+			List<BarInfo> testBarData = testBarDataMap[strategy.Name];
+			Assert.AreEqual(goodBarData.Count,testBarData.Count);
 		}
 		
 		public void VerifyTrades(StrategyInterface strategy) {
@@ -142,17 +208,22 @@ namespace Loaders
 				TransactionPairBinary goodTrade = goodInfo.Trade;
 				TransactionPairBinary testTrade = testInfo.Trade;
 				Assert.AreEqual(goodTrade,testTrade,"Trade at " + i);
-//				Assert.AreEqual(goodTrade.Direction,testTrade.Direction,"position at " + i);
-//				Assert.AreEqual(goodTrade.EntryBar,testTrade.EntryBar,"entry bar at " + i);
-//				Assert.AreEqual(goodTrade.EntryPrice,testTrade.EntryPrice,"EntryPrice at " + i);
-//				Assert.AreEqual(goodTrade.EntryTime,testTrade.EntryTime,"EntryTime at " + i);
-//				Assert.AreEqual(goodTrade.ExitBar,testTrade.ExitBar,"ExitBar at " + i);
-//				Assert.AreEqual(goodTrade.ExitPrice,testTrade.ExitPrice,"ExitPrice at " + i);
-//				Assert.AreEqual(goodTrade.ExitTime,testTrade.ExitTime,"ExitTime at " + i);
-//				Assert.AreEqual(goodTrade.MaxPrice,testTrade.MaxPrice,"MaxPrice at " + i);
-//				Assert.AreEqual(goodTrade.MinPrice,testTrade.MinPrice,"MinPrice at " + i);
 				Assert.AreEqual(goodInfo.ProfitLoss,testInfo.ProfitLoss,"ProfitLoss at " + i);
 				Assert.AreEqual(goodInfo.ClosedEquity,testInfo.ClosedEquity,"ClosedEquity at " + i);
+			}
+		}
+		
+		public void VerifyBarData(StrategyInterface strategy) {
+			List<BarInfo> goodBarData = goodBarDataMap[strategy.Name];
+			List<BarInfo> testBarData = testBarDataMap[strategy.Name];
+			for( int i=0; i<testBarData.Count && i<goodBarData.Count; i++) {
+				BarInfo testInfo = testBarData[i];
+				BarInfo goodInfo = goodBarData[i];
+				Assert.AreEqual(goodInfo.Time,testInfo.Time,"Time at " + i);
+				Assert.AreEqual(goodInfo.Open,testInfo.Open,"Open at " + i);
+				Assert.AreEqual(goodInfo.High,testInfo.High,"High at " + i);
+				Assert.AreEqual(goodInfo.Low,testInfo.Low,"Low at " + i);
+				Assert.AreEqual(goodInfo.Close,testInfo.Close,"Close at " + i);
 			}
 		}
 		
@@ -181,11 +252,28 @@ namespace Loaders
 	       	try {
 				for( int i=chartThreads.Count-1; i>=0; i--) {
 					chartThreads[i].PortfolioDoc.ShowInvoke();
-					chartThreads[i].PortfolioDoc.HideInvoke();
+					if( !ShowCharts) {
+						chartThreads[i].PortfolioDoc.HideInvoke();
+					}
 				}
         	} catch( Exception ex) {
         		log.Debug(ex.ToString());
         	}
+        }
+		
+		public bool TryCloseCharts()
+        {
+	       	try {
+				for( int i=chartThreads.Count-1; i>=0; i--) {
+					if( chartThreads[i].IsAlive) {
+						return false;
+					}
+				}
+        	} catch( Exception ex) {
+        		log.Debug(ex.ToString());
+        	}
+			HistoricalCloseCharts();
+			return true;
         }
 		
 		public void HistoricalCloseCharts()

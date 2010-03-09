@@ -1,4 +1,4 @@
-#region Copyright
+﻿#region Copyright
 /*
  * Copyright 2008 M. Wayne Walter
  * Software: TickZoom Trading Platform
@@ -40,37 +40,41 @@ using ZedGraph;
 
 namespace MockProvider
 {
-
-#if !PROVIDER
 	[TestFixture]
-	public class SyntheticSimpleTest : ExampleSimpleTest {
+	public class BrokerDualLimitOrder : DualStrategyLimitOrder {
+		
+		public BrokerDualLimitOrder() {
+			ConfigurationManager.AppSettings.Set("ProviderAddress","InProcess");
+			SyncTicks.Enabled = true;
+			DeleteFiles();
+			Symbols = "USD/JPY,EUR/USD";
+			BreakPoint.SetEngineConstraint();
+			BreakPoint.SetTickBreakPoint("2009-06-09 10:49:21.502");
+	//			BreakPoint.SetBarBreakPoint(15);
+			BreakPoint.SetSymbolConstraint("EUR/USD");
+			ShowCharts = false;
+		}
+		
 		public override Starter CreateStarter()
 		{
 			return new RealTimeStarter();
-		}
-		[TestFixtureSetUp]
-		public override void RunStrategy()
-		{
-			ConfigurationManager.AppSettings.Set("ProviderAddress","InProcess");
-			SyncTicks.Enabled = false;
-			DeleteFiles();
-			base.Symbols="Mock4Sim";
-			base.RunStrategy();
 		}
 		
 		private void DeleteFiles() {
 			while( true) {
 				try {
 					string appData = Factory.Settings["AppDataFolder"];
-		 			File.Delete( appData + @"\TestServerCache\Mock4Sim_Tick.tck");
-		 			File.Delete( appData + @"\TestServerCache\ESZ9_Tick.tck");
-		 			File.Delete( appData + @"\TestServerCache\IBM_Tick.tck");
-		 			File.Delete( appData + @"\TestServerCache\GBPUSD_Tick.tck");
+		 			File.Delete( appData + @"\TestServerCache\EURUSD_Tick.tck");
+		 			File.Delete( appData + @"\TestServerCache\USDJPY_Tick.tck");
 					break;
 				} catch( Exception) {
 				}
 			}
 		}
+		
+		[Test]
+		public void CheckMockTradeCount() {
+			Assert.AreEqual(67,SyncTicks.MockTradeCount);
+		}
 	}
-#endif
 }

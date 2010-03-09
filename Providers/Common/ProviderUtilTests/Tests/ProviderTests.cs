@@ -44,6 +44,13 @@ namespace TickZoom.Test
 			TimeAndSales,
 			Level1
 		}
+		
+		public ProviderTests() {
+			string providerAssembly = Factory.Settings["ProviderAssembly"];
+			if( !string.IsNullOrEmpty(providerAssembly)) {
+				SetProviderAssembly( providerAssembly);
+			}
+		}
 			
 		[TestFixtureSetUp]
 		public void Init()
@@ -148,7 +155,24 @@ namespace TickZoom.Test
   			long count = verify.Verify(2,assertTick,symbol,25);
   			Assert.GreaterOrEqual(count,2,"tick count");
   			Process[] processes = Process.GetProcessesByName(providerAssembly);
-  			Assert.AreEqual(1,processes.Length,"Number of MBTradingService processes.");
+  			Assert.AreEqual(1,processes.Length,"Number of provider service processes.");
+		}
+
+		private void CreateEntry( OrderType orderType, double expectedPositions, double actualPosition) {
+			CreateOrder(TradeDirection.Entry,orderType,expectedPositions,actualPosition);
+		}
+		private void CreateExit( OrderType orderType, double expectedPositions, double actualPosition) {
+			CreateOrder(TradeDirection.Exit,orderType,expectedPositions,actualPosition);
+		}
+		private void CreateOrder( TradeDirection tradeDirection, OrderType orderType, double expectedPositions, double actualPosition) {
+  			List<LogicalOrder> list = new List<LogicalOrder>();
+  			LogicalOrder order = Factory.Engine.LogicalOrder(symbol,null);
+  			order.TradeDirection = tradeDirection;
+  			order.Type = orderType;
+  			order.Positions = expectedPositions;
+  			order.IsActive = true;
+  			list.Add(order);
+  			provider.SendEvent(verify,symbol,(int)EventType.PositionChange,new PositionChangeDetail(symbol,actualPosition,list));
 		}
 		
 		[Test]
@@ -156,22 +180,55 @@ namespace TickZoom.Test
 			int secondsDelay = 25;
 			if(debug) log.Debug("===DemoConnectionTest===");
 			provider.SendEvent(verify,symbol,(int)EventType.StartSymbol,new StartSymbolDetail(TimeStamp.MinValue));
+  			long count = verify.Verify(1,assertTick,symbol,25);
+
   			double expectedPosition = 150;
-  			provider.SendEvent(verify,symbol,(int)EventType.PositionChange,new PositionChangeDetail(expectedPosition,null));
+  			CreateEntry(OrderType.BuyMarket,expectedPosition,0);
+  			double actualPosition = verify.VerifyPosition(expectedPosition,symbol,secondsDelay);
+  			Assert.AreEqual(expectedPosition,actualPosition,"position");
+
+  			expectedPosition = 0;
+  			CreateExit(OrderType.SellMarket,expectedPosition,actualPosition);
+  			actualPosition = verify.VerifyPosition(expectedPosition,symbol,secondsDelay);
+  			Assert.AreEqual(expectedPosition,actualPosition,"position");
+
+  			expectedPosition = 150;
+  			CreateEntry(OrderType.BuyMarket,expectedPosition,actualPosition);
+  			actualPosition = verify.VerifyPosition(expectedPosition,symbol,secondsDelay);
+  			Assert.AreEqual(expectedPosition,actualPosition,"position");
+
+  			expectedPosition = 150;
+  			CreateEntry(OrderType.BuyMarket,expectedPosition,actualPosition);
+  			actualPosition = verify.VerifyPosition(expectedPosition,symbol,secondsDelay);
+  			Assert.AreEqual(expectedPosition,actualPosition,"position");
+  			
+  			expectedPosition = 0;
+  			CreateExit(OrderType.SellMarket,expectedPosition,actualPosition);
+  			actualPosition = verify.VerifyPosition(expectedPosition,symbol,secondsDelay);
+  			Assert.AreEqual(expectedPosition,actualPosition,"position");
+		}
+		
+		[Test]
+		public void TestSignalChanges() {
+			int secondsDelay = 25;
+			if(debug) log.Debug("===DemoConnectionTest===");
+			provider.SendEvent(verify,symbol,(int)EventType.StartSymbol,new StartSymbolDetail(TimeStamp.MinValue));
+  			double expectedPosition = 150;
+  			provider.SendEvent(verify,symbol,(int)EventType.PositionChange,new PositionChangeDetail(symbol,expectedPosition,null));
   			double position = verify.VerifyPosition(expectedPosition,symbol,secondsDelay);
   			Assert.AreEqual(expectedPosition,position,"position");
   			expectedPosition = 0;
-  			provider.SendEvent(verify,symbol,(int)EventType.PositionChange,new PositionChangeDetail(expectedPosition,null));
+  			provider.SendEvent(verify,symbol,(int)EventType.PositionChange,new PositionChangeDetail(symbol,expectedPosition,null));
   			position = verify.VerifyPosition(expectedPosition,symbol,secondsDelay);
   			Assert.AreEqual(expectedPosition,position,"position");
 
   			expectedPosition = 150;
-  			provider.SendEvent(verify,symbol,(int)EventType.PositionChange,new PositionChangeDetail(expectedPosition,null));
+  			provider.SendEvent(verify,symbol,(int)EventType.PositionChange,new PositionChangeDetail(symbol,expectedPosition,null));
   			position = verify.VerifyPosition(expectedPosition,symbol,secondsDelay);
   			Assert.AreEqual(expectedPosition,position,"position");
 
   			expectedPosition = 150;
-  			provider.SendEvent(verify,symbol,(int)EventType.PositionChange,new PositionChangeDetail(expectedPosition,null));
+  			provider.SendEvent(verify,symbol,(int)EventType.PositionChange,new PositionChangeDetail(symbol,expectedPosition,null));
   			position = verify.VerifyPosition(expectedPosition,symbol,secondsDelay);
   			Assert.AreEqual(expectedPosition,position,"position");
 		}
@@ -179,7 +236,7 @@ namespace TickZoom.Test
 		[Test]
 		public void TestLogicalOrders() {
 			provider.SendEvent(verify,symbol,(int)EventType.StartSymbol,new StartSymbolDetail(TimeStamp.MinValue));
-  			provider.SendEvent(verify,symbol,(int)EventType.PositionChange,new PositionChangeDetail(0,orders));
+  			provider.SendEvent(verify,symbol,(int)EventType.PositionChange,new PositionChangeDetail(symbol,0,orders));
   			long count = verify.Verify(1,assertTick,symbol,25);
 			CreateLogicalEntry(OrderType.BuyLimit,15.12,1000);
 			CreateLogicalEntry(OrderType.SellLimit,34.12,1000);
@@ -187,10 +244,21 @@ namespace TickZoom.Test
 			CreateLogicalExit(OrderType.SellStop,5.12);
 			CreateLogicalExit(OrderType.BuyLimit,10.12);
 			CreateLogicalExit(OrderType.BuyStop,45.12);
-  			provider.SendEvent(verify,symbol,(int)EventType.PositionChange,new PositionChangeDetail(0,orders));
+  			provider.SendEvent(verify,symbol,(int)EventType.PositionChange,new PositionChangeDetail(symbol,0,orders));
   			count = verify.Verify(2,assertTick,symbol,25);
   			Assert.GreaterOrEqual(count,2,"tick count");
   			Thread.Sleep(2000);
+		}
+		
+		[Test]
+		public void TestSpecificLogicalOrder() {
+			provider.SendEvent(verify,symbol,(int)EventType.StartSymbol,new StartSymbolDetail(TimeStamp.MinValue));
+  			provider.SendEvent(verify,symbol,(int)EventType.PositionChange,new PositionChangeDetail(symbol,0,orders));
+			CreateLogicalEntry(OrderType.BuyLimit,503.72,100);
+  			provider.SendEvent(verify,symbol,(int)EventType.PositionChange,new PositionChangeDetail(symbol,0,orders));
+  			long count = verify.Verify(2,assertTick,symbol,25);
+  			Assert.GreaterOrEqual(count,2,"tick count");
+  			 Thread.Sleep(2000);
 		}
 		
 		public void AssertLevel1( TickIO tick, TickIO lastTick, ulong symbol) {

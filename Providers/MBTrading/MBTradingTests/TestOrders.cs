@@ -81,22 +81,22 @@ namespace TickZoom.Test
 		[Test]
 		public void TestPositionChange() {
 			if(debug) log.Debug("===DemoConnectionTest===");
-			provider.SendEvent(verify,symbol,(int)EventType.StartSymbol,TimeStamp.MinValue);
+			provider.SendEvent(verify,symbol,(int)EventType.StartSymbol,new StartSymbolDetail(TimeStamp.MinValue));
   			long count = verify.Verify(2,AssertTick,symbol,25);
   			Assert.GreaterOrEqual(count,2,"tick count");
   			Thread.Sleep(500);
-  			provider.SendEvent(verify,symbol,(int)EventType.PositionChange,new PositionChangeDetail( 150,null));
+  			provider.SendEvent(verify,symbol,(int)EventType.PositionChange,new PositionChangeDetail( symbol, 150,null));
   			count = verify.Verify(2,AssertTick,symbol,25);
   			Assert.GreaterOrEqual(count,2,"tick count");
-  			provider.SendEvent(verify,symbol,(int)EventType.PositionChange,new PositionChangeDetail( 0,null));
-  			count = verify.Verify(2,AssertTick,symbol,25);
-  			Assert.GreaterOrEqual(count,2,"tick count");
-  			Thread.Sleep(500);
-  			provider.SendEvent(verify,symbol,(int)EventType.PositionChange,new PositionChangeDetail( 100,null));
+  			provider.SendEvent(verify,symbol,(int)EventType.PositionChange,new PositionChangeDetail( symbol, 0,null));
   			count = verify.Verify(2,AssertTick,symbol,25);
   			Assert.GreaterOrEqual(count,2,"tick count");
   			Thread.Sleep(500);
-  			provider.SendEvent(verify,symbol,(int)EventType.PositionChange,new PositionChangeDetail( 0,null));
+  			provider.SendEvent(verify,symbol,(int)EventType.PositionChange,new PositionChangeDetail( symbol, 100,null));
+  			count = verify.Verify(2,AssertTick,symbol,25);
+  			Assert.GreaterOrEqual(count,2,"tick count");
+  			Thread.Sleep(500);
+  			provider.SendEvent(verify,symbol,(int)EventType.PositionChange,new PositionChangeDetail( symbol, 0,null));
   			count = verify.Verify(2,AssertTick,symbol,25);
   			Assert.GreaterOrEqual(count,2,"tick count");
 		}

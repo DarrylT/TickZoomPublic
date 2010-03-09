@@ -60,11 +60,15 @@ namespace TickZoom.Common
 			}
 		}
         
+        public void AddPosition( double position) {
+        	this.position += position;
+        }
+	        	
         public void SetPosition( double position) {
         	if( this.position != position) {
 	        	this.position = position;
-	        	LogicalFillBinary fill = new LogicalFillBinary(position,tickIO.Bid,tickIO.Time,0);
-	        	receiver.OnEvent(symbol,(int)EventType.LogicalFill,fill);
+//	        	LogicalFillBinary fill = new LogicalFillBinary(position,tickIO.Bid,tickIO.Time,0);
+//	        	receiver.OnEvent(symbol,(int)EventType.LogicalFill,fill);
         	}
         }
         

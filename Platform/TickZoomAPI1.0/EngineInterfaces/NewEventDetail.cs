@@ -26,6 +26,8 @@ using System.Collections.Generic;
 
 namespace TickZoom.Api
 {
+
+	
 	public class NewEventDetail {
 		public int Id;
 	}

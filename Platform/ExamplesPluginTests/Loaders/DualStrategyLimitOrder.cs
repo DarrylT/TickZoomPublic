@@ -30,6 +30,7 @@
 
 using System;
 using NUnit.Framework;
+using System.Threading;
 using TickZoom;
 using TickZoom.Api;
 using TickZoom.Common;
@@ -39,12 +40,15 @@ namespace Loaders
 	[TestFixture]
 	public class DualStrategyLimitOrder : StrategyTest
 	{
-		Log log = Factory.Log.GetLogger(typeof(ExampleSimulatedTest));
+		Log log = Factory.Log.GetLogger(typeof(DualStrategyLimitOrder));
 		Portfolio portfolio;
 		Strategy strategy1;
 		Strategy strategy2;
 		public DualStrategyLimitOrder() {
 			Symbols = "USD/JPY,EUR/USD";
+			ShowCharts = false;
+			BreakPoint.SetBarBreakPoint(15);
+			BreakPoint.SetSymbolConstraint("EUR/USD");
 		}
 			
 		[TestFixtureSetUp]
@@ -70,6 +74,8 @@ namespace Loaders
 	    		strategy1 = portfolio.Strategies[0];
 	    		strategy2 = portfolio.Strategies[1];
 	    		LoadTrades();
+	    		LoadBarData();
+//	    		Thread.Sleep(60000);
 			} catch( Exception ex) {
 				log.Error("Setup error.", ex);
 				throw;
@@ -114,6 +120,26 @@ namespace Loaders
 		}
 		
 		[Test]
+		public void VerifyStrategy1BarData() {
+			VerifyBarData(strategy1);
+		}
+		
+		[Test]
+		public void VerifyStrategy2BarData() {
+			VerifyBarData(strategy2);
+		}
+		
+		[Test]
+		public void VerifyStrategy1BarDataCount() {
+			VerifyBarDataCount(strategy1);
+		}
+		
+		[Test]
+		public void VerifyStrategy2BarDataCount() {
+			VerifyBarDataCount(strategy2);
+		}
+		
+		[Test]
 		public void CompareBars() {
 			CompareChart(portfolio,GetChart(portfolio.SymbolDefault));
 		}
@@ -134,7 +160,8 @@ namespace Loaders
 		}
 		
 		public override void OnLoad(ProjectProperties properties) {
-			foreach( var symbol in properties.Starter.SymbolProperties) {
+			properties.Engine.RealtimeOutput = false;
+			foreach( var symbol in properties. Starter.SymbolProperties) {
 				string name = "ExampleOrderStrategy+" + symbol.Symbol;
 				Strategy strategy = CreateStrategy("ExampleOrderStrategy",name);
 				strategy.SymbolDefault = symbol.Symbol;

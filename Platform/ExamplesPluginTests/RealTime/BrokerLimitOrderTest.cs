@@ -46,8 +46,9 @@ namespace MockProvider
 		public BrokerLimitOrderTest() {
 			ConfigurationManager.AppSettings.Set("ProviderAddress","InProcess");
 			SyncTicks.Enabled = true;
+			ShowCharts = false;
 			DeleteFiles();
-			Symbols="USD/JPY";
+			Symbols = "USD/JPY";
 		}
 		
 		public override Starter CreateStarter()

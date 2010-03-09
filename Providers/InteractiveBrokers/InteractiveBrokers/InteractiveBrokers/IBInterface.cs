@@ -137,9 +137,9 @@ namespace TickZoom.InteractiveBrokers
 			return temp.ToUpper() + input.Remove(0, 1);
 		}        
         
-		public void StartSymbol(Receiver receiver, SymbolInfo symbol, TimeStamp lastTimeStamp)
+		public void StartSymbol(Receiver receiver, SymbolInfo symbol, StartSymbolDetail detail)
 		{
-			if( debug) log.Debug("StartSymbol " + symbol + ", " + lastTimeStamp);
+			if( debug) log.Debug("StartSymbol " + symbol + ", " + detail.LastTime);
             Equity equity = new Equity(symbol.Symbol);
             SymbolHandler handler = GetSymbolHandler(symbol,receiver);
             client.RequestMarketData((int)symbol.BinaryIdentifier, equity, null, false, false);
@@ -155,7 +155,13 @@ namespace TickZoom.InteractiveBrokers
 		
 		public void PositionChange(Receiver receiver, SymbolInfo symbol, double signal, IList<LogicalOrder> orders)
 		{
-			if( debug) log.Debug("PositionChange");
+			int orderCount = orders==null?0:orders.Count;
+			log.Info("Received PositionChange for " + symbol + " at position " + signal + " and " + orderCount + " orders.");
+			if( orders != null) {
+				foreach( var order in orders) {
+					log.Info(order);
+				}
+			}
 			
 			LogicalOrderHandler handler = symbolHandlers[symbol.BinaryIdentifier].LogicalOrderHandler;
 			handler.SetDesiredPosition(signal);
@@ -174,6 +180,15 @@ namespace TickZoom.InteractiveBrokers
             log.InfoFormat("Execution: {0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11}",
                 e.Contract.Symbol, e.Execution.AccountNumber, e.Execution.ClientId, e.Execution.Exchange, e.Execution.ExecutionId,
                 e.Execution.Liquidation, e.Execution.OrderId, e.Execution.PermId, e.Execution.Price, e.Execution.Shares, e.Execution.Side, e.Execution.Time);
+        	
+        	SymbolInfo symbol = Factory.Symbol.LookupSymbol(e.Contract.Symbol);
+			SymbolHandler symbolHandler = symbolHandlers[symbol.BinaryIdentifier];
+			TimeStamp executionTime = new TimeStamp(e.Execution.Time);
+			int logicalOrderId = GetLogicalOrderId( e.Execution.OrderId);
+			double change = e.Execution.Side == ExecutionSide.Bought ? e.Execution.Shares : - e.Execution.Shares;
+			symbolHandler.AddPosition( change);
+			LogicalFillBinary binary = new LogicalFillBinary(symbolHandler.Position,e.Execution.Price,executionTime,logicalOrderId);
+            receiver.OnEvent(symbol,(int)EventType.LogicalFill,binary);
         }
 
         private void client_RealTimeBar(object sender, RealTimeBarEventArgs e)
@@ -488,10 +503,10 @@ namespace TickZoom.InteractiveBrokers
 					Stop(receiver);
 					break;
 				case EventType.StartSymbol:
-					StartSymbol(receiver,symbol, (TimeStamp) eventDetail);
+					StartSymbol(receiver, symbol, (StartSymbolDetail) eventDetail);
 					break;
 				case EventType.StopSymbol:
-					StopSymbol(receiver,(SymbolInfo)eventDetail);
+					StopSymbol(receiver,symbol);
 					break;
 				case EventType.PositionChange:
 					PositionChangeDetail positionChange = (PositionChangeDetail) eventDetail;

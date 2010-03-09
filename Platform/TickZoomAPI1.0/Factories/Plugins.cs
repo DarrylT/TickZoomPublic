@@ -113,6 +113,7 @@ namespace TickZoom.Api
 			// This loads plugins from the installation folder
 			// so all the common models and modelloaders get loaded.
 			files.AddRange( Directory.GetFiles(currentDirectory, "*plugin*.dll", SearchOption.AllDirectories));
+			files.AddRange( Directory.GetFiles(currentDirectory, "*common*.dll", SearchOption.AllDirectories));
 			files.AddRange( Directory.GetFiles(currentDirectory, "*test*.dll", SearchOption.AllDirectories));
 			files.AddRange( Directory.GetFiles(currentDirectory, "*test*.exe", SearchOption.AllDirectories));
 			
@@ -130,7 +131,6 @@ namespace TickZoom.Api
 				log.Warn("Zero Serializer plugins found in " + PluginFolder + " or " + currentDirectory);
 			}
 		}
-
 
 		// Exit and Enter Common aren't directly accessible.
 		// They provide support for custom strategies.
