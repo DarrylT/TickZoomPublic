@@ -54,6 +54,8 @@ namespace TickZoom.Common
 		Performance performance;
 		PositionSize positionSize;
 		ExitStrategy exitStrategy;
+		OrderManager preOrderManager;
+		OrderManager postOrderManager;
 		
 		public Strategy()
 		{
@@ -83,6 +85,13 @@ namespace TickZoom.Common
 			performance = new Performance(this);
 		    positionSize = new PositionSize(this);
 		    exitStrategy = new ExitStrategy(this);
+		    preOrderManager = Factory.Engine.OrderManager(this);
+			postOrderManager = Factory.Engine.OrderManager(this);
+			postOrderManager.PostProcess = true;
+			postOrderManager.ChangePosition = position.Change;
+			postOrderManager.DoEntryOrders = false;
+			postOrderManager.DoExitOrders = false;
+			postOrderManager.DoExitStrategyOrders = true;
 		}
 		
 		public override void OnConfigure()
@@ -95,11 +104,11 @@ namespace TickZoom.Common
 			base.OnConfigure();
 
 			BreakPoint.TrySetStrategy(this);
-			OrderManager preOrderManager = Factory.Engine.OrderManager(this);
 			AddInterceptor(preOrderManager);
 			AddInterceptor(performance.Equity);
 			AddInterceptor(performance);
 			AddInterceptor(positionSize);
+//			AddInterceptor(postOrderManager);
 			AddInterceptor(exitStrategy);
 		}
 		

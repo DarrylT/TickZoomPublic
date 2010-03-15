@@ -230,7 +230,7 @@ namespace TickZoom.Common
 		}
 		
 		private void processStopLoss(Tick tick) {
-			if( !stopLossOrder.IsActive) {
+//			if( !stopLossOrder.IsActive) {
 				stopLossOrder.IsActive = true;
 				if( position.IsLong) {
 					stopLossOrder.Type = OrderType.SellStop;
@@ -240,7 +240,7 @@ namespace TickZoom.Common
 					stopLossOrder.Type = OrderType.BuyStop;
 					stopLossOrder.Price = entryPrice + stopLoss;
 				}
-			}
+//			}
 			if( pnl <= -stopLoss) {
 				LogExit("StopLoss " + stopLoss + " Exit at " + tick);
 				flattenSignal(stopLossOrder,tick);

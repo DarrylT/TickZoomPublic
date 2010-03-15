@@ -40,6 +40,7 @@ namespace TickZoom.InteractiveBrokers
 	{
 		private static readonly Log log = Factory.Log.GetLogger(typeof(IBInterface));
 		private static readonly bool debug = log.IsDebugEnabled;
+		private static readonly bool trace = log.IsTraceEnabled;
         private readonly object readersLock = new object();
 	    private readonly static object listLock = new object();
         private IBClient client;
@@ -159,7 +160,7 @@ namespace TickZoom.InteractiveBrokers
 			log.Info("Received PositionChange for " + symbol + " at position " + signal + " and " + orderCount + " orders.");
 			if( orders != null) {
 				foreach( var order in orders) {
-					log.Info(order);
+					log.Info("Logical Order: " + order);
 				}
 			}
 			
@@ -198,7 +199,7 @@ namespace TickZoom.InteractiveBrokers
 
         private void client_OrderStatus(object sender, OrderStatusEventArgs e)
         {
-        	if(debug) log.Debug("Order Status for Id " + e.OrderId + " is " + e.Status);
+        	if(trace) log.Trace("Order Status for Id " + e.OrderId + " is " + e.Status);
         	bool deleteFlag = false;
         	switch( e.Status) {
         		case OrderStatus.Canceled:
@@ -207,6 +208,7 @@ namespace TickZoom.InteractiveBrokers
         		case OrderStatus.PendingCancel:
         			deleteFlag = true;
         			break;
+        		case OrderStatus.PendingSubmit:
         		case OrderStatus.PreSubmitted:
         		case OrderStatus.PartiallyFilled:
         		case OrderStatus.Submitted:
@@ -220,18 +222,18 @@ namespace TickZoom.InteractiveBrokers
     			if( openOrders.ContainsKey(e.OrderId)) {
     				openOrders.Remove(e.OrderId);
     			}
-	        	if(debug) log.Debug("Removing open order id " + e.OrderId);
+	        	if(trace) log.Trace("Removing open order id " + e.OrderId);
         	}
         }
 
         private void client_OpenOrder(object sender, OpenOrderEventArgs e)
         {
-        	if( debug) log.Debug("Open Order Id " + e.Order.OrderId + " " + e.Contract.Symbol + " " + OrderToString(e.Order));
+        	if( trace) log.Trace("Open Order Id " + e.Order.OrderId + " " + e.Contract.Symbol + " " + OrderToString(e.Order));
         	openOrders[e.Order.OrderId] = e;
         }
         
         public void HandleOpenOrder(OpenOrderEventArgs e) {
-        	if( debug) log.Debug("HandleOpenOrder id " + e.Order.OrderId + " " + e.Contract.Symbol + " " + OrderToString(e.Order));
+        	if( debug) log.Debug("Broker Order: id " + e.Order.OrderId + " " + e.Contract.Symbol + " " + OrderToString(e.Order));
         	TickZoom.Api.OrderType type = TickZoom.Api.OrderType.BuyMarket;
         	double price = 0;
         	switch( e.Order.OrderType) {
@@ -308,7 +310,7 @@ namespace TickZoom.InteractiveBrokers
         
         private void client_OpenOrderEnd(object sender, EventArgs e)
         {
-        	if(debug) log.Debug("Open Order End ");
+        	if(trace) log.Trace("Open Order End ");
         	foreach( var kvp in symbolHandlers) {
         		LogicalOrderHandler handler = kvp.Value.LogicalOrderHandler;
         		handler.ClearPhysicalOrders();
@@ -370,7 +372,7 @@ namespace TickZoom.InteractiveBrokers
         
         private void client_Error(object sender, Krs.Ats.IBNet.ErrorEventArgs e)
         {
-            log.Error("Error: "+ e.ErrorMsg);
+            log.Notice("Status: "+ e.ErrorMsg);
         }
 
         private void client_TickPrice(object sender, TickPriceEventArgs e)
@@ -457,7 +459,7 @@ namespace TickZoom.InteractiveBrokers
         
 		public void OnCreateBrokerOrder(PhysicalOrder physicalOrder)
 		{
-			if( debug) log.Debug( "OnCreateBrokerOrder " + physicalOrder);
+			if( trace) log.Trace( "OnCreateBrokerOrder " + physicalOrder);
 			SymbolInfo symbol = physicalOrder.Symbol;
 			Contract contract = new Contract(symbol.Symbol,"SMART",SecurityType.Stock,"USD");
 			Order brokerOrder = ToBrokerOrder(physicalOrder);
@@ -467,15 +469,16 @@ namespace TickZoom.InteractiveBrokers
 			nextValidId++;
 			client.PlaceOrder(nextValidId,contract,brokerOrder);
 			physicalToLogicalOrderMap.Add(nextValidId,physicalOrder.LogicalOrderId);
-			if(debug) log.Debug("PlaceOrder: " + contract.Symbol + " " + OrderToString(brokerOrder));
+			if(debug) log.Debug("Place Order: " + contract.Symbol + " " + OrderToString(brokerOrder));
 		}
 		
 		public void OnCancelBrokerOrder(PhysicalOrder physicalOrder)
 		{
-			if( debug) log.Debug( "OnCancelBrokerOrder " + physicalOrder);
+			if( trace) log.Trace( "OnCancelBrokerOrder " + physicalOrder);
 			Order order = physicalOrder.BrokerOrder as Order;
 			if( order != null) {
 				client.CancelOrder( order.OrderId);
+				if(debug) log.Debug("Cancel Order: " + physicalOrder.Symbol.Symbol + " " + OrderToString(order));
 			} else {
 				throw new ApplicationException("BrokerOrder property want's an Order object.");
 			}
@@ -483,11 +486,11 @@ namespace TickZoom.InteractiveBrokers
 		
 		public void OnChangeBrokerOrder(PhysicalOrder physicalOrder)
 		{
-			if( debug) log.Debug( "OnChangeBrokerOrder " + physicalOrder);
+			if( trace) log.Trace( "OnChangeBrokerOrder " + physicalOrder);
 			Order order = physicalOrder.BrokerOrder as Order;
 			if( order != null) {
-				client.CancelOrder(order.OrderId);
-				if(debug) log.Debug("Cancel Order (for change): " + physicalOrder.Symbol.Symbol + " " + OrderToString(order));
+				if(debug) log.Debug("Change Order (Cancel/Replace): " + physicalOrder.Symbol.Symbol + " " + OrderToString(order));
+				OnCancelBrokerOrder(physicalOrder);
 				OnCreateBrokerOrder(physicalOrder);
 			} else {
 				throw new ApplicationException("BrokerOrder property want's an Order object.");

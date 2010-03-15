@@ -182,7 +182,7 @@ namespace TickZoom.Test
 			provider.SendEvent(verify,symbol,(int)EventType.StartSymbol,new StartSymbolDetail(TimeStamp.MinValue));
   			long count = verify.Verify(1,assertTick,symbol,25);
 
-  			double expectedPosition = 150;
+  			double expectedPosition = 2;
   			CreateEntry(OrderType.BuyMarket,expectedPosition,0);
   			double actualPosition = verify.VerifyPosition(expectedPosition,symbol,secondsDelay);
   			Assert.AreEqual(expectedPosition,actualPosition,"position");
@@ -192,12 +192,12 @@ namespace TickZoom.Test
   			actualPosition = verify.VerifyPosition(expectedPosition,symbol,secondsDelay);
   			Assert.AreEqual(expectedPosition,actualPosition,"position");
 
-  			expectedPosition = 150;
+  			expectedPosition = 2;
   			CreateEntry(OrderType.BuyMarket,expectedPosition,actualPosition);
   			actualPosition = verify.VerifyPosition(expectedPosition,symbol,secondsDelay);
   			Assert.AreEqual(expectedPosition,actualPosition,"position");
 
-  			expectedPosition = 150;
+  			expectedPosition = 2;
   			CreateEntry(OrderType.BuyMarket,expectedPosition,actualPosition);
   			actualPosition = verify.VerifyPosition(expectedPosition,symbol,secondsDelay);
   			Assert.AreEqual(expectedPosition,actualPosition,"position");

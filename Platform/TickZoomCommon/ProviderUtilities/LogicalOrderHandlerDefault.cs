@@ -41,6 +41,7 @@ namespace TickZoom.Common
 	public class LogicalOrderHandlerDefault : LogicalOrderHandler {
 		private static readonly Log log = Factory.Log.GetLogger(typeof(LogicalOrderHandlerDefault));
 		private static readonly bool debug = log.IsDebugEnabled;
+		private static readonly bool trace = log.IsTraceEnabled;
 		SymbolInfo symbol;
 		PhysicalOrderHandler brokerOrders;
 		List<PhysicalOrderDefault> physicalOrders;
@@ -102,17 +103,17 @@ namespace TickZoom.Common
 		}
 		
 		private void CancelBrokerOrder(PhysicalOrder physical) {
-			log.Info("Cancel Broker Order " + physical);
+			if( trace) log.Trace("Cancel Broker Order " + physical);
 			brokerOrders.OnCancelBrokerOrder(physical);
 		}
 		
 		private void ChangeBrokerOrder(PhysicalOrder physical) {
-			log.Info("Change Broker Order " + physical);
+			if( trace) log.Trace("Change Broker Order " + physical);
 			brokerOrders.OnChangeBrokerOrder(physical);
 		}
 		
 		private void CreateBrokerOrder(PhysicalOrder physical) {
-			log.Info("Create Broker Order " + physical);
+			if( trace) log.Trace("Create Broker Order " + physical);
 			brokerOrders.OnCreateBrokerOrder(physical);
 		}
 		
@@ -171,6 +172,7 @@ namespace TickZoom.Common
 			// When flat, allow entry orders.
 			if( actualPosition == 0) {
 				if( logical.TradeDirection == TradeDirection.Entry) {
+					if(debug) log.Debug("ProcessMissingPhysicalEntry("+logical+")");
 					PhysicalOrder physical = new PhysicalOrderDefault(symbol,logical,logical.Positions,null);
 					CreateBrokerOrder(physical);
 				}
@@ -182,16 +184,19 @@ namespace TickZoom.Common
 		}
 		
 		private void ProcessMissingPhysicalExit(LogicalOrder logical) {
+			if(debug) log.Debug("ProcessMissingPhysicalExit("+logical+")");
 			if( actualPosition > 0 ) {
 				if( logical.Type == OrderType.SellLimit ||
-				  logical.Type == OrderType.SellStop) {
+				  logical.Type == OrderType.SellStop ||
+				  logical.Type == OrderType.SellMarket) {
 					PhysicalOrder physical = new PhysicalOrderDefault(symbol,logical,actualPosition,null);
 					CreateBrokerOrder(physical);
 				}
 			}
 			if( actualPosition < 0 ) {
 				if( logical.Type == OrderType.BuyLimit ||
-				  logical.Type == OrderType.BuyStop) {
+				  logical.Type == OrderType.BuyStop ||
+				  logical.Type == OrderType.BuyMarket) {
 					PhysicalOrder physical = new PhysicalOrderDefault(symbol,logical,Math.Abs(actualPosition),null);
 					CreateBrokerOrder(physical);
 				}
@@ -218,7 +223,7 @@ namespace TickZoom.Common
 		
 		public void SetLogicalOrders( IList<LogicalOrder> originalLogicals) {
 			int orderCount = originalLogicals == null ? 0 : originalLogicals.Count;
-			if( debug) log.Debug("SetLogicalOrders() order count = " + orderCount);
+			if( trace) log.Trace("SetLogicalOrders() order count = " + orderCount);
 			this.originalLogicals = originalLogicals;
 		}
 		

@@ -51,18 +51,17 @@ namespace TickZoom.Common
 		public override void Intercept(EventContext context, EventType eventType, object eventDetail)
 		{
 			if( eventType == EventType.Initialize) {
+				Strategy.AddInterceptor(EventType.Open,this);
+				Strategy.AddInterceptor(EventType.Close,this);
 				Strategy.AddInterceptor(EventType.Tick,this);
 			}
 			context.Invoke();
-			if( eventType == EventType.Tick) {
-				if( previousSignal != context.Position.Current ) {
-					// Pass 
-					previousSignal = context.Position.Current;
-					position.Change(previousSignal * size, context.Position.Price, context.Position.Time);
+			if( Strategy.IsActiveOrdersChanged) {
+				Strategy.RefreshActiveOrders();
+				foreach( var order in Strategy.AllOrders) {
+					order.Positions = size;
 				}
-				context.Position.Copy(position);
 			}
-			
 		}
 
 		/// <summary>

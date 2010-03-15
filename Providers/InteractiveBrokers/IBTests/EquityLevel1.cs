@@ -35,7 +35,7 @@ namespace Test
 	{
 		public EquityLevel1()
 		{
-			SetSymbol("GOOG");
+			SetSymbol("IBM");
 			SetTickTest(TickTest.Level1);
 		}
 		

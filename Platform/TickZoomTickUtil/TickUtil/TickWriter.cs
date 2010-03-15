@@ -230,7 +230,7 @@ namespace TickZoom.TickUtil
 		
 		public bool CanReceive {
 			get {
-				return writeQueue.CanEnqueue;
+				return writeQueue != null && writeQueue.CanEnqueue;
 			}
 		}
 		

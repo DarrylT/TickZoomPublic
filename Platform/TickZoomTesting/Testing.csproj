@@ -75,7 +75,6 @@
     <Compile Include="Common\DateTimeTest.cs" />
     <Compile Include="Common\PerformanceTest.cs" />
     <Compile Include="Common\PluginManagerTest.cs" />
-    <Compile Include="Common\PositionSizeTest.cs" />
     <Compile Include="Indicators\EMATest.cs" />
     <Compile Include="Indicators\LinearRegressionTest.cs" />
     <Compile Include="Indicators\SMATest.cs" />
@@ -100,7 +99,6 @@
     <Compile Include="TradingFramework\ExchangeTimeZoneTest.cs" />
     <Compile Include="TradingFramework\ExitStrategyMiscTest.cs" />
     <Compile Include="TradingFramework\ExitStrategyMock.cs" />
-    <Compile Include="TradingFramework\ExitStrategyStopTest.cs" />
     <Compile Include="TradingFramework\ExitStrategyStopLossTest.cs" />
     <Compile Include="TradingFramework\ChainTest.cs" />
     <Compile Include="TradingFramework\ExitStrategyTickTest.cs" />

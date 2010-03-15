@@ -37,7 +37,8 @@ namespace TickZoom.Api
 		List<Type> models;
 		List<Type> serializers;
 		int errorCount = 0;
-		Log log = Factory.Log.GetLogger(typeof(Plugins));
+		static readonly Log log = Factory.Log.GetLogger(typeof(Plugins));
+		static readonly bool debug = log.IsDebugEnabled;
 		[ThreadStatic]
 		static Plugins plugins;
 		
@@ -137,7 +138,7 @@ namespace TickZoom.Api
 
 		void LoadImplementations(String filename, string typeName, List<Type> list)
 		{
-			log.Info("Loading " + filename);
+			if( debug) log.Debug("Loading " + filename);
 			Type t2 = typeof(object);
 			try {
 				Assembly assembly = Assembly.LoadFrom(filename);
