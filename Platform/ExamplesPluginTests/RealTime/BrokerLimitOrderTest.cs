@@ -47,8 +47,10 @@ namespace MockProvider
 			ConfigurationManager.AppSettings.Set("ProviderAddress","InProcess");
 			SyncTicks.Enabled = true;
 			ShowCharts = false;
+			StoreKnownGood = false;
 			DeleteFiles();
 			Symbols = "USD/JPY";
+			
 		}
 		
 		public override Starter CreateStarter()
@@ -69,7 +71,7 @@ namespace MockProvider
 		
 		[Test]
 		public void CheckMockTradeCount() {
-			Assert.AreEqual(34,SyncTicks.MockTradeCount);
+			Assert.AreEqual(38,SyncTicks.MockTradeCount);
 		}
 	}
 }

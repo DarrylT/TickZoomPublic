@@ -56,6 +56,7 @@ namespace Loaders
 		Dictionary<string,List<TradeInfo>> goodTradeMap = new Dictionary<string,List<TradeInfo>>();
 		Dictionary<string,List<TradeInfo>> testTradeMap = new Dictionary<string,List<TradeInfo>>();
 		public bool ShowCharts = false;
+		public bool StoreKnownGood = false;
 		
 		[TestFixtureSetUp]
 		public virtual void RunStrategy() {
@@ -112,13 +113,16 @@ namespace Loaders
 			
 		public void LoadTrades() {
 			string fileDir = @"..\..\Platform\ExamplesPluginTests\Loaders\Trades\";
-			string filePath = fileDir + GetType().Name + "Trades.log";
+			string knownGoodPath = fileDir + GetType().Name + "Trades.log";
 			string appDataFolder = Factory.Settings["AppDataFolder"];
+			string newPath = appDataFolder + @"\Logs\Trades.log";
+			if( StoreKnownGood) {
+				File.Copy(newPath,knownGoodPath,true);
+			}
 			goodTradeMap.Clear();
-			LoadTrades(filePath,goodTradeMap);
-			filePath = appDataFolder + @"\Logs\Trades.log";
+			LoadTrades(knownGoodPath,goodTradeMap);
 			testTradeMap.Clear();
-			LoadTrades(filePath,testTradeMap);
+			LoadTrades(newPath,testTradeMap);
 		}
 		
 		public void LoadTrades(string filePath, Dictionary<string,List<TradeInfo>> tempTrades) {

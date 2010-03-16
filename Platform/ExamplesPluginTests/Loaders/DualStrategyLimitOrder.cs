@@ -47,6 +47,7 @@ namespace Loaders
 		public DualStrategyLimitOrder() {
 			Symbols = "USD/JPY,EUR/USD";
 			ShowCharts = false;
+			StoreKnownGood = false;
 			BreakPoint.SetBarBreakPoint(15);
 			BreakPoint.SetSymbolConstraint("EUR/USD");
 		}
@@ -84,15 +85,15 @@ namespace Loaders
 		
 		[Test]
 		public void VerifyCurrentEquity() {
-			Assert.AreEqual( 5887.80D,portfolio.Performance.Equity.CurrentEquity,"current equity");
+			Assert.AreEqual( 6340.30D,Math.Round(portfolio.Performance.Equity.CurrentEquity,2),"current equity");
 		}
 		[Test]
 		public void VerifyOpenEquity() {
-			Assert.AreEqual( -493.20D,portfolio.Performance.Equity.OpenEquity,"open equity");
+			Assert.AreEqual( -496.40D,portfolio.Performance.Equity.OpenEquity,"open equity");
 		}
 		[Test]
 		public void VerifyClosedEquity() {
-			Assert.AreEqual( 6381,portfolio.Performance.Equity.ClosedEquity,"closed equity");
+			Assert.AreEqual( 6836.70,Math.Round(portfolio.Performance.Equity.ClosedEquity,2),"closed equity");
 		}
 		[Test]
 		public void VerifyStartingEquity() {
@@ -163,7 +164,8 @@ namespace Loaders
 			properties.Engine.RealtimeOutput = false;
 			foreach( var symbol in properties. Starter.SymbolProperties) {
 				string name = "ExampleOrderStrategy+" + symbol.Symbol;
-				Strategy strategy = CreateStrategy("ExampleOrderStrategy",name);
+				ExampleOrderStrategy strategy = (ExampleOrderStrategy) CreateStrategy("ExampleOrderStrategy",name);
+				strategy.Multiplier = 10D;
 				strategy.SymbolDefault = symbol.Symbol;
 				AddDependency("Portfolio",strategy);
 			}

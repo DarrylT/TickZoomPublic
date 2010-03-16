@@ -45,6 +45,8 @@ namespace Loaders
 		ExampleOrderStrategy strategy;
 		public LimitOrderTest() {
 			Symbols = "USD/JPY";
+			StoreKnownGood = false;
+			ShowCharts = false;
 		}
 			
 		[TestFixtureSetUp]
@@ -62,7 +64,7 @@ namespace Loaders
 	    		starter.CreateChartCallback = new CreateChartCallback(HistoricalCreateChart);
 	    		starter.ShowChartCallback = new ShowChartCallback(HistoricalShowChart);
 				// Run the loader.
-				ExampleLimitOrderLoader loader = new ExampleLimitOrderLoader();
+				TestLimitOrderLoader loader = new TestLimitOrderLoader();
 	    		starter.Run(loader);
 	
 	    		// Get the stategy
@@ -76,7 +78,7 @@ namespace Loaders
 		
 		[Test]
 		public void VerifyCurrentEquity() {
-			Assert.AreEqual( 5920,strategy.Performance.Equity.CurrentEquity,"current equity");
+			Assert.AreEqual( 6380,strategy.Performance.Equity.CurrentEquity,"current equity");
 		}
 		[Test]
 		public void VerifyOpenEquity() {
@@ -84,7 +86,7 @@ namespace Loaders
 		}
 		[Test]
 		public void VerifyClosedEquity() {
-			Assert.AreEqual( 6410,strategy.Performance.Equity.ClosedEquity,"closed equity");
+			Assert.AreEqual( 6870,strategy.Performance.Equity.ClosedEquity,"closed equity");
 		}
 		[Test]
 		public void VerifyStartingEquity() {
@@ -104,6 +106,27 @@ namespace Loaders
 		[Test]
 		public void CompareBars() {
 			CompareChart(strategy,GetChart(strategy.SymbolDefault));
+		}
+	}
+	
+	public class TestLimitOrderLoader : ModelLoaderCommon
+	{
+		public TestLimitOrderLoader() {
+			/// <summary>
+			/// IMPORTANT: You can personalize the name of each model loader.
+			/// </summary>
+			category = "Example";
+			name = "Limit Order";
+			this.IsVisibleInGUI = false;
+		}
+		
+		public override void OnInitialize(ProjectProperties properties) {
+		}
+		
+		public override void OnLoad(ProjectProperties properties) {
+			ExampleOrderStrategy strategy = (ExampleOrderStrategy) CreateStrategy("ExampleOrderStrategy",name);
+			strategy.Multiplier = 10D;
+			TopModel = strategy;
 		}
 	}
 }

@@ -53,6 +53,7 @@ namespace MockProvider
 	//			BreakPoint.SetBarBreakPoint(15);
 			BreakPoint.SetSymbolConstraint("EUR/USD");
 			ShowCharts = false;
+			StoreKnownGood = false;
 		}
 		
 		public override Starter CreateStarter()
@@ -74,7 +75,7 @@ namespace MockProvider
 		
 		[Test]
 		public void CheckMockTradeCount() {
-			Assert.AreEqual(67,SyncTicks.MockTradeCount);
+			Assert.AreEqual(77,SyncTicks.MockTradeCount);
 		}
 	}
 }

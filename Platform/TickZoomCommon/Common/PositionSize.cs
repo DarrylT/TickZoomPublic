@@ -41,7 +41,6 @@ namespace TickZoom.Common
 	public class PositionSize : StrategySupport
 	{
 		double size = 1;
-		double previousSignal = 0;
 		PositionCommon position;
 		
 		public PositionSize(Strategy strategy) : base(strategy) {

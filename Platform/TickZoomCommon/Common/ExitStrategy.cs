@@ -201,25 +201,26 @@ namespace TickZoom.Common
 		}
 		
 		private void flattenSignal(LogicalOrder order, Tick tick) {
-            if (Strategy.Performance.GraphTrades)
-            {
-				double fillPrice = 0;
-				if( position.IsLong) {
-					order.Positions = context.Position.Size;
-					fillPrice = tick.Bid;
-				}
-				if( position.IsShort) {
-					order.Positions = context.Position.Size;
-					fillPrice = tick.Ask;
-				}
-                Strategy.Chart.DrawTrade(order, fillPrice, 0);
-            }
-            position.Change(0);
-			CancelOrders();
-			if( controlStrategy) {
-				Strategy.Orders.Exit.ActiveNow.GoFlat();
-				strategySignal = 0;
-			}
+// Actual fills of exit strategy orders now handles via the OrderManager interceptor.
+//            if (Strategy.Performance.GraphTrades)
+//            {
+//				double fillPrice = 0;
+//				if( position.IsLong) {
+//					order.Positions = context.Position.Size;
+//					fillPrice = tick.Bid;
+//				}
+//				if( position.IsShort) {
+//					order.Positions = context.Position.Size;
+//					fillPrice = tick.Ask;
+//				}
+//                Strategy.Chart.DrawTrade(order, fillPrice, 0);
+//            }
+//            position.Change(0);
+//			CancelOrders();
+//			if( controlStrategy) {
+//				Strategy.Orders.Exit.ActiveNow.GoFlat();
+//				strategySignal = 0;
+//			}
 		}
 	
 		private void processTargetProfit(Tick tick) {

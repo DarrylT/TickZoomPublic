@@ -35,6 +35,8 @@ namespace TickZoom
 {
 	public class ExampleOrderStrategy : Strategy
 	{
+		double multiplier = 1.0D;
+		double minimumTick;
 		
 		public ExampleOrderStrategy() {
 			Performance.GraphTrades = true;
@@ -44,8 +46,9 @@ namespace TickZoom
 		
 		public override void OnInitialize()
 		{
-			ExitStrategy.BreakEven = 30 * Data.SymbolInfo.MinimumTick;
-			ExitStrategy.StopLoss = 45 * Data.SymbolInfo.MinimumTick;
+			minimumTick = multiplier * Data.SymbolInfo.MinimumTick;
+			ExitStrategy.BreakEven = 30 * minimumTick;
+			ExitStrategy.StopLoss = 45 * minimumTick;
 			PositionSize.Size = 10000;
 		}
 		
@@ -57,29 +60,34 @@ namespace TickZoom
 			double close = Bars.Close[0];
 			if( Bars.Close[0] > Bars.Open[0]) {
 				if( Position.IsFlat) {
-					Orders.Enter.NextBar.BuyStop(Bars.Close[0] + 10 * Data.SymbolInfo.MinimumTick);
-					Orders.Exit.NextBar.SellStop(Bars.Close[0] - 10 * Data.SymbolInfo.MinimumTick);
+					Orders.Enter.NextBar.BuyStop(Bars.Close[0] + 10 * minimumTick);
+					Orders.Exit.NextBar.SellStop(Bars.Close[0] - 10 * minimumTick);
 				}
 				if( Position.IsShort) {
-					Orders.Exit.NextBar.BuyLimit(Bars.Close[0] - 3 * Data.SymbolInfo.MinimumTick);
+					Orders.Exit.NextBar.BuyLimit(Bars.Close[0] - 3 * minimumTick);
 				}
 			}
 			if( Position.IsLong) {
-				Orders.Exit.NextBar.SellStop(Bars.Close[0] - 10 * Data.SymbolInfo.MinimumTick);
+				Orders.Exit.NextBar.SellStop(Bars.Close[0] - 10 * minimumTick);
 			}
 			if( Bars.Close[0] < Bars.Open[0]) {
 				if( Position.IsFlat) {
-					Orders.Enter.NextBar.SellLimit(Bars.Close[0] + 30 * Data.SymbolInfo.MinimumTick);
-					ExitStrategy.StopLoss = 45 * Data.SymbolInfo.MinimumTick;
+					Orders.Enter.NextBar.SellLimit(Bars.Close[0] + 30 * minimumTick);
+					ExitStrategy.StopLoss = 45 * minimumTick;
 				}
 			}
 			if( Bars.Close[0] < Bars.Open[0] && Bars.Open[0] < Bars.Close[1]) {
 				if( Position.IsFlat) {
 					Orders.Enter.NextBar.SellMarket();
-					ExitStrategy.StopLoss = 15 * Data.SymbolInfo.MinimumTick;
+					ExitStrategy.StopLoss = 15 * minimumTick;
 				}
 			}
 			return true;
+		}
+		
+		public double Multiplier {
+			get { return multiplier; }
+			set { multiplier = value; }
 		}
 	}
 }

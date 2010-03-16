@@ -88,7 +88,7 @@ namespace TickZoom.Common
 		    preOrderManager = Factory.Engine.OrderManager(this);
 			postOrderManager = Factory.Engine.OrderManager(this);
 			postOrderManager.PostProcess = true;
-			postOrderManager.ChangePosition = position.Change;
+			postOrderManager.ChangePosition = exitStrategy.Position.Change;
 			postOrderManager.DoEntryOrders = false;
 			postOrderManager.DoExitOrders = false;
 			postOrderManager.DoExitStrategyOrders = true;
@@ -108,8 +108,8 @@ namespace TickZoom.Common
 			AddInterceptor(performance.Equity);
 			AddInterceptor(performance);
 			AddInterceptor(positionSize);
-//			AddInterceptor(postOrderManager);
 			AddInterceptor(exitStrategy);
+			AddInterceptor(postOrderManager);
 		}
 		
 		public override void OnEvent(EventContext context, EventType eventType, object eventDetail)
@@ -308,6 +308,10 @@ namespace TickZoom.Common
 		public bool IsActiveOrdersChanged {
 			get { return isActiveOrdersChanged; }
 			set { isActiveOrdersChanged = value; }
+		}
+		
+		public bool IsExitStrategyFlat {
+			get { return exitStrategy.Position.IsFlat && position.HasPosition; }
 		}
 	}
 	

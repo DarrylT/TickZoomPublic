@@ -287,11 +287,7 @@ namespace TickZoom.Common
 
 		public void OnStop()
 		{
-			try {
-				tickQueue.EnQueue(EventType.Terminate, (SymbolInfo)null);
-			} catch (QueueException) {
-				// Queue already terminated.
-			}
+			Close();
 		}
 
 		public void OnError(string error)
@@ -322,9 +318,9 @@ namespace TickZoom.Common
 			get { return isRealTime; }
 		}
 		
-		SymbolInfo customEventSymbol;
-		int customEventType;
-		object customEventDetail;
+		volatile SymbolInfo customEventSymbol;
+		volatile int customEventType;
+		volatile object customEventDetail;
 		public void OnCustomEvent(SymbolInfo symbol, int eventType, object eventDetail) {
 			customEventSymbol = symbol;
 			customEventType = eventType;

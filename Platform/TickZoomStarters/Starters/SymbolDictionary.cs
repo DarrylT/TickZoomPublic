@@ -332,6 +332,7 @@ namespace TickZoom.Common
       <symbol name=""AUD/USD"" universal=""AUDUSD"" />
       <symbol name=""USD/NOK"" universal=""USDNOK"" />
       <symbol name=""EUR/USD"" universal=""EURUSD"" >
+        <property name=""MinimumTick"" value=""0.00001"" />
         <property name=""UseSyntheticLimits"" value=""false"" />
         <property name=""UseSyntheticStops"" value=""false"" />
         <property name=""UseSyntheticMarkets"" value=""false"" />
@@ -349,7 +350,7 @@ namespace TickZoom.Common
       <symbol name=""AUD/CAD"" universal=""AUDCAD"" />
     </category>
     <category name=""2 Pip"">
-    <property name=""MinimumTick"" value=""0.01"" />
+    <property name=""MinimumTick"" value=""0.001"" />
       <symbol name=""USD/JPY"" >
         <property name=""UseSyntheticLimits"" value=""false"" />
         <property name=""UseSyntheticStops"" value=""false"" />

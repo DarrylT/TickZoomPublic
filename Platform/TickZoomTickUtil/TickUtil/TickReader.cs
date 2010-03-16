@@ -90,7 +90,7 @@ namespace TickZoom.TickUtil
 				throw new ApplicationException( "Mismatching symbol.");
 			}
 			if( detail.LastTime != StartTime) {
-				throw new ApplicationException( "Mismatching start time. Expectd: " + StartTime + " but was " + detail.LastTime);
+				throw new ApplicationException( "Mismatching start time. Expected: " + StartTime + " but was " + detail.LastTime);
 			}
 		}
 		

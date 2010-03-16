@@ -42,7 +42,6 @@ namespace TickZoom.Common
 		private Performance performance;
 		private bool isActiveOrdersChanged;
 		
-		
 		public Portfolio()
 		{
 			result = new Result(this);
@@ -325,7 +324,13 @@ namespace TickZoom.Common
 			get { return isActiveOrdersChanged; }
 			set { isActiveOrdersChanged = value; }
 		}
+		
 		public void RefreshActiveOrders() {
+			
+		}
+		
+		public bool IsExitStrategyFlat {
+			get { return false; }
 		}
 	}
 

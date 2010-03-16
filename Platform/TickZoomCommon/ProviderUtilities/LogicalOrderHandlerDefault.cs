@@ -208,7 +208,43 @@ namespace TickZoom.Common
 		}
 		
 		private void ComparePosition() {
-			double delta = desiredPosition - actualPosition;
+			double positionDelta = desiredPosition - actualPosition;
+			double pendingAdjustments = 0D;
+			for( int i=0; i<physicalOrders.Count; i++) {
+				var order = physicalOrders[i];
+				if( order.LogicalOrderId == 0) {
+					if( order.Type == OrderType.BuyMarket) {
+						pendingAdjustments += order.Size;
+					}
+					if( order.Type == OrderType.SellMarket) {
+						pendingAdjustments -= order.Size;
+					}
+					if( positionDelta > 0) {
+						if( pendingAdjustments > positionDelta) {
+							CancelBrokerOrder(order);
+							pendingAdjustments -= order.Size;
+						} else if( pendingAdjustments < 0) {
+							CancelBrokerOrder(order);
+							pendingAdjustments += order.Size;
+						}
+					}
+					if( positionDelta < 0) {
+						if( pendingAdjustments < positionDelta) {
+							CancelBrokerOrder(order);
+							pendingAdjustments += order.Size;
+						} else if( pendingAdjustments > 0) {
+							CancelBrokerOrder(order);
+							pendingAdjustments -= order.Size;
+						}
+					}
+					if( positionDelta == 0) {
+						CancelBrokerOrder(order);
+						pendingAdjustments += order.Type == OrderType.SellMarket ? order.Size : -order.Size;
+					}
+					physicalOrders.RemoveAt(i);	i--;
+				}
+			}
+			double delta = positionDelta - pendingAdjustments;
 			PhysicalOrder physical;
 			if( delta > 0) {
 				physical = new PhysicalOrderDefault(symbol,OrderType.BuyMarket,0,delta,0,null);

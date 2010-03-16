@@ -147,18 +147,18 @@ namespace TickZoom.Common
 			}
 		}
 
-		private void FlattenSignal(double price, Tick tick, int orderId)
+		private void FlattenSignal(double price, Tick tick, LogicalOrder order)
 		{
-			LogicalFillBinary fill = new LogicalFillBinary(0,price,tick.Time,orderId);
+			LogicalFillBinary fill = new LogicalFillBinary(0,price,tick.Time,order.Id);
 			changePosition(symbol, fill);
-			CancelExitOrders();
+			CancelExitOrders(order.TradeDirection);
 		}
 
-		public void CancelExitOrders()
+		public void CancelExitOrders(TradeDirection tradeDirection)
 		{
 			for (int i = activeOrders.Count - 1; i >= 0; i--) {
 				LogicalOrder order = activeOrders[i];
-				if (order.TradeDirection == TradeDirection.Exit) {
+				if (order.TradeDirection == tradeDirection) {
 					order.IsActive = false;
 				}
 			}
@@ -167,9 +167,8 @@ namespace TickZoom.Common
 		private void ProcessBuyMarket(LogicalOrder order, Tick tick)
 		{
 			LogMsg("Buy Market Exit at " + tick);
-			FlattenSignal(tick.Ask, tick, order.Id);
+			FlattenSignal(tick.Ask, tick, order);
 			TryDrawTrade(order, tick.Ask, position);
-			CancelExitOrders();
 		}
 		
 		private void TryDrawTrade(LogicalOrder order, double price, double position) {
@@ -181,18 +180,16 @@ namespace TickZoom.Common
 		private void ProcessSellMarket(LogicalOrder order, Tick tick)
 		{
 			LogMsg("Sell Market Exit at " + tick);
-			FlattenSignal(tick.Ask, tick, order.Id);
+			FlattenSignal(tick.Ask, tick, order);
 			TryDrawTrade(order, tick.Bid, position);
-			CancelExitOrders();
 		}
 
 		private void ProcessBuyStop(LogicalOrder order, Tick tick)
 		{
 			if (tick.Ask >= order.Price) {
 				LogMsg("Buy Stop Exit at " + tick);
-				FlattenSignal(tick.Ask, tick, order.Id);
+				FlattenSignal(tick.Ask, tick, order);
 				TryDrawTrade(order, tick.Ask, position);
-				CancelExitOrders();
 			}
 		}
 
@@ -209,9 +206,8 @@ namespace TickZoom.Common
 			}
 			if (isFilled) {
 				LogMsg("Buy Limit Exit at " + tick);
-				FlattenSignal(price, tick, order.Id);
+				FlattenSignal(price, tick, order);
 				TryDrawTrade(order, price, position);
-				CancelExitOrders();
 			}
 		}
 
@@ -219,9 +215,8 @@ namespace TickZoom.Common
 		{
 			if (tick.Bid <= order.Price) {
 				LogMsg("Sell Stop Exit at " + tick);
-				FlattenSignal(tick.Bid, tick, order.Id);
+				FlattenSignal(tick.Bid, tick, order);
 				TryDrawTrade(order, tick.Bid, position);
-				CancelExitOrders();
 			}
 		}
 
@@ -238,9 +233,8 @@ namespace TickZoom.Common
 			}
 			if (isFilled) {
 				LogMsg("Sell Stop Limit at " + tick);
-				FlattenSignal(price, tick, order.Id);
+				FlattenSignal(price, tick, order);
 				TryDrawTrade(order, price, position);
-				CancelExitOrders();
 			}
 		}
 
@@ -391,11 +385,14 @@ namespace TickZoom.Common
 			LogicalOrder filledOrder = null;
 			foreach( var order in strategy.ActiveOrders) {
 				if( order.Id == orderId) {
+					if( order.TradeDirection == TradeDirection.Entry && !doEntryOrders) return;
+					if( order.TradeDirection == TradeDirection.Exit && !doExitOrders) return;
+					if( order.TradeDirection == TradeDirection.ExitStrategy && !doExitStrategyOrders) return;
 					filledOrder = order;
 					if (drawTrade != null) {
 						drawTrade(filledOrder,fill.Price,fill.Position);
 					}
-					strategy.Position.Change(strategy.Data.SymbolInfo,fill);
+					changePosition(strategy.Data.SymbolInfo,fill);
 				}
 			}
 			if( filledOrder != null) {
