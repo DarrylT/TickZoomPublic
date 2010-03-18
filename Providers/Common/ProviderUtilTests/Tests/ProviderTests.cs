@@ -25,9 +25,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
 
 using NUnit.Framework;
-using System.Threading;
 using TickZoom.Api;
 
 namespace TickZoom.Test
@@ -50,6 +50,7 @@ namespace TickZoom.Test
 			if( !string.IsNullOrEmpty(providerAssembly)) {
 				SetProviderAssembly( providerAssembly);
 			}
+			SyncTicks.Enabled = true;
 		}
 			
 		[TestFixtureSetUp]
@@ -89,7 +90,8 @@ namespace TickZoom.Test
 		}
 		
 		[TearDown]
-		public void TearDown() {
+		public virtual void TearDown() {
+			if(debug) log.Debug("TearDown");
 	  		provider.SendEvent(verify,null,(int)EventType.Disconnect,null);	
 	  		provider.SendEvent(verify,null,(int)EventType.Terminate,null);		
 			int start = Environment.TickCount;
@@ -105,6 +107,7 @@ namespace TickZoom.Test
 				log.Error("These tasks still running after " + elapsed + "ms.");
 				log.Error(Factory.Parallel.GetStats());
 			}
+			Assert.AreEqual(0,Factory.Parallel.Tasks.Length,"running tasks");
 		}
 		
 		[Test]
@@ -158,18 +161,18 @@ namespace TickZoom.Test
   			Assert.AreEqual(1,processes.Length,"Number of provider service processes.");
 		}
 
-		private void CreateEntry( OrderType orderType, double expectedPositions, double actualPosition) {
-			CreateOrder(TradeDirection.Entry,orderType,expectedPositions,actualPosition);
+		private void CreateEntry( OrderType orderType, double desiredPositions, double actualPosition) {
+			CreateOrder(TradeDirection.Entry,orderType,desiredPositions,actualPosition);
 		}
-		private void CreateExit( OrderType orderType, double expectedPositions, double actualPosition) {
-			CreateOrder(TradeDirection.Exit,orderType,expectedPositions,actualPosition);
+		private void CreateExit( OrderType orderType, double desiredPositions, double actualPosition) {
+			CreateOrder(TradeDirection.Exit,orderType,desiredPositions,actualPosition);
 		}
-		private void CreateOrder( TradeDirection tradeDirection, OrderType orderType, double expectedPositions, double actualPosition) {
+		private void CreateOrder( TradeDirection tradeDirection, OrderType orderType, double desiredPositions, double actualPosition) {
   			List<LogicalOrder> list = new List<LogicalOrder>();
   			LogicalOrder order = Factory.Engine.LogicalOrder(symbol,null);
   			order.TradeDirection = tradeDirection;
   			order.Type = orderType;
-  			order.Positions = expectedPositions;
+  			order.Positions = desiredPositions;
   			order.IsActive = true;
   			list.Add(order);
   			provider.SendEvent(verify,symbol,(int)EventType.PositionChange,new PositionChangeDetail(symbol,actualPosition,list));
@@ -181,31 +184,35 @@ namespace TickZoom.Test
 			if(debug) log.Debug("===DemoConnectionTest===");
 			provider.SendEvent(verify,symbol,(int)EventType.StartSymbol,new StartSymbolDetail(TimeStamp.MinValue));
   			long count = verify.Verify(1,assertTick,symbol,25);
+  			double desiredPosition = 2;
+  			log.Warn("Sending 1");
+  			CreateEntry(OrderType.BuyMarket,desiredPosition,0);
+  			double actualPosition = verify.VerifyPosition(desiredPosition,symbol,secondsDelay);
+  			Assert.AreEqual(desiredPosition,actualPosition,"position");
 
-  			double expectedPosition = 2;
-  			CreateEntry(OrderType.BuyMarket,expectedPosition,0);
-  			double actualPosition = verify.VerifyPosition(expectedPosition,symbol,secondsDelay);
-  			Assert.AreEqual(expectedPosition,actualPosition,"position");
+  			desiredPosition = 0;
+  			log.Warn("Sending 2");
+  			CreateExit(OrderType.SellMarket,desiredPosition,actualPosition);
+  			actualPosition = verify.VerifyPosition(desiredPosition,symbol,secondsDelay);
+  			Assert.AreEqual(desiredPosition,actualPosition,"position");
 
-  			expectedPosition = 0;
-  			CreateExit(OrderType.SellMarket,expectedPosition,actualPosition);
-  			actualPosition = verify.VerifyPosition(expectedPosition,symbol,secondsDelay);
-  			Assert.AreEqual(expectedPosition,actualPosition,"position");
+  			desiredPosition = 2;
+  			log.Warn("Sending 3");
+  			CreateEntry(OrderType.BuyMarket,desiredPosition,actualPosition);
+  			actualPosition = verify.VerifyPosition(desiredPosition,symbol,secondsDelay);
+  			Assert.AreEqual(desiredPosition,actualPosition,"position");
 
-  			expectedPosition = 2;
-  			CreateEntry(OrderType.BuyMarket,expectedPosition,actualPosition);
-  			actualPosition = verify.VerifyPosition(expectedPosition,symbol,secondsDelay);
-  			Assert.AreEqual(expectedPosition,actualPosition,"position");
-
-  			expectedPosition = 2;
-  			CreateEntry(OrderType.BuyMarket,expectedPosition,actualPosition);
-  			actualPosition = verify.VerifyPosition(expectedPosition,symbol,secondsDelay);
-  			Assert.AreEqual(expectedPosition,actualPosition,"position");
+  			desiredPosition = 2;
+  			log.Warn("Sending 4");
+  			CreateEntry(OrderType.BuyMarket,desiredPosition,actualPosition);
+  			actualPosition = verify.VerifyPosition(desiredPosition,symbol,secondsDelay);
+  			Assert.AreEqual(desiredPosition,actualPosition,"position");
   			
-  			expectedPosition = 0;
-  			CreateExit(OrderType.SellMarket,expectedPosition,actualPosition);
-  			actualPosition = verify.VerifyPosition(expectedPosition,symbol,secondsDelay);
-  			Assert.AreEqual(expectedPosition,actualPosition,"position");
+  			desiredPosition = 0;
+  			log.Warn("Sending 5");
+  			CreateExit(OrderType.SellMarket,desiredPosition,actualPosition);
+  			actualPosition = verify.VerifyPosition(desiredPosition,symbol,secondsDelay);
+  			Assert.AreEqual(desiredPosition,actualPosition,"position");
 		}
 		
 		[Test]
@@ -325,6 +332,10 @@ namespace TickZoom.Test
 			logical.Price = price;
 			orders.Add(logical);
 			return logical;
+		}
+		
+		public static Log Log {
+			get { return log; }
 		}
 	}
 }

@@ -1,4 +1,4 @@
-#region Copyright
+﻿#region Copyright
 /*
  * Software: TickZoom Trading Platform
  * Copyright 2009 M. Wayne Walter
@@ -25,20 +25,15 @@ using System;
 
 namespace TickZoom.Api
 {
-	public interface Numbers {
-		int this[int position] {
-			get;
-		}
-		int Count {
-			get;
-		}
-		int BarCount {
-			get;
-		}
+	public interface ICircularArray 
+	{
+		int Count {get;}
+		int BarCount {get;}
 	}
-	
-	public interface Prices : CircularList<double> {
-	}
-	
 
+	public interface CircularList<T> : ICircularArray {
+		T this[int position] {
+			get;
+		}
+	}
 }

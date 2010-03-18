@@ -42,7 +42,8 @@ namespace TickZoom.Common
 		private static readonly Log log = Factory.Log.GetLogger(typeof(VerifyFeed));
 		private static readonly bool debug = log.IsDebugEnabled;
 		private TickQueue tickQueue = Factory.TickUtil.TickQueue(typeof(VerifyFeed));
-		private bool isRealTime = false;
+		private volatile bool isRealTime = false;
+		private TaskLock syncTicks;
 
 		public TickQueue TickQueue {
 			get { return tickQueue; }
@@ -80,6 +81,7 @@ namespace TickZoom.Common
 		{
 			if (debug)
 				log.Debug("VerifyFeed");
+			syncTicks = SyncTicks.GetTickSync(symbol.BinaryIdentifier);
 			int startTime = Environment.TickCount;
 			count = 0;
 			while (Environment.TickCount - startTime < timeout * 1000) {
@@ -159,6 +161,7 @@ namespace TickZoom.Common
 					assertTick(tick, lastTick, symbol.BinaryIdentifier);
 				}
 				lastTick.Copy(tick);
+				syncTicks.Unlock();
 				if (count >= expectedCount)
 					return true;
 			} catch (QueueException ex) {
@@ -253,6 +256,7 @@ namespace TickZoom.Common
 
 		public void OnRealTime(SymbolInfo symbol)
 		{
+			isRealTime = true;
 		}
 
 		public void OnHistorical(SymbolInfo symbol)

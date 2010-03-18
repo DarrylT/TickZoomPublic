@@ -103,6 +103,7 @@
     <Compile Include="EngineInterfaces\ArrowDirection.cs" />
     <Compile Include="EngineInterfaces\AsyncProviderAware.cs" />
     <Compile Include="EngineInterfaces\Bars.cs" />
+    <Compile Include="EngineInterfaces\CircularList.cs" />
     <Compile Include="EngineInterfaces\FastQueue.cs" />
     <Compile Include="EngineInterfaces\NewEventDetail.cs" />
     <Compile Include="EngineInterfaces\PositionChangeDetail.cs" />
