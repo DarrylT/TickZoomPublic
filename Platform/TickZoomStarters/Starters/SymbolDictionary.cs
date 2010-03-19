@@ -273,6 +273,10 @@ namespace TickZoom.Common
 #region UNIVERSAL_DICTIONARY
 		public static string UniversalDictionary = @"<?xml version=""1.0"" encoding=""utf-16""?>
 <category name=""Universal"">
+  <category name=""Synthetic"">
+    <property name=""DisplayTimeZone"" value=""Local"" />
+    	<symbol name=""TimeSync""/>
+  </category>
   <category name=""Stock"">
     <property name=""InstrumentType"" value=""Stock"" />
     <property name=""DisplayTimeZone"" value=""Local"" />
