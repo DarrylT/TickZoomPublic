@@ -115,12 +115,10 @@ namespace TickZoom.Common
 		public override void OnEvent(EventContext context, EventType eventType, object eventDetail)
 		{
 			base.OnEvent(context, eventType, eventDetail);
-			if( eventType == EventType.Tick) {
-				if( context.Position == null) {
-					context.Position = new PositionCommon(this);
-				}
-				context.Position.Copy(Position);
+			if( context.Position == null) {
+				context.Position = new PositionCommon(this);
 			}
+			context.Position.Copy(Position);
 		}
 		
 		[Obsolete("Please, use OnGetOptimizeResult() instead.",true)]
