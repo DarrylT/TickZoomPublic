@@ -38,7 +38,6 @@ namespace TickZoom.Common
 	/// of a price from the mean. High values indicate that prices
 	/// are very high compared to the average whereas low values
 	/// point out that prices are considerably lower than average.
-	/// FB 20091230: cleaned up
 	/// </summary>
 	public class CCI : IndicatorCommon
 	{
@@ -54,7 +53,7 @@ namespace TickZoom.Common
 		
 		public override void OnInitialize()
 		{
-			Name = "CCI";
+			Name = "CCI_New";
 			Drawing.Color = Color.Orange;
 			Drawing.PaneType = PaneType.Secondary;
 			Drawing.IsVisible = true;
@@ -73,6 +72,7 @@ namespace TickZoom.Common
 			for (int idx = Math.Min(Input.CurrentBar, Period - 1); idx >= 0; idx--)
 				mean += Math.Abs(Input[idx] - sma[0]);
 			this[0] = (Input[0] - sma[0]) / (mean == 0 ? 1 : (0.015 * (mean / Math.Min(Period, Input.CurrentBar + 1))));
+			double result = this[0];
 		}
 
 		public int Period {

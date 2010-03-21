@@ -32,7 +32,6 @@ namespace TickZoom.Common
 	/// that prior value. For 5 bar WMA the current bar is multiplied by 5, the previous
 	/// one by 4, and so on, down to 1 for the final value. WMA divides the result by the
 	/// total of the multipliers for the average.
-	/// FB 20091230: cleaned up
 	/// </summary>
 	public class WMA : IndicatorCommon
 	{
@@ -46,7 +45,7 @@ namespace TickZoom.Common
 		}
 		
 		public override void OnInitialize() {
-			Name = "WMA";
+			Name = "WMA_New";
 			Drawing.Color = Color.Brown;
 			Drawing.PaneType = PaneType.Primary;
 			Drawing.IsVisible = true;
@@ -55,15 +54,13 @@ namespace TickZoom.Common
 		public override void Update() {
 			double sum = 0;
 			int count = 0;
-			if( Count < period + 1) this[0] = Input[0];
-			else {
-				for( int i = 0; i< period; i++) {
-					int mult = period - i;
-					sum += Input[i] * (period - i);
-					count += period - i;
-				}
-				this[0] = sum / count;
+			for( int i = 0; i< period; i++) {
+				int mult = period - i;
+				sum += Input[i] * (period - i);
+				count += period - i;
 			}
+			this[0] = sum / count;
+			double result = this[0];
 		}
 		
 		public int Period {

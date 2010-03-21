@@ -47,14 +47,15 @@ namespace TickZoom.Indicators
 			tema = new TEMA(bars.Close,14);
 			Assert.IsNotNull(tema, "constructor");
 			tema.IntervalDefault = Intervals.Day1;
-			for(int j=0; j<tema.Chain.Dependencies.Count; j++) {
-				Model formula = (Model) tema.Chain.Dependencies[j].Model;
-				formula.Bars = bars;
-				formula.OnInitialize();
-			}
 			tema.Bars = bars;
 			tema.OnConfigure();
 			tema.OnInitialize();
+			for(int j=0; j<tema.Chain.Dependencies.Count; j++) {
+				Model formula = (Model) tema.Chain.Dependencies[j].Model;
+				formula.Bars = bars;
+				formula.OnConfigure();
+				formula.OnInitialize();
+			}
 		}
 		
 		[Test]

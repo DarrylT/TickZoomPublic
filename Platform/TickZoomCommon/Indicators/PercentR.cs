@@ -1,4 +1,4 @@
-#region Copyright
+﻿#region Copyright
 /*
  * Software: TickZoom Trading Platform
  * Copyright 2009 M. Wayne Walter
@@ -28,15 +28,14 @@ using TickZoom.Api;
 namespace TickZoom.Common
 {
 	/// <summary>
-	/// Description of SMA.
+	/// Developed by Larry Williams, the Williams %R (pronounced "percent R") indicator 
+	/// is a momentum oscillator used to measure overbought and oversold levels. It's very 
+	/// similar to the Stochastic Oscillator except that the %R is plotted upside-down on 
+	/// a negative scale from 0 to -100 and has no internal smoothing.
 	/// </summary>
 	public class PercentR : IndicatorCommon
 	{
-		int period;
-		
-		public PercentR() : this(5)
-		{
-		}
+		int period = 13;
 		
 		public PercentR(int period)
 		{
@@ -47,17 +46,17 @@ namespace TickZoom.Common
 			Drawing.Color = Color.Blue;
 			Drawing.PaneType = PaneType.Secondary;
 			Drawing.IsVisible = true;
+			Drawing.ScaleMax = 0;
+			Drawing.ScaleMin = -100;
 		}
 		
-		public override bool OnIntervalClose() {
-			double high = Formula.Highest(Bars.High,period);
-			double low = Formula.Lowest(Bars.Low,period);
-			double last = Bars.Close[0];
-			double result = (last - low) * 100 / (high - low + 1);
-			this[0] = result;
-			
-			return true;
+		public override void Update() {
+			double highestH = Formula.Highest(Bars.High, period);
+			double lowestL = Formula.Lowest(Bars.Low, period);
+			double last = Bars.Close[1];
+			this[0] = -100 * ((highestH - last) / (highestH - lowestL));
 		}
+		
 		public int Period {
 			get { return period; }
 			set { period = value; }

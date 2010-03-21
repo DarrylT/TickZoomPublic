@@ -25,34 +25,40 @@ using System;
 using System.Drawing;
 using TickZoom.Api;
 
+
 namespace TickZoom.Common
 {
 	/// <summary>
-	/// Exponential Moving Average (EMA), a basic recursive MA. 
-	/// FB 20091230: cleaned up
+	/// Exponential Moving Average (EMA).
 	/// </summary>
 	public class EMA : IndicatorCommon
 	{
-		int period = 13;
+		int period;
 
-		public EMA(object anyPrice, int period)	{
+		public EMA(object anyPrice, int period)
+		{
 			AnyInput = anyPrice;
 			StartValue = 0;
 			this.period = period;
 		}
 		
-		public override void OnInitialize()	{
-			Name = "EMA";
+		public override void OnInitialize()
+		{
+			Name = "EMA_New";
 			Drawing.Color = Color.Green;
 			Drawing.PaneType = PaneType.Primary;
 			Drawing.IsVisible = true;
-			Drawing.GroupName = "EMA";
-			Drawing.GraphType = GraphType.Line;
 		}
 
 		public override void Update() {
-			if(Count < period + 1) this[0] = Input[0];
-			else this[0] = Input[0] * (2 / (period + 1)) + this[1] * (1 - (2 / (period + 1)));
+			if( Count == 1) {
+				this[0] = Input[0];
+			} else {
+				double last = this[1];
+				double curr = Input[0];
+				this[0] = Input[0] * (2D / (1D + period)) + (1D - (2D / (1D + period))) * last;
+			}
+			double result = this[0];
 		}
 		
 		public int Period {

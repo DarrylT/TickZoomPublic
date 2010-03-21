@@ -50,7 +50,7 @@ namespace TickZoom.Common
 
 		public override void OnInitialize() {
 			Name = "TEMA";
-			Drawing.Color = Color.Blue;
+			Drawing.Color = Color.LightBlue;
 			Drawing.PaneType = PaneType.Primary;
 			Drawing.IsVisible = true;
 			E1 = Formula.EMA(Input, Period);
@@ -60,6 +60,7 @@ namespace TickZoom.Common
 		
 		public override void Update() {
 			this[0] = (3 * E1[0] - 3 * E2[0] + E3[0]);
+			double result = this[0];
 		}
 
 		public int Period {

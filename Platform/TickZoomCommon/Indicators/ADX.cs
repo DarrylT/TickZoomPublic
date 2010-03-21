@@ -27,7 +27,13 @@ using TickZoom.Api;
 namespace TickZoom.Common
 {
 	/// <summary>
-	/// Description of TEMA.
+	/// The Average Directional Movement Index (ADX) is a 
+	/// momentum indicator developed by J. Welles Wilder and described in his 
+	/// book "New Concepts in Technical Trading Systems", written in 1978. 
+	/// The ADX is constructed from two other Wilders' indicators: the Positive Directional indicator (+DI) 
+	/// and the Negative Directional Indicator (-DI). The +DI and -DI indicators are commonly referred to 
+	/// as the Directional Movement Index. Combining the +/-DI and applying a Wilders() smoothing 
+	/// filter results in the final ADX value.
 	/// </summary>
 	public class ADX : IndicatorCommon
 	{
@@ -43,11 +49,6 @@ namespace TickZoom.Common
 		private Doubles			sumDmMinus;
 		private Doubles			sumTr;
 		private Doubles			tr;
-
-		public ADX() : this(5)
-		{
-			
-		}
 		
 		public ADX(int period)
 		{
