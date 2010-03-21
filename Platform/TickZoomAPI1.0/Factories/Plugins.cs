@@ -82,9 +82,14 @@ namespace TickZoom.Api
 		public Serializer GetSerializer( int eventType) {
 			for( int i=0; i<serializers.Count; i++) {
 				Type type = serializers[i];
-				Serializer serializer = (Serializer)Activator.CreateInstance(type);
-				if( serializer.EventType == eventType) {
-					return serializer;
+				Serializer serializer = null;
+				try { 
+					serializer = (Serializer)Activator.CreateInstance(type);
+					if( serializer.EventType == eventType) {
+						return serializer;
+					}
+				} catch( Exception ex) {
+					log.Warn("stale serializer found. Coninuing. Error message: " + ex.Message);
 				}
 			}
 			throw new ApplicationException("Serializer for " + (EventType) eventType + " not found.");

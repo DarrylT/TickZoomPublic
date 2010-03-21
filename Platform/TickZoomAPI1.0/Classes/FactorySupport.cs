@@ -42,39 +42,34 @@ namespace TickZoom.Api
 
 		public FactorySupport() {
 			Assembly.GetExecutingAssembly().GetName().Version = new Version();
+			string path = GetShadowCopyFolder();
+			if( Directory.Exists(path)) {
+				int startTime = Environment.TickCount;
+				bool isDeleted = false;
+				while( !isDeleted && Environment.TickCount - startTime < 2000) {
+					try { 
+						Directory.Delete(path,true);
+						isDeleted = true;
+					} catch( Exception ex) {
+						LogMsg("warning: error removing shadow copy folder: " + GetShadowCopyFolder() + ": " + ex.Message);
+					}
+				}
+			}
+			Directory.CreateDirectory(path);
 		}
-		internal static void LogMsg(string message) {
+		
+		internal void LogMsg(string message) {
 			System.Diagnostics.Debug.WriteLine(message);
             Console.WriteLine(
 			AppDomain.CurrentDomain.FriendlyName+":"+
 				message);
 		}
 		
-		public static object Load( Type type, string assemblyName, params object[] args)
+		public object Load( Type type, string assemblyName, params object[] args)
 		{
             LogMsg("Attempting Load of " + type + " from " + assemblyName);
-//            SetupResolver();
 			errorCount = 0;
-			string commandLinePath = "";
-			string currentDirectoryPath = "";
-	        // This loads plugins from the installation folder
-	        // so all the common models and modelloaders get loaded.
-	        string[] commandLineParts = Environment.GetCommandLineArgs();
-	        if( commandLineParts.Length > 1) {
-		        string exeName = commandLineParts[1].Trim();
-	            int length = exeName.Length;
-	            if (length > 0)
-	            {
-	            	try { 
-				        FileInfo fileInfo = new FileInfo(exeName);
-				        commandLinePath = fileInfo.DirectoryName;
-	            	} catch( Exception ex) {
-	            		throw new ApplicationException( exeName + " failed FineInfo ", ex);
-	            	}
-		        }
-	        }
-            
-            currentDirectoryPath = System.Environment.CurrentDirectory;
+			string currentDirectoryPath = System.Environment.CurrentDirectory;
             
             LogMsg("Environment.CurrentDirectory = " + currentDirectoryPath);
 
@@ -83,28 +78,29 @@ namespace TickZoom.Api
 	            if( obj == null && !string.IsNullOrEmpty(currentDirectoryPath)) {
 	            	obj = Load( currentDirectoryPath, type, assemblyName, false, args);
             	}
-	            if( obj == null && !string.IsNullOrEmpty(commandLinePath)) {
-		            obj = Load( commandLinePath, type, assemblyName, false, args);
-	            }
 	            if( obj == null && !string.IsNullOrEmpty(currentDirectoryPath)) {
 	            	obj = Load( currentDirectoryPath, type, assemblyName, true, args);
-	            }
-	            if( obj == null && !string.IsNullOrEmpty(commandLinePath)) {
-		            obj = Load( commandLinePath, type, assemblyName, true, args);
 	            }
             } catch( Exception ex) {
             	// if not found in main bin folder, look in the update folder
             	LogMsg("Individual load failed: " + ex.Message);
             }
             if( obj == null) {
-            	string message = "Sorry, type " + type.Name + " was not found in any assembly named, " + assemblyName + ", in " + currentDirectoryPath + " or " + commandLinePath;
+            	string message = "Sorry, type " + type.Name + " was not found in any assembly named, " + assemblyName + ", in " + currentDirectoryPath;
             	LogMsg(message);
 	            throw new Exception(message);
             }
             return obj;
 		}
 		
-		private static object Load( string path, Type type, string partialName, bool runUpdate, params object[] args) {
+		private string GetShadowCopyFolder() {
+			return System.Environment.CurrentDirectory+
+				Path.DirectorySeparatorChar+
+				"ShadowCopy"+
+				Path.DirectorySeparatorChar;
+		}
+		
+		private object Load( string path, Type type, string partialName, bool runUpdate, params object[] args) {
 			string internalName = partialName;
 			
 	        LogMsg("Current version : " + currentVersion);
@@ -150,15 +146,18 @@ namespace TickZoom.Api
 					
 					// Create shadow copy.
 					string fileName = Path.GetFileName(fullPath);
-					string shadowPath = path+Path.DirectorySeparatorChar+fileName;
-					if( shadowPath != fullPath) {
+					string fileDirectory = Path.GetDirectoryName(fullPath);
+					string loadPath = fullPath;
+					if( fileDirectory != System.Environment.CurrentDirectory) {
 						try {
+							string shadowPath = GetShadowCopyFolder() + fileName;
 							File.Copy(fullPath,shadowPath,true);
+							loadPath = shadowPath;
 						} catch( IOException ex) {
 							LogMsg("Unable to create shadow copy of " + fileName + ". Actual error: '" + ex.GetType() + ": " + ex.Message + "'. Ignoring. Continuing.");
 						}
 					}
-		            Assembly assembly = Assembly.LoadFrom(shadowPath);
+		            Assembly assembly = Assembly.LoadFrom(loadPath);
 		            
 		            object obj = InstantiateObject(assembly,type,args);
 		            if( obj != null) return obj;
@@ -183,7 +182,7 @@ namespace TickZoom.Api
 	    	return null;
 		}
 
-		private static object InstantiateObject(Assembly assembly, Type type, object[] args) {
+		private object InstantiateObject(Assembly assembly, Type type, object[] args) {
             foreach (Type t in assembly.GetTypes())
             {
             	if (t.IsClass && !t.IsAbstract && !t.IsInterface) {
@@ -204,7 +203,8 @@ namespace TickZoom.Api
             }
             return null;
 		}
-		private static Version GetCurrentVersion( string[] files, string partialName) {
+		
+		private Version GetCurrentVersion( string[] files, string partialName) {
             
 	        Version currentVersion = new Version(0,0,0,0);
 		    foreach (String filename in files)
@@ -224,7 +224,7 @@ namespace TickZoom.Api
 		    return currentVersion;
 		}
 		
-		private static string GetHighestModel( string[] files, string partialName, string engineModel, Version maxVersion) {
+		private string GetHighestModel( string[] files, string partialName, string engineModel, Version maxVersion) {
             
 			string value = null;
 		    foreach (String filename in files)
@@ -247,7 +247,7 @@ namespace TickZoom.Api
 		    return value;
 		}
 		
-		public static void SetupResolver() {
+		public void SetupResolver() {
 			if( !IsResolverSetup) {
 				lock(locker) {
 					if( !IsResolverSetup) {
@@ -260,7 +260,7 @@ namespace TickZoom.Api
 			}
 		}
 		
-		private static Assembly TZResolveEventHandler(object sender, ResolveEventArgs args)
+		private Assembly TZResolveEventHandler(object sender, ResolveEventArgs args)
 		{
 			LogMsg("===============================");
 			LogMsg("WARN: ResolveEventHandle called");

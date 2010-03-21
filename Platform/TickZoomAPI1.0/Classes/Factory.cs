@@ -50,20 +50,30 @@ namespace TickZoom.Api
 		private static SymbolFactory symbolFactory;
 		private static StarterFactory starterFactory;
 		private static UtilityFactory utilityFactory;
-		
-		
-		static Factory() {
-			locker = new object();
-		}
+		private static FactorySupport factorySupport;
 		
 		private static object Locker {
-			get { if( locker == null) {
+			get {
+				if( locker == null) {
 					locker = new object();
 				}
 				return locker;
 			}
 		}
 	
+		public static FactorySupport FactorySupport {
+			get {
+				if( factorySupport == null) {
+					lock(Locker) {
+						if( factorySupport == null) {
+							factorySupport = new FactorySupport();
+						}
+					}
+				}
+				return factorySupport;
+			}
+		}
+		
 		public static EngineFactory Engine {
 			get { 
 				if( engineFactory == null) {
