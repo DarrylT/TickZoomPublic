@@ -1,4 +1,4 @@
-#region Copyright
+﻿#region Copyright
 /*
  * Software: TickZoom Trading Platform
  * Copyright 2009 M. Wayne Walter
@@ -28,44 +28,50 @@ using TickZoom.Api;
 namespace TickZoom.Common
 {
 	/// <summary>
-	/// The Weighted Moving Average indicator weights the more recent value greater
-	/// that prior value. For 5 bar WMA the current bar is multiplied by 5, the previous
-	/// one by 4, and so on, down to 1 for the final value. WMA divides the result by the
-	/// total of the multipliers for the average.
-	/// FB 20091230: cleaned up
+	/// The Hull Moving Average (HMA), developed by Alan Hull, is an extremely 
+	/// fast and smooth moving average. In fact, the HMA almost eliminates lag 
+	/// altogether and manages to improve smoothing at the same time.
+	/// FB 20091230: Created
 	/// </summary>
-	public class WMA : IndicatorCommon
+	public class HMA : IndicatorCommon
 	{
+		WMA W1;
+		WMA W2;
+		WMA W3;
 		int period = 14;
+		double halfPeriod;
+		double sqrtPeriod;
+		IndicatorCommon temp;
 		
-		public WMA(object anyPrice, int period)
-		{
+		public HMA(object anyPrice, int period) {
 			AnyInput = anyPrice;
 			StartValue = 0;
 			this.period = period;
 		}
-		
+
 		public override void OnInitialize() {
-			Name = "WMA";
-			Drawing.Color = Color.Brown;
+			Name = "HMA";
+			Drawing.Color = Color.Green;
 			Drawing.PaneType = PaneType.Primary;
 			Drawing.IsVisible = true;
+			
+			temp = Formula.Indicator();
+			halfPeriod = (Math.Ceiling(Convert.ToDouble(period/2)) - (Convert.ToDouble(period/2)) <= 0.5) ? Math.Ceiling(Convert.ToDouble(period/2)) : Math.Floor(Convert.ToDouble(period/2));
+			sqrtPeriod = (Math.Ceiling(Math.Sqrt(Convert.ToDouble(period))) - Math.Sqrt(Convert.ToDouble(period)) <= 0.5) ? Math.Ceiling(Math.Sqrt(Convert.ToDouble(period))) : Math.Floor(Math.Sqrt(Convert.ToDouble(period)));
+			W1 = Formula.WMA(Input, Convert.ToInt32(halfPeriod));
+			W2 = Formula.WMA(Input, period);
 		}
-
+				
 		public override void Update() {
-			double sum = 0;
-			int count = 0;
-			if( Count < period + 1) this[0] = Input[0];
-			else {
-				for( int i = 0; i< period; i++) {
-					int mult = period - i;
-					sum += Input[i] * (period - i);
-					count += period - i;
-				}
-				this[0] = sum / count;
+			if (Count < period + 1 ) {
+				this[0] = Input[0];
+			} else {
+				temp[0] = 2 * W1[0] - W2[0];
+				W3 = Formula.WMA(temp, Convert.ToInt32(sqrtPeriod));
+				this[0] = W3[0];
 			}
 		}
-		
+
 		public int Period {
 			get { return period; }
 			set { period = value; }

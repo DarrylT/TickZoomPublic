@@ -25,50 +25,43 @@ using System;
 using System.Drawing;
 using TickZoom.Api;
 
+
 namespace TickZoom.Common
 {
-	/// <summary>
-	/// The Weighted Moving Average indicator weights the more recent value greater
-	/// that prior value. For 5 bar WMA the current bar is multiplied by 5, the previous
-	/// one by 4, and so on, down to 1 for the final value. WMA divides the result by the
-	/// total of the multipliers for the average.
-	/// FB 20091230: cleaned up
-	/// </summary>
-	public class WMA : IndicatorCommon
+	public class IFT : IndicatorCommon
 	{
-		int period = 14;
+		int period = 5;
+		IndicatorCommon value1;
+		IndicatorCommon value2;
+		RSI rsi;
+		WMA wma;
 		
-		public WMA(object anyPrice, int period)
-		{
+		public IFT(object anyPrice, int period) {
 			AnyInput = anyPrice;
 			StartValue = 0;
 			this.period = period;
 		}
 		
-		public override void OnInitialize() {
-			Name = "WMA";
-			Drawing.Color = Color.Brown;
-			Drawing.PaneType = PaneType.Primary;
+		public override void OnInitialize()
+		{
+			Name = "IFT";
+			Drawing.PaneType = PaneType.Secondary;
 			Drawing.IsVisible = true;
-		}
-
-		public override void Update() {
-			double sum = 0;
-			int count = 0;
-			if( Count < period + 1) this[0] = Input[0];
-			else {
-				for( int i = 0; i< period; i++) {
-					int mult = period - i;
-					sum += Input[i] * (period - i);
-					count += period - i;
-				}
-				this[0] = sum / count;
-			}
+			
+			value1 = Formula.Indicator();
+			value2 = Formula.Indicator();
+			rsi = Formula.RSI(Input, period);
+			wma = Formula.WMA(value1, period);
+			Formula.Line(0.5, Color.LightGreen);
+			Formula.Line(-0.5, Color.Red);
 		}
 		
-		public int Period {
-			get { return period; }
-			set { period = value; }
+		public override void Update()
+		{
+			Drawing.Color = this[1] < this[0] ? Color.Green : this[1] > this[0] ? Color.Red : Color.Black;
+			value1[0] = 0.1 * (rsi[0] - 50);
+			value2[0] = 2 * wma[0];
+			this[0] = (Math.Exp(value2[0]) - 1)/(Math.Exp(value2[0]) + 1);
 		}
 	}
 }

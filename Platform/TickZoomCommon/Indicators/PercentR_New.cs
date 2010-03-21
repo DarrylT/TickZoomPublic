@@ -1,4 +1,4 @@
-#region Copyright
+﻿#region Copyright
 /*
  * Software: TickZoom Trading Platform
  * Copyright 2009 M. Wayne Walter
@@ -28,42 +28,33 @@ using TickZoom.Api;
 namespace TickZoom.Common
 {
 	/// <summary>
-	/// The Weighted Moving Average indicator weights the more recent value greater
-	/// that prior value. For 5 bar WMA the current bar is multiplied by 5, the previous
-	/// one by 4, and so on, down to 1 for the final value. WMA divides the result by the
-	/// total of the multipliers for the average.
-	/// FB 20091230: cleaned up
+	/// Developed by Larry Williams, the Williams %R (pronounced "percent R") indicator 
+	/// is a momentum oscillator used to measure overbought and oversold levels. It's very 
+	/// similar to the Stochastic Oscillator except that the %R is plotted upside-down on 
+	/// a negative scale from 0 to -100 and has no internal smoothing.
 	/// </summary>
-	public class WMA : IndicatorCommon
+	public class PercentR_New : IndicatorCommon
 	{
-		int period = 14;
+		int period = 13;
 		
-		public WMA(object anyPrice, int period)
+		public PercentR_New(int period)
 		{
-			AnyInput = anyPrice;
-			StartValue = 0;
 			this.period = period;
 		}
 		
 		public override void OnInitialize() {
-			Name = "WMA";
-			Drawing.Color = Color.Brown;
-			Drawing.PaneType = PaneType.Primary;
+			Drawing.Color = Color.Blue;
+			Drawing.PaneType = PaneType.Secondary;
 			Drawing.IsVisible = true;
+			Drawing.ScaleMax = 0;
+			Drawing.ScaleMin = -100;
 		}
-
+		
 		public override void Update() {
-			double sum = 0;
-			int count = 0;
-			if( Count < period + 1) this[0] = Input[0];
-			else {
-				for( int i = 0; i< period; i++) {
-					int mult = period - i;
-					sum += Input[i] * (period - i);
-					count += period - i;
-				}
-				this[0] = sum / count;
-			}
+			double highestH = Formula.Highest(Bars.High, period);
+			double lowestL = Formula.Lowest(Bars.Low, period);
+			double last = Bars.Close[1];
+			this[0] = -100 * ((highestH - last) / (highestH - lowestL));
 		}
 		
 		public int Period {

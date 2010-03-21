@@ -1,4 +1,4 @@
-#region Copyright
+﻿#region Copyright
 /*
  * Software: TickZoom Trading Platform
  * Copyright 2009 M. Wayne Walter
@@ -22,48 +22,42 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
+
 using TickZoom.Api;
 
 namespace TickZoom.Common
 {
 	/// <summary>
-	/// The Weighted Moving Average indicator weights the more recent value greater
-	/// that prior value. For 5 bar WMA the current bar is multiplied by 5, the previous
-	/// one by 4, and so on, down to 1 for the final value. WMA divides the result by the
-	/// total of the multipliers for the average.
-	/// FB 20091230: cleaned up
+	/// Introduced by Welles Wilder in his book "New Concepts in Technical Trading Systems" (1978), 
+	/// the Average True Range (ATR) is a measure of a trading instrument's volatility. It measures 
+	/// the degree of price movement, not the direction or duration of the price movement.
 	/// </summary>
-	public class WMA : IndicatorCommon
+	public class ATR : IndicatorCommon
 	{
-		int period = 14;
+		int period;
+		SMA atr;
 		
-		public WMA(object anyPrice, int period)
+		public ATR(int period)
 		{
-			AnyInput = anyPrice;
-			StartValue = 0;
 			this.period = period;
+			Drawing.PaneType = PaneType.Secondary;
 		}
 		
-		public override void OnInitialize() {
-			Name = "WMA";
-			Drawing.Color = Color.Brown;
-			Drawing.PaneType = PaneType.Primary;
+		public override void OnInitialize()
+		{
+			Name = "ATR";
+			Drawing.Color = Color.Red;
+			Drawing.PaneType = PaneType.Secondary;
 			Drawing.IsVisible = true;
 		}
-
+		
 		public override void Update() {
-			double sum = 0;
-			int count = 0;
-			if( Count < period + 1) this[0] = Input[0];
-			else {
-				for( int i = 0; i< period; i++) {
-					int mult = period - i;
-					sum += Input[i] * (period - i);
-					count += period - i;
-				}
-				this[0] = sum / count;
-			}
+			double trueRange = Math.Max(Bars.High[0] - Bars.Low[0], Math.Max(Math.Abs(Bars.High[0] - Bars.Close[1]), Math.Abs(Bars.Close[1] - Bars.Low[0])));
+			atr = new SMA(trueRange, period);
+			this[0] = atr[0];
 		}
 		
 		public int Period {

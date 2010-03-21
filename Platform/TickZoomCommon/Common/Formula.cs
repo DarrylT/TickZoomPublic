@@ -91,6 +91,36 @@ namespace TickZoom.Common
 		#endregion
 		
 		#region Convenience methods to create indicators
+		public CCI CCI(object obj, int period) {
+			CCI cci = new CCI(obj,period);
+			model.AddDependency(cci);
+			return cci;
+		}
+		
+		public DEMA DEMA(object obj, int period) {
+			DEMA dema = new DEMA(obj, period);
+			model.AddDependency(dema);
+			return dema;
+		}
+		
+		public EMA EMA(object obj, int period) {
+			EMA ema = new EMA(obj, period);
+			model.AddDependency(ema);
+			return ema;
+		}
+		
+		public HMA HMA(object obj, int period) {
+			HMA hma = new HMA(obj, period);
+			model.AddDependency(hma);
+			return hma;
+		}
+		
+		public PercentR PercentR(int period) {
+			PercentR percentR = new PercentR(period);
+			model.AddDependency(percentR);
+			return percentR;
+		}
+		
 		public RSI RSI(object obj, int period) {
 			RSI rsi = new RSI(obj,period);
 			model.AddDependency(rsi);
@@ -103,12 +133,24 @@ namespace TickZoom.Common
 			return sma;
 		}
 		
-		public CCI CCI(object obj, int period) {
-			CCI cci = new CCI(obj,period);
-			model.AddDependency(cci);
-			return cci;
+		public TEMA TEMA(object obj, int period) {
+			TEMA tema = new TEMA(obj, period);
+			model.AddDependency(tema);
+			return tema;
 		}
 		
+		public Wilder Wilder(object obj, int period) {
+			Wilder wilder = new Wilder(obj, period);
+			model.AddDependency(wilder);
+			return wilder;
+		}
+				
+		public WilderRSI WilderRSI(object obj, int period) {
+			WilderRSI wilderRSI = new WilderRSI(obj, period);
+			model.AddDependency(wilderRSI);
+			return wilderRSI;
+		}
+
 		public WMA WMA(object obj, int period) {
 			WMA wma = new WMA(obj,period);
 			model.AddDependency(wma);
@@ -170,6 +212,24 @@ namespace TickZoom.Common
 			return min;
 		}
 
+		public double HighestP(object _values, int length) {
+			Doubles values = model.Doubles(_values);
+			double hh = int.MinValue;
+			for (int i = 0; i < length; i++) {
+				if (values[i] > hh) hh = values[i];
+			}
+			return hh;
+		}
+
+		public double LowestP(object _values, int length) {
+			Doubles values = model.Doubles(_values);
+			double ll = int.MaxValue;
+			for (int i = 0; i < length; i++) {
+				if (values[i] < ll) ll = values[i];
+			}
+			return ll;
+		}
+		
 		public bool CrossesOver( object _price, double level) {
 			return CrossesOver( _price, 0, level);
 		}

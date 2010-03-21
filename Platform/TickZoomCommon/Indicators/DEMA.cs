@@ -1,4 +1,4 @@
-#region Copyright
+﻿#region Copyright
 /*
  * Software: TickZoom Trading Platform
  * Copyright 2009 M. Wayne Walter
@@ -28,44 +28,39 @@ using TickZoom.Api;
 namespace TickZoom.Common
 {
 	/// <summary>
-	/// The Weighted Moving Average indicator weights the more recent value greater
-	/// that prior value. For 5 bar WMA the current bar is multiplied by 5, the previous
-	/// one by 4, and so on, down to 1 for the final value. WMA divides the result by the
-	/// total of the multipliers for the average.
-	/// FB 20091230: cleaned up
+	/// Double Exponential Moving Average (DEMA). Developed by Patrick Mulloy and introduced 
+	/// in the February 1994 issue of Technical Analysis of Stocks & Commodities magazine.
+	/// DEMA was designed to lessen the lag of a regular exponential moving average. 
+	/// It is a composite of a single exponential MA and a double exponential MA that 
+	/// produces less lag than its two components individually.
+	/// FB 20091230: Created
 	/// </summary>
-	public class WMA : IndicatorCommon
+	public class DEMA : IndicatorCommon
 	{
+		EMA E1;
+		EMA E2;
 		int period = 14;
 		
-		public WMA(object anyPrice, int period)
-		{
+		public DEMA( object anyPrice, int period) {
 			AnyInput = anyPrice;
 			StartValue = 0;
 			this.period = period;
 		}
-		
+
 		public override void OnInitialize() {
-			Name = "WMA";
-			Drawing.Color = Color.Brown;
+			Name = "DEMA";
+			Drawing.Color = Color.Blue;
 			Drawing.PaneType = PaneType.Primary;
 			Drawing.IsVisible = true;
-		}
-
-		public override void Update() {
-			double sum = 0;
-			int count = 0;
-			if( Count < period + 1) this[0] = Input[0];
-			else {
-				for( int i = 0; i< period; i++) {
-					int mult = period - i;
-					sum += Input[i] * (period - i);
-					count += period - i;
-				}
-				this[0] = sum / count;
-			}
+			E1 = Formula.EMA(Input, Period);
+			E2 = Formula.EMA(E1, Period);
 		}
 		
+		public override void Update() {
+			if( Count < period + 1) this[0] = Input[0];
+			else this[0] = (2 * E1[0] - E2[0]);
+		}
+
 		public int Period {
 			get { return period; }
 			set { period = value; }

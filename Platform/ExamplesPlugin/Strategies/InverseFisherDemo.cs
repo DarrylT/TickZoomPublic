@@ -30,16 +30,16 @@ using TickZoom.Common;
 
 namespace TickZoom
 {
-	public class InverseFischerDemo : Strategy
+	public class InverseFisherDemo : Strategy
 	{
 		InverseFisherTransform ifsh;
-		public InverseFischerDemo() {
+		public InverseFisherDemo() {
 		}
 		
 		public override void OnInitialize()
 		{
 			ifsh = new InverseFisherTransform();
-			AddDependency(ifsh);
+			AddIndicator(ifsh);
 		}
 	}
 }

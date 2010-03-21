@@ -28,47 +28,41 @@ using TickZoom.Api;
 namespace TickZoom.Common
 {
 	/// <summary>
-	/// The Weighted Moving Average indicator weights the more recent value greater
-	/// that prior value. For 5 bar WMA the current bar is multiplied by 5, the previous
-	/// one by 4, and so on, down to 1 for the final value. WMA divides the result by the
-	/// total of the multipliers for the average.
-	/// FB 20091230: cleaned up
+	/// Exponential Moving Average (EMA).
 	/// </summary>
-	public class WMA : IndicatorCommon
+	public class EMA_New : IndicatorCommon
 	{
-		int period = 14;
-		
-		public WMA(object anyPrice, int period)
+		int period;
+
+		public EMA_New(object anyPrice, int period)
 		{
 			AnyInput = anyPrice;
 			StartValue = 0;
 			this.period = period;
 		}
 		
-		public override void OnInitialize() {
-			Name = "WMA";
-			Drawing.Color = Color.Brown;
+		public override void OnInitialize()
+		{
+			Name = "EMA_New";
+			Drawing.Color = Color.Green;
 			Drawing.PaneType = PaneType.Primary;
 			Drawing.IsVisible = true;
 		}
 
 		public override void Update() {
-			double sum = 0;
-			int count = 0;
-			if( Count < period + 1) this[0] = Input[0];
-			else {
-				for( int i = 0; i< period; i++) {
-					int mult = period - i;
-					sum += Input[i] * (period - i);
-					count += period - i;
-				}
-				this[0] = sum / count;
+			if( Count == 1) {
+				this[0] = Input[0];
+			} else {
+				double last = this[1];
+				this[0] = Input[0] * (2 / (1 + period)) + (1 - (2 / (1 + period))) * last;
 			}
+			double result = this[0];
 		}
 		
 		public int Period {
 			get { return period; }
 			set { period = value; }
 		}
+
 	}
 }

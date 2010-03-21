@@ -22,7 +22,7 @@
 #endregion
 
 using System;
-using System.IO;
+using System.Drawing;
 using TickZoom.Api;
 
 namespace TickZoom.Common
@@ -44,6 +44,9 @@ namespace TickZoom.Common
 		}
 		
 		public override void OnInitialize() {
+			Drawing.Color = Color.Blue;
+			Drawing.PaneType = PaneType.Secondary;
+			Drawing.IsVisible = true;
 		}
 		
 		public override bool OnIntervalClose() {

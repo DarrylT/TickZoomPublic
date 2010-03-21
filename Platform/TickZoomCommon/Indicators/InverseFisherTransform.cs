@@ -37,6 +37,7 @@ namespace TickZoom.Common
 		
 		public override void OnInitialize()
 		{
+			Name = "IFT";
 			// Display below the price chart
 			Drawing.PaneType = PaneType.Secondary;
 			// Display below the price chart

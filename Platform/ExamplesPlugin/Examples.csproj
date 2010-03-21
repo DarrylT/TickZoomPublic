@@ -81,6 +81,7 @@
     <Compile Include="Indicators\YearLow.cs" />
     <Compile Include="Indicators\YearMiddle.cs" />
     <Compile Include="Loaders\BenchmarkSimpleLoader.cs" />
+    <Compile Include="Loaders\ExampleChartIndicator.cs" />
     <Compile Include="Loaders\ExampleDataConverterLoader.cs" />
     <Compile Include="Loaders\ExampleMixedLoader.cs" />
     <Compile Include="Loaders\ExampleMultiSymbolLoader.cs" />
@@ -92,6 +93,7 @@
     <Compile Include="Loaders\ExampleSimulatedLoader.cs" />
     <Compile Include="Loaders\ExampleDualSymbolLoader.cs" />
     <Compile Include="Strategies\BreakoutTrend.cs" />
+    <Compile Include="Strategies\ChartIndicator.cs" />
     <Compile Include="Strategies\DOMSmooth.cs" />
     <Compile Include="Strategies\ExampleDataChecker.cs" />
     <Compile Include="Strategies\ExampleOrderStrategy.cs" />

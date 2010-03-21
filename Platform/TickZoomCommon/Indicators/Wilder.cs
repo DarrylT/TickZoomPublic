@@ -1,4 +1,4 @@
-#region Copyright
+﻿#region Copyright
 /*
  * Software: TickZoom Trading Platform
  * Copyright 2009 M. Wayne Walter
@@ -28,47 +28,38 @@ using TickZoom.Api;
 namespace TickZoom.Common
 {
 	/// <summary>
-	/// The Weighted Moving Average indicator weights the more recent value greater
-	/// that prior value. For 5 bar WMA the current bar is multiplied by 5, the previous
-	/// one by 4, and so on, down to 1 for the final value. WMA divides the result by the
-	/// total of the multipliers for the average.
-	/// FB 20091230: cleaned up
+	/// Wilder's Exponential Moving Average.
+	/// FB 20091230: Created
 	/// </summary>
-	public class WMA : IndicatorCommon
+	public class Wilder : IndicatorCommon
 	{
-		int period = 14;
+		int period = 13;
 		
-		public WMA(object anyPrice, int period)
-		{
+		public Wilder(object anyPrice, int period)	{
 			AnyInput = anyPrice;
 			StartValue = 0;
 			this.period = period;
 		}
 		
-		public override void OnInitialize() {
-			Name = "WMA";
-			Drawing.Color = Color.Brown;
+		public override void OnInitialize()	{
+			Name = "Wilder's EMA";
+			Drawing.Color = Color.Green;
 			Drawing.PaneType = PaneType.Primary;
 			Drawing.IsVisible = true;
+			Drawing.GroupName = "Wilder";
+			Drawing.GraphType = GraphType.Line;
 		}
 
 		public override void Update() {
-			double sum = 0;
-			int count = 0;
-			if( Count < period + 1) this[0] = Input[0];
-			else {
-				for( int i = 0; i< period; i++) {
-					int mult = period - i;
-					sum += Input[i] * (period - i);
-					count += period - i;
-				}
-				this[0] = sum / count;
-			}
+			if(Count < period + 1) this[0] = Input[0];
+			else this[0] = (Input[0] + (period - 1) * this[1]) / period;
+			
 		}
 		
 		public int Period {
 			get { return period; }
 			set { period = value; }
 		}
+
 	}
 }

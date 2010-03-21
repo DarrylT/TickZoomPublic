@@ -22,12 +22,18 @@
 #endregion
 
 using System;
+using System.Drawing;
 using TickZoom.Api;
 
 namespace TickZoom.Common
 {
 	/// <summary>
-	/// Description of TEMA.
+	/// Triple Exponential Moving Average (TEMA). Presented by Patrick Mulloy in 
+	/// the January 1994 issue of Technical Analysis of Stocks & Commodities magazine. 
+	/// TEMA has less lag than a Exponential Moving Average (EMA). It is not a simple
+	/// triple smoothing, but rather a composite of several EMAs.
+	/// Pseudocode:
+	/// TEMA = 3*EMA() -  3*EMA(EMA) + EMA(EMA(EMA))
 	/// </summary>
 	public class TEMA : IndicatorCommon
 	{
@@ -35,72 +41,25 @@ namespace TickZoom.Common
 		EMA E2;
 		EMA E3;
 		int period = 14;
-		Doubles price;
-		object anyPrice;
-		
-		public TEMA( ) : this( null, 5) {
-			
-		}
 		
 		public TEMA( object anyPrice, int period) {
-			this.anyPrice = anyPrice;
+			AnyInput = anyPrice;
+			StartValue = 0;
 			this.period = period;
-			RequestUpdate(Intervals.Second10);
 		}
 
 		public override void OnInitialize() {
-			if( anyPrice == null) {
-				price = Doubles(Bars.Close);
-			} else {
-				price = Doubles(anyPrice);
-			}
-			E1 = new EMA(period);
-			E2 = new EMA(period);
-			E3 = new EMA(period);
-			AddIndicator(E1);
-			AddIndicator(E2);
-			AddIndicator(E3);
+			Name = "TEMA";
+			Drawing.Color = Color.Blue;
+			Drawing.PaneType = PaneType.Primary;
+			Drawing.IsVisible = true;
+			E1 = Formula.EMA(Input, Period);
+			E2 = Formula.EMA(E1, Period);
+			E3 = Formula.EMA(E2, Period);
 		}
 		
-		public override bool OnProcessTick(Tick tick)
-		{
-			if( Chart.IsDynamicUpdate) {
-				UpdateAverage();
-			}
-			return true;
-		}
-		
-		public void Reset() {
-			double close = Bars.Close[0];
-			this[0] = close;
-			E1.Reset(close);
-			E2.Reset(close);
-			E3.Reset(close);
-		}
-		
-		public override bool OnIntervalClose(Interval interval)
-		{
-			if( interval.Equals(Intervals.Second10)) {
-				UpdateAverage();
-			}
-			return true;
-		}
-		
-		public override bool OnIntervalClose() {
-			UpdateAverage();
-			return true;
-		}
-		
-		private void UpdateAverage() {
-			double close = price[0];
-			E1.Set(close);
-			E2.Set(E1[0]);
-			E3.Set(E2[0]);
-			double e1 = E1[0];
-			double e2 = E2[0];
-			double e3 = E3[0];
-			double x = (3 * E1[0] - 3 * E2[0] + E3[0]);
-			this[0] = x;
+		public override void Update() {
+			this[0] = (3 * E1[0] - 3 * E2[0] + E3[0]);
 		}
 
 		public int Period {

@@ -28,44 +28,41 @@ using TickZoom.Api;
 namespace TickZoom.Common
 {
 	/// <summary>
-	/// The Weighted Moving Average indicator weights the more recent value greater
-	/// that prior value. For 5 bar WMA the current bar is multiplied by 5, the previous
-	/// one by 4, and so on, down to 1 for the final value. WMA divides the result by the
-	/// total of the multipliers for the average.
-	/// FB 20091230: cleaned up
+	/// Triple Exponential Moving Average (TEMA). Presented by Patrick Mulloy in 
+	/// the January 1994 issue of Technical Analysis of Stocks & Commodities magazine. 
+	/// TEMA has less lag than a Exponential Moving Average (EMA). It is not a simple
+	/// triple smoothing, but rather a composite of several EMAs.
+	/// Pseudocode:
+	/// TEMA = 3*EMA() -  3*EMA(EMA) + EMA(EMA(EMA))
 	/// </summary>
-	public class WMA : IndicatorCommon
+	public class TEMA_New : IndicatorCommon
 	{
+		EMA E1;
+		EMA E2;
+		EMA E3;
 		int period = 14;
 		
-		public WMA(object anyPrice, int period)
-		{
+		public TEMA_New( object anyPrice, int period) {
 			AnyInput = anyPrice;
 			StartValue = 0;
 			this.period = period;
 		}
-		
+
 		public override void OnInitialize() {
-			Name = "WMA";
-			Drawing.Color = Color.Brown;
+			Name = "TEMA_New";
+			Drawing.Color = Color.LightBlue;
 			Drawing.PaneType = PaneType.Primary;
 			Drawing.IsVisible = true;
-		}
-
-		public override void Update() {
-			double sum = 0;
-			int count = 0;
-			if( Count < period + 1) this[0] = Input[0];
-			else {
-				for( int i = 0; i< period; i++) {
-					int mult = period - i;
-					sum += Input[i] * (period - i);
-					count += period - i;
-				}
-				this[0] = sum / count;
-			}
+			E1 = Formula.EMA(Input, Period);
+			E2 = Formula.EMA(E1, Period);
+			E3 = Formula.EMA(E2, Period);
 		}
 		
+		public override void Update() {
+			this[0] = (3 * E1[0] - 3 * E2[0] + E3[0]);
+			double result = this[0];
+		}
+
 		public int Period {
 			get { return period; }
 			set { period = value; }

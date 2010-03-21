@@ -25,45 +25,43 @@ using System;
 using System.Drawing;
 using TickZoom.Api;
 
+
 namespace TickZoom.Common
 {
 	/// <summary>
-	/// The Weighted Moving Average indicator weights the more recent value greater
-	/// that prior value. For 5 bar WMA the current bar is multiplied by 5, the previous
-	/// one by 4, and so on, down to 1 for the final value. WMA divides the result by the
-	/// total of the multipliers for the average.
-	/// FB 20091230: cleaned up
+	/// Description of SMA.
 	/// </summary>
-	public class WMA : IndicatorCommon
+	public class SMA_New : IndicatorCommon
 	{
-		int period = 14;
+		int period;
 		
-		public WMA(object anyPrice, int period)
+		public SMA_New(object anyPrice, int period)
 		{
 			AnyInput = anyPrice;
 			StartValue = 0;
 			this.period = period;
 		}
 		
-		public override void OnInitialize() {
-			Name = "WMA";
-			Drawing.Color = Color.Brown;
+		public override void OnInitialize()
+		{
+			Name = "SMA_New";
+			Drawing.Color = Color.Red;
 			Drawing.PaneType = PaneType.Primary;
 			Drawing.IsVisible = true;
 		}
-
+		
 		public override void Update() {
-			double sum = 0;
-			int count = 0;
-			if( Count < period + 1) this[0] = Input[0];
-			else {
-				for( int i = 0; i< period; i++) {
-					int mult = period - i;
-					sum += Input[i] * (period - i);
-					count += period - i;
+			if (double.IsNaN(this[0])) {
+				this[0] = Input[0];
+			} else {
+				double last = this[1];
+				double sum = last * Math.Min(Count-1, period);
+
+				if (Count > period && Input.BarCount > period) {
+					this[0] = (sum + Input[0] - Input[period]) / Math.Min(Count, period);
 				}
-				this[0] = sum / count;
 			}
+			double result = this[0];
 		}
 		
 		public int Period {
