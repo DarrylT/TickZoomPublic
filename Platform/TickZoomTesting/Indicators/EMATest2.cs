@@ -1,4 +1,4 @@
-#region Copyright
+﻿#region Copyright
 /*
  * Software: TickZoom Trading Platform
  * Copyright 2009 M. Wayne Walter
@@ -29,12 +29,11 @@ using TickZoom.TickUtil;
 
 namespace TickZoom.Indicators
 {
-
 	[TestFixture]
-	public class TEMATest
+	public class EMATest2
 	{
 		private static readonly Log log = Factory.Log.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-		TEMA tema;
+		EMA ema;
 		TestBars bars;
 		
 		[TearDown]
@@ -45,16 +44,14 @@ namespace TickZoom.Indicators
 		[SetUp]
 		public void Setup() {
 			bars = Factory.Engine.TestBars(Intervals.Day1);
-			tema = new TEMA(bars.Close,14);
-			Assert.IsNotNull(tema, "constructor");
-			tema.IntervalDefault = Intervals.Day1;
-			tema.Bars = bars;
-			tema.OnConfigure();
-			tema.OnInitialize();
-			for(int j=0; j<tema.Chain.Dependencies.Count; j++) {
-				Model formula = (Model) tema.Chain.Dependencies[j].Model;
+			ema = new EMA(bars.Close,14);
+			Assert.IsNotNull(ema, "constructor");
+			ema.IntervalDefault = Intervals.Day1;
+			ema.Bars = bars;
+			ema.OnInitialize();
+			for(int j=0; j<ema.Chain.Dependencies.Count; j++) {
+				ModelInterface formula = ema.Chain.Dependencies[j].Model;
 				formula.Bars = bars;
-				formula.OnConfigure();
 				formula.OnInitialize();
 			}
 		}
@@ -66,22 +63,20 @@ namespace TickZoom.Indicators
 			for( int i = 0; i < data.Length; i++) {
 				// open, high, low, close all the same.
 				bars.AddBar( symbol, data[i], data[i], data[i], data[i], 0);
-				for(int j=0; j<tema.Chain.Dependencies.Count; j++) {
-					Model formula = (Model) tema.Chain.Dependencies[j].Model;
+				for(int j=0; j<ema.Chain.Dependencies.Count; j++) {
+					ModelInterface formula = ema.Chain.Dependencies[j].Model;
 					formula.OnBeforeIntervalOpen();
-					formula.OnIntervalOpen();
 					formula.OnIntervalClose();
 				}
-				tema.OnBeforeIntervalOpen();
-				tema.OnIntervalClose();
-				log.Warn(Math.Round(tema.E1[0]));
-				Assert.AreEqual(result[i],Math.Round(tema[0]),"current result at " + i);
-				if( i > 1) Assert.AreEqual(result[i-1],Math.Round(tema[1]),"result 1 back at " + i);
-				if( i > 2) Assert.AreEqual(result[i-2],Math.Round(tema[2]),"result 2 back at " + i);
+				ema.OnBeforeIntervalOpen();
+				ema.OnIntervalClose();
+				Assert.AreEqual(result[i],Math.Round(ema[0]),"current result at " + i);
+				if( i > 1) Assert.AreEqual(result[i-1],Math.Round(ema[1]),"result 1 back at " + i);
+				if( i > 2) Assert.AreEqual(result[i-2],Math.Round(ema[2]),"result 2 back at " + i);
 			}
 		}
 		
-		private double[] data = new double[] {
+		private int[] data = new int[] {
 			10000,
 			10100,
 			10040,
@@ -139,64 +134,64 @@ namespace TickZoom.Indicators
 			11790,
 			11890
 		};
-
+	
 		private int[] result = new int[] {
 			10000,
-			10035,
-			10040,
-			10099,
-			10339,
-			10666,
-			10946,
-			11404,
-			11852,
-			12102,
-			12374,
-			12725,
-			13095,
-			13100,
-			12852,
-			12809,
-			12614,
-			12444,
-			12122,
-			11682,
-			11315,
-			11338,
-			11690,
-			12226,
-			12731,
-			13193,
+			10013,
+			10016,
+			10041,
+			10137,
+			10277,
+			10413,
+			10629,
+			10860,
+			11032,
+			11219,
+			11445,
+			11688,
+			11803,
+			11814,
+			11886,
+			11892,
+			11893,
+			11823,
+			11689,
+			11560,
+			11561,
+			11689,
+			11902,
+			12127,
+			12357,
+			12509,
+			12683,
+			12916,
+			13033,
+			13181,
+			13270,
+			13262,
+			13291,
+			13404,
+			13517,
+			13528,
+			13479,
 			13407,
-			13663,
-			14056,
-			14115,
-			14260,
-			14252,
-			14006,
-			13902,
-			14044,
-			14179,
-			14044,
-			13780,
-			13498,
-			13539,
-			13603,
-			13434,
-			13250,
-			12894,
-			12707,
-			12797,
-			12522,
-			12176,
-			12076,
-			11785,
-			11265,
-			10632,
-			10302,
-			10333,
-			10644,
-			10931
+			13442,
+			13486,
+			13441,
+			13381,
+			13244,
+			13156,
+			13164,
+			13038,
+			12873,
+			12787,
+			12626,
+			12367,
+			12043,
+			11811,
+			11706,
+			11718,
+			11740
 		};
 		
 	}

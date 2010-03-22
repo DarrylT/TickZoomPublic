@@ -28,11 +28,10 @@ using TickZoom.Api;
 namespace TickZoom.Common
 {
 	/// <summary>
-	/// Double Exponential Moving Average (DEMA). Developed by Patrick Mulloy and introduced 
+	/// Double Exponential Moving Average (DEMA). Introduced by Patrick Mulloy
 	/// in the February 1994 issue of Technical Analysis of Stocks & Commodities magazine.
-	/// DEMA was designed to lessen the lag of a regular exponential moving average. 
-	/// It is a composite of a single exponential MA and a double exponential MA that 
-	/// produces less lag than its two components individually.
+	/// DEMA was created to induce less lag than a regular EMA. It is a composite of 
+	/// a single exponential MA and a double exponential MA that generates less lag than EMA.
 	/// FB 20091230: Created
 	/// </summary>
 	public class DEMA : IndicatorCommon
@@ -52,12 +51,13 @@ namespace TickZoom.Common
 			Drawing.Color = Color.Blue;
 			Drawing.PaneType = PaneType.Primary;
 			Drawing.IsVisible = true;
-			E1 = Formula.EMA(Input, Period);
-			E2 = Formula.EMA(E1, Period);
+			
+			E1 = new EMA(Input, Period);
+			E2 = new EMA(E1, Period);
 		}
 		
 		public override void Update() {
-			if( Count < period + 1) this[0] = Input[0];
+			if( Count == 1) this[0] = Input[0];
 			else this[0] = (2 * E1[0] - E2[0]);
 		}
 

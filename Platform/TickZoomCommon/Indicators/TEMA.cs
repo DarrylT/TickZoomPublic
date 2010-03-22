@@ -37,7 +37,7 @@ namespace TickZoom.Common
 	/// </summary>
 	public class TEMA : IndicatorCommon
 	{
-		EMA E1;
+		public EMA E1;
 		EMA E2;
 		EMA E3;
 		int period = 14;
@@ -46,21 +46,27 @@ namespace TickZoom.Common
 			AnyInput = anyPrice;
 			StartValue = 0;
 			this.period = period;
+			Drawing.IsVisible = true;
 		}
 
 		public override void OnInitialize() {
 			Name = "TEMA";
 			Drawing.Color = Color.LightBlue;
 			Drawing.PaneType = PaneType.Primary;
-			Drawing.IsVisible = true;
 			E1 = Formula.EMA(Input, Period);
 			E2 = Formula.EMA(E1, Period);
 			E3 = Formula.EMA(E2, Period);
+			E1.Drawing.IsVisible = false;
+			E2.Drawing.IsVisible = false;
+			E3.Drawing.IsVisible = false;
 		}
 		
 		public override void Update() {
-			this[0] = (3 * E1[0] - 3 * E2[0] + E3[0]);
-			double result = this[0];
+			if( Count == 1) {
+				this[0] = Input[0];
+			} else {
+				this[0] = (3.0 * E1[0] - 3.0 * E2[0] + E3[0]);
+			}
 		}
 
 		public int Period {

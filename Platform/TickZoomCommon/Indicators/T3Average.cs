@@ -28,52 +28,64 @@ using TickZoom.Api;
 namespace TickZoom.Common
 {
 	/// <summary>
-	/// The Hull Moving Average (HMA). Introduced by Alan Hull, is an extremely 
-	/// fast and smooth moving average. HMA significantly decreases lag 
-	/// and improve smoothing at the same time. The price we 
-	/// pay for this performance is serious overshot.
-	/// FB 20091230: Created
+	/// T3 Moving Average (T3Average). Introduced by Tim Tillson in the January 1998 issue of 
+	/// Technical Analysis of Stocks & Commodities article "Smoothing Techniques for More Accurate Signals". 
+	/// Compared to TEMA or other EMA derivatives it is much smoother and exhibits less lag.
+	/// FB 20100104: created
 	/// </summary>
-	public class HMA : IndicatorCommon
+	public class T3Average : IndicatorCommon
 	{
-		WMA W1;
-		WMA W2;
-		WMA W3;
-		int period = 14;
+		int period = 13;
+		double hot = 0.7;
 		double halfPeriod;
-		double sqrtPeriod;
 
-		
-		public HMA(object anyPrice, int period) {
+		EMA E1, E2, E3, E4, E5, E6;
+
+		public T3Average(object anyPrice, int period, double hot) {
 			AnyInput = anyPrice;
 			StartValue = 0;
 			this.period = period;
+			this.hot = hot;
 		}
-
-		public override void OnInitialize() {
-			Name = "HMA";
-			Drawing.Color = Color.Green;
+		
+		public override void OnInitialize()	{
+			Name = "T3Average";
+			Drawing.Color = Color.Blue;
 			Drawing.PaneType = PaneType.Primary;
-			Drawing.IsVisible = true;
+			Drawing.GroupName = "T3Average";
+			Drawing.GraphType = GraphType.Line;
 			
 			halfPeriod = (Math.Ceiling(Convert.ToDouble(Period*0.5)) - (Convert.ToDouble(Period*0.5)) <= 0.5) ? Math.Ceiling(Convert.ToDouble(Period*0.5)) : Math.Floor(Convert.ToDouble(Period*0.5));
-			sqrtPeriod = (Math.Ceiling(Math.Sqrt(Convert.ToDouble(Period))) - Math.Sqrt(Convert.ToDouble(Period)) <= 0.5) ? Math.Ceiling(Math.Sqrt(Convert.ToDouble(Period))) : Math.Floor(Math.Sqrt(Convert.ToDouble(Period)));
-			W1 = Formula.WMA(Input, Convert.ToInt32(halfPeriod));
-			W2 = Formula.WMA(Input, Period);
-			W3 = Formula.WMA(2D * W1[0] - W2[0], Convert.ToInt32(sqrtPeriod));
-		}
-				
-		public override void Update() {
-			if (Count == 1 ) {
-				this[0] = Input[0];
-			} else {
-				this[0] = W3[0];
-			}
+			E1 = Formula.EMA(Input, Convert.ToInt32(halfPeriod));
+			E2 = Formula.EMA(E1, Convert.ToInt32(halfPeriod));
+			E3 = Formula.EMA(E2, Convert.ToInt32(halfPeriod));
+			E4 = Formula.EMA(E3, Convert.ToInt32(halfPeriod));
+			E5 = Formula.EMA(E4, Convert.ToInt32(halfPeriod));
+			E6 = Formula.EMA(E5, Convert.ToInt32(halfPeriod));
+			
 		}
 
+		public override void Update() {
+			double b = Hot; 
+	        double b2 = b*b; 
+	        double b3 = b2*b; 
+	        double c1 = -b3; 
+	        double c2 = 3*b2 + 3*b3;
+	        double c3 = -6*b2 - 3*b - 3*b3; 
+	        double c4 = 1D + 3*b + b3 + 3*b2;
+
+			if(Count == 1) this[0] = Input[0];
+			else this[0] = c1*E6[0] + c2*E5[0] + c3*E4[0] + c4*E3[0];
+		}
+		
 		public int Period {
 			get { return period; }
 			set { period = value; }
+		}
+		
+		public double Hot {
+			get { return hot; }
+			set { hot = value; }
 		}
 	}
 }

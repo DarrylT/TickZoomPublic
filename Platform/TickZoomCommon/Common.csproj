@@ -98,6 +98,7 @@
     <Compile Include="Indicators\PercentR.cs" />
     <Compile Include="Indicators\RSI.cs" />
     <Compile Include="Indicators\SMA.cs" />
+    <Compile Include="Indicators\T3Average.cs" />
     <Compile Include="Indicators\TEMA.cs" />
     <Compile Include="Indicators\Volume.cs" />
     <Compile Include="Indicators\Wilder.cs" />

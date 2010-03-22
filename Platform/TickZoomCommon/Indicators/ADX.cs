@@ -22,6 +22,7 @@
 #endregion
 
 using System;
+using System.Drawing;
 using TickZoom.Api;
 
 namespace TickZoom.Common
@@ -37,31 +38,37 @@ namespace TickZoom.Common
 	/// </summary>
 	public class ADX : IndicatorCommon
 	{
-		private double				period = 14;
-		private double 				prevBarOpen;
-		private double 				prevBarHigh;
-		private double 				prevBarLow;
-		private double 				prevBarClose;
+		double period = 14;
+		double prevBarOpen;
+		double prevBarHigh;
+		double prevBarLow;
+		double prevBarClose;
 
-		private Doubles	 		dmPlus;
-		private Doubles			dmMinus;
-		private Doubles			sumDmPlus;
-		private Doubles			sumDmMinus;
-		private Doubles			sumTr;
-		private Doubles			tr;
+		IndicatorCommon dmPlus;
+		IndicatorCommon dmMinus;
+		IndicatorCommon sumDmPlus;
+		IndicatorCommon sumDmMinus;
+		IndicatorCommon sumTr;
+		IndicatorCommon tr;
 		
 		public ADX(int period)
 		{
-			dmPlus		= Doubles();
-			dmMinus		= Doubles();
-			sumDmPlus	= Doubles();
-			sumDmMinus	= Doubles();
-			sumTr		= Doubles();
-			tr			= Doubles();
-			Drawing.PaneType = PaneType.Secondary;
+			Drawing.Color = Color.Green;
+ 			Drawing.PaneType = PaneType.Secondary;
+			Drawing.IsVisible = true;
+			Drawing.GroupName = "ADX";
+			Drawing.GraphType = GraphType.Line;
+
+			dmPlus = Formula.Indicator();
+			dmMinus	= Formula.Indicator();
+			sumDmPlus = Formula.Indicator();
+			sumDmMinus = Formula.Indicator();
+			sumTr = Formula.Indicator();
+			tr = Formula.Indicator();
+			this.period = period;
 		}
 		
-		public override bool OnIntervalClose() {
+		public override void Update() {
 			double trueRange = Bars.High[0] - Bars.Low[0];
 			if (Count == 1)
 			{
@@ -71,17 +78,10 @@ namespace TickZoom.Common
 				sumTr.Add(tr[0]);
 				sumDmPlus.Add(dmPlus[0]);
 				sumDmMinus.Add(dmMinus[0]);
-				Add(50);
+				Add(50.0);
 			}
 			else
 			{
-//				TickConsole.WriteLine( " ADX value set to " + this[0] +
-//				      ", high = " + series[0].High +
-//					", bar.Count = " + series.Count + 
-//					", low = " + series[0].Low +
-//					", open = " + series[0].Open +
-//					", close = " + series[0].Close +
-//					", period = " + period);
 				tr.Add(Math.Max(Math.Abs(Bars.Low[0] - prevBarClose), Math.Max(trueRange, Math.Abs(Bars.High[0] - prevBarClose))));
 				dmPlus.Add(Bars.High[0] - prevBarHigh > prevBarLow - Bars.Low[0] ? Math.Max(Bars.High[0] - prevBarHigh, 0) : 0);
 				dmMinus.Add(prevBarLow - Bars.Low[0] > Bars.High[0] - prevBarHigh ? Math.Max(prevBarLow - Bars.Low[0], 0) : 0);
@@ -102,18 +102,22 @@ namespace TickZoom.Common
 					sumDmMinus[0] = (sumDmMinus[1] - sumDmMinus[1] / period + dmMinus[0]);
 				}
 
-				double diPlus	= 100 * (sumTr[0] == 0 ? 0 : sumDmPlus[0] / sumTr[0]);
-				double diMinus	= 100 * (sumTr[0] == 0 ? 0 : sumDmMinus[0] / sumTr[0]);
+				double diPlus	= 100.0 * (sumTr[0] == 0 ? 0 : sumDmPlus[0] / sumTr[0]);
+				double diMinus	= 100.0 * (sumTr[0] == 0 ? 0 : sumDmMinus[0] / sumTr[0]);
 				double diff		= Math.Abs(diPlus - diMinus);
 				double sum		= diPlus + diMinus;
 
-				Add(sum == 0 ? 50 : ((period - 1) * this[0] + 100 * diff / sum) / period);
+				Add(sum == 0 ? 50.0 : ((period - 1.0) * this[0] + 100.0 * diff / sum) / period);
 			}
 			prevBarOpen = Bars.Open[0];
 			prevBarHigh = Bars.High[0];
 			prevBarLow = Bars.Low[0];
 			prevBarClose = Bars.Close[0];
-			return true;
+		}
+				
+		public double Period {
+			get { return period; }
+			set { period = value; }
 		}
 	}
 }

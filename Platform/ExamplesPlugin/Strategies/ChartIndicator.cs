@@ -39,7 +39,7 @@ namespace TickZoom
 		
 		public override void OnInitialize()
 		{
-			ind1 = new EMA(Bars.Close, 13);
+			ind1 = new EMA(Bars.Close, 14);
 			AddIndicator(ind1);
 		}
 	}

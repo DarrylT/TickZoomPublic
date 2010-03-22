@@ -76,7 +76,6 @@ namespace Loaders
 	    		strategy2 = portfolio.Strategies[1];
 	    		LoadTrades();
 	    		LoadBarData();
-//	    		Thread.Sleep(60000);
 			} catch( Exception ex) {
 				log.Error("Setup error.", ex);
 				throw;

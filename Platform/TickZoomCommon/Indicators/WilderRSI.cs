@@ -43,6 +43,8 @@ namespace TickZoom.Common
 		IndicatorCommon loss;
 		IndicatorCommon avgGain;
 		IndicatorCommon avgLoss;
+		//Wilder avgGain;
+		//Wilder avgLoss;
 		
 		public WilderRSI(object anyPrice, int period)
 		{
@@ -75,9 +77,11 @@ namespace TickZoom.Common
 				mom[0] = Input[0] - Input[1];
 				if (mom[0] > 0.0) gain[0] = mom[0];
 				else if (mom[0] < 0.0) loss[0] = -mom[0];
-				avgGain[0] = (gain[0] + (period - 1) * gain[1]) / period; // Wilder's MA
-				avgLoss[0] = (loss[0] + (period - 1) * loss[1]) / period; // Wilder's MA
-				this[0] = 100 - (100 / ((avgGain[0]/avgLoss[0]) + 1));
+				avgGain[0] = (gain[0] + (period - 1D) * gain[1]) / period; // Wilder's MA
+				avgLoss[0] = (loss[0] + (period - 1D) * loss[1]) / period; // Wilder's MA
+				//avgGain = new Wilder(gain, period);
+				//avgLoss = new Wilder(loss, period);
+				this[0] = 100 - (100 / ((avgGain[0]/avgLoss[0]) + 1D));
 			}
 		}
 		

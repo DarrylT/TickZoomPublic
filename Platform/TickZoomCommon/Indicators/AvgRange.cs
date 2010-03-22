@@ -22,41 +22,39 @@
 #endregion
 
 using System;
-using System.IO;
+using System.Drawing;
 using TickZoom.Api;
 
 namespace TickZoom.Common
 {
 	/// <summary>
-	/// Description of SMA.
+	/// Average Range
+	/// FB 20100102: Cleaned up
 	/// </summary>
 	public class AvgRange : IndicatorCommon
 	{
-		int period;
+		int period = 13;
 		double totalRange = 0;
 		int totalCount = 0;
 		long totalDiffSquares = 0;
 		
-		public AvgRange() : this( 5)
-		{
-			
-		}
 		public AvgRange(int period)
 		{
-			IntervalDefault = Intervals.Day1;
+			Name = "AvgRange";
+			Drawing.Color = Color.Green;
 			Drawing.PaneType = PaneType.Secondary;
+			Drawing.IsVisible = true;
+			Drawing.GroupName = "AvgRange";
+			Drawing.GraphType = GraphType.Line;
+			
 			this.period = period;
-		}
-		
-		public override void OnInitialize() {
-
 		}
 		
 		double range(int pos) {
 			return Bars.High[pos] - Bars.Low[pos];
 		}
 		
-		public override bool OnIntervalClose() {
+		public override void Update() {
 			totalRange += range(0);
 			totalCount ++;
 			totalDiffSquares += (long) Math.Pow(HistoricalAverage - range(0),2);
@@ -72,15 +70,17 @@ namespace TickZoom.Common
 					this[0] = (last + range(0)) / (Math.Min(Count, period));
 				}
 			}
-			return true;
 		}
+		
 		public int Period {
 			get { return period; }
 			set { period = value; }
 		}
+		
 		public int HistoricalAverage {
 			get { return (int) (totalRange / totalCount); }
 		}
+		
 		public int HistoricalStdDev {
 			get { 
 				if( totalCount > 0) {
