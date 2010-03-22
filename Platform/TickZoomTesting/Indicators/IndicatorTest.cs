@@ -29,29 +29,29 @@ using TickZoom.TickUtil;
 
 namespace TickZoom.Indicators
 {
-	[TestFixture]
-	public class EMATest2
+	public abstract class IndicatorTest
 	{
 		private static readonly Log log = Factory.Log.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-		EMA ema;
+		IndicatorCommon indicator;
 		TestBars bars;
 		
-		[TearDown]
-		public void TearDown() {
-			
-		}
+		protected abstract IndicatorCommon CreateIndicator();
+		
+		protected abstract double [] GetExpectedResults();
 		
 		[SetUp]
 		public void Setup() {
 			bars = Factory.Engine.TestBars(Intervals.Day1);
-			ema = new EMA(bars.Close,14);
-			Assert.IsNotNull(ema, "constructor");
-			ema.IntervalDefault = Intervals.Day1;
-			ema.Bars = bars;
-			ema.OnInitialize();
-			for(int j=0; j<ema.Chain.Dependencies.Count; j++) {
-				ModelInterface formula = ema.Chain.Dependencies[j].Model;
+			indicator = CreateIndicator();
+			Assert.IsNotNull(indicator, "constructor");
+			indicator.IntervalDefault = Intervals.Day1;
+			indicator.Bars = bars;
+			indicator.OnConfigure();
+			indicator.OnInitialize();
+			for(int j=0; j<indicator.Chain.Dependencies.Count; j++) {
+				Model formula = (Model) indicator.Chain.Dependencies[j].Model;
 				formula.Bars = bars;
+				formula.OnConfigure();
 				formula.OnInitialize();
 			}
 		}
@@ -60,23 +60,25 @@ namespace TickZoom.Indicators
 		public void Values()
 		{
 			SymbolInfo symbol = Factory.Symbol.LookupSymbol("USD_JPY");
+			double[] results = GetExpectedResults();
 			for( int i = 0; i < data.Length; i++) {
 				// open, high, low, close all the same.
 				bars.AddBar( symbol, data[i], data[i], data[i], data[i], 0);
-				for(int j=0; j<ema.Chain.Dependencies.Count; j++) {
-					ModelInterface formula = ema.Chain.Dependencies[j].Model;
-					formula.OnBeforeIntervalOpen();
-					formula.OnIntervalClose();
+				for(int j=0; j<indicator.Chain.Dependencies.Count; j++) {
+					Model childIndicator = (Model) indicator.Chain.Dependencies[j].Model;
+					childIndicator.OnBeforeIntervalOpen();
+					childIndicator.OnIntervalOpen();
+					childIndicator.OnIntervalClose();
 				}
-				ema.OnBeforeIntervalOpen();
-				ema.OnIntervalClose();
-				Assert.AreEqual(result[i],Math.Round(ema[0]),"current result at " + i);
-				if( i > 1) Assert.AreEqual(result[i-1],Math.Round(ema[1]),"result 1 back at " + i);
-				if( i > 2) Assert.AreEqual(result[i-2],Math.Round(ema[2]),"result 2 back at " + i);
+				indicator.OnBeforeIntervalOpen();
+				indicator.OnIntervalClose();
+				Assert.AreEqual(results[i],Math.Round(indicator[0]),"current result at " + i);
+				if( i > 1) Assert.AreEqual(results[i-1],Math.Round(indicator[1]),"result 1 back at " + i);
+				if( i > 2) Assert.AreEqual(results[i-2],Math.Round(indicator[2]),"result 2 back at " + i);
 			}
 		}
 		
-		private int[] data = new int[] {
+		protected double[] data = new double[] {
 			10000,
 			10100,
 			10040,
@@ -134,65 +136,9 @@ namespace TickZoom.Indicators
 			11790,
 			11890
 		};
-	
-		private int[] result = new int[] {
-			10000,
-			10013,
-			10016,
-			10041,
-			10137,
-			10277,
-			10413,
-			10629,
-			10860,
-			11032,
-			11219,
-			11445,
-			11688,
-			11803,
-			11814,
-			11886,
-			11892,
-			11893,
-			11823,
-			11689,
-			11560,
-			11561,
-			11689,
-			11902,
-			12127,
-			12357,
-			12509,
-			12683,
-			12916,
-			13033,
-			13181,
-			13270,
-			13262,
-			13291,
-			13404,
-			13517,
-			13528,
-			13479,
-			13407,
-			13442,
-			13486,
-			13441,
-			13381,
-			13244,
-			13156,
-			13164,
-			13038,
-			12873,
-			12787,
-			12626,
-			12367,
-			12043,
-			11811,
-			11706,
-			11718,
-			11740
-		};
 		
+		public TestBars Bars {
+			get { return bars; }
+		}
 	}
 }

@@ -31,173 +31,72 @@ namespace TickZoom.Indicators
 {
 
 	[TestFixture]
-	public class TEMATest
+	public class TEMATest : IndicatorTest
 	{
-		private static readonly Log log = Factory.Log.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-		TEMA tema;
-		TestBars bars;
-		
-		[TearDown]
-		public void TearDown() {
-			
-		}
-		
-		[SetUp]
-		public void Setup() {
-			bars = Factory.Engine.TestBars(Intervals.Day1);
-			tema = new TEMA(bars.Close,14);
-			Assert.IsNotNull(tema, "constructor");
-			tema.IntervalDefault = Intervals.Day1;
-			tema.Bars = bars;
-			tema.OnConfigure();
-			tema.OnInitialize();
-			for(int j=0; j<tema.Chain.Dependencies.Count; j++) {
-				Model formula = (Model) tema.Chain.Dependencies[j].Model;
-				formula.Bars = bars;
-				formula.OnConfigure();
-				formula.OnInitialize();
-			}
-		}
-		
-		[Test]
-		public void Values()
+		protected override IndicatorCommon CreateIndicator()
 		{
-			SymbolInfo symbol = Factory.Symbol.LookupSymbol("USD_JPY");
-			for( int i = 0; i < data.Length; i++) {
-				// open, high, low, close all the same.
-				bars.AddBar( symbol, data[i], data[i], data[i], data[i], 0);
-				for(int j=0; j<tema.Chain.Dependencies.Count; j++) {
-					Model formula = (Model) tema.Chain.Dependencies[j].Model;
-					formula.OnBeforeIntervalOpen();
-					formula.OnIntervalOpen();
-					formula.OnIntervalClose();
-				}
-				tema.OnBeforeIntervalOpen();
-				tema.OnIntervalClose();
-				log.Warn(Math.Round(tema.E1[0]));
-				Assert.AreEqual(result[i],Math.Round(tema[0]),"current result at " + i);
-				if( i > 1) Assert.AreEqual(result[i-1],Math.Round(tema[1]),"result 1 back at " + i);
-				if( i > 2) Assert.AreEqual(result[i-2],Math.Round(tema[2]),"result 2 back at " + i);
-			}
+			return new TEMA(Bars.Close,14);
 		}
 		
-		private double[] data = new double[] {
-			10000,
-			10100,
-			10040,
-			10200,
-			10760,
-			11190,
-			11300,
-			12030,
-			12360,
-			12150,
-			12440,
-			12910,
-			13270,
-			12550,
-			11890,
-			12350,
-			11930,
-			11900,
-			11370,
-			10820,
-			10720,
-			11570,
-			12520,
-			13290,
-			13590,
-			13850,
-			13500,
-			13810,
-			14430,
-			13800,
-			14140,
-			13850,
-			13210,
-			13480,
-			14140,
-			14250,
-			13600,
-			13160,
-			12940,
-			13670,
-			13770,
-			13150,
-			12990,
-			12360,
-			12580,
-			13220,
-			12220,
-			11800,
-			12230,
-			11580,
-			10680,
-			9940,
-			10300,
-			11030,
-			11790,
-			11890
-		};
-
-		private int[] result = new int[] {
-			10000,
-			10035,
-			10040,
-			10099,
-			10339,
-			10666,
-			10946,
-			11404,
-			11852,
-			12102,
-			12374,
-			12725,
-			13095,
-			13100,
-			12852,
-			12809,
-			12614,
-			12444,
-			12122,
-			11682,
-			11315,
-			11338,
-			11690,
-			12226,
-			12731,
-			13193,
-			13407,
-			13663,
-			14056,
-			14115,
-			14260,
-			14252,
-			14006,
-			13902,
-			14044,
-			14179,
-			14044,
-			13780,
-			13498,
-			13539,
-			13603,
-			13434,
-			13250,
-			12894,
-			12707,
-			12797,
-			12522,
-			12176,
-			12076,
-			11785,
-			11265,
-			10632,
-			10302,
-			10333,
-			10644,
-			10931
-		};
-		
+		protected override double[] GetExpectedResults() {
+			return new double[] {
+				10000,
+				10035,
+				10040,
+				10099,
+				10339,
+				10666,
+				10946,
+				11404,
+				11852,
+				12102,
+				12374,
+				12725,
+				13095,
+				13100,
+				12852,
+				12809,
+				12614,
+				12444,
+				12122,
+				11682,
+				11315,
+				11338,
+				11690,
+				12226,
+				12731,
+				13193,
+				13407,
+				13663,
+				14056,
+				14115,
+				14260,
+				14252,
+				14006,
+				13902,
+				14044,
+				14179,
+				14044,
+				13780,
+				13498,
+				13539,
+				13603,
+				13434,
+				13250,
+				12894,
+				12707,
+				12797,
+				12522,
+				12176,
+				12076,
+				11785,
+				11265,
+				10632,
+				10302,
+				10333,
+				10644,
+				10931
+			};
+		}		
 	}
 }

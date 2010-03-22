@@ -76,6 +76,7 @@
     <Compile Include="Common\PerformanceTest.cs" />
     <Compile Include="Common\PluginManagerTest.cs" />
     <Compile Include="Indicators\EMATest.cs" />
+    <Compile Include="Indicators\IndicatorTest.cs" />
     <Compile Include="Indicators\LinearRegressionTest.cs" />
     <Compile Include="Indicators\SMATest.cs" />
     <Compile Include="Indicators\TEMATest.cs" />
