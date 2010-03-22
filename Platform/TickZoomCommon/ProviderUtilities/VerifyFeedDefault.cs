@@ -44,6 +44,7 @@ namespace TickZoom.Common
 		private TickQueue tickQueue = Factory.TickUtil.TickQueue(typeof(VerifyFeed));
 		private volatile bool isRealTime = false;
 		private TaskLock syncTicks;
+		private volatile ReceiverState receiverState = ReceiverState.Ready;
 
 		public TickQueue TickQueue {
 			get { return tickQueue; }
@@ -51,7 +52,7 @@ namespace TickZoom.Common
 
 		public ReceiverState OnGetReceiverState(SymbolInfo symbol)
 		{
-			return ReceiverState.Ready;
+			return receiverState;
 		}
 
 		public VerifyFeedDefault()
@@ -79,8 +80,7 @@ namespace TickZoom.Common
 		TickImpl tick = new TickImpl();
 		public long Verify(int expectedCount, Action<TickIO, TickIO, ulong> assertTick, SymbolInfo symbol, int timeout)
 		{
-			if (debug)
-				log.Debug("VerifyFeed");
+			if (debug) log.Debug("VerifyFeed");
 			syncTicks = SyncTicks.GetTickSync(symbol.BinaryIdentifier);
 			int startTime = Environment.TickCount;
 			count = 0;
@@ -95,7 +95,32 @@ namespace TickZoom.Common
 			}
 			return count;
 		}
-
+		
+		public ReceiverState VerifyState(ReceiverState expectedState, SymbolInfo symbol, int timeout) {
+			if (debug) log.Debug("VerifyFeed");
+			syncTicks = SyncTicks.GetTickSync(symbol.BinaryIdentifier);
+			int startTime = Environment.TickCount;
+			count = 0;
+			TickBinary binary = new TickBinary();
+			while (Environment.TickCount - startTime < timeout * 1000) {
+				if (tickQueue.CanDequeue) {
+					try { 
+						tickQueue.Dequeue(ref binary);
+					} catch (QueueException ex) {
+						if( HandleQueueException(ex)) {
+							break;
+						}
+					}
+				} else {
+					Thread.Sleep(10);
+				}
+				if( receiverState == expectedState) {
+					break;
+				}
+			}
+			return receiverState;
+		}
+		
 		public long VerifyEvent(int expectedCount, Action<SymbolInfo,int,object> assertEvent, SymbolInfo symbol, int timeout)
 		{
 			if (debug) log.Debug("VerifyEvent");
@@ -192,11 +217,14 @@ namespace TickZoom.Common
 		private bool HandleQueueException( QueueException ex) {
 			switch (ex.EntryType) {
 				case EventType.StartRealTime:
+					receiverState = ReceiverState.RealTime;
 					isRealTime = true;
 					break;
 				case EventType.EndHistorical:
+					receiverState = ReceiverState.Ready;
 					break;
 				case EventType.EndRealTime:
+					receiverState = ReceiverState.Ready;
 					isRealTime = false;
 					break;
 				case EventType.Terminate:
@@ -261,6 +289,7 @@ namespace TickZoom.Common
 
 		public void OnHistorical(SymbolInfo symbol)
 		{
+			receiverState = ReceiverState.Historical;
 		}
 
 		public bool CanReceive( SymbolInfo symbol) {

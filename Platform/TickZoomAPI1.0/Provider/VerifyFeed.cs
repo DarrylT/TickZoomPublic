@@ -32,6 +32,7 @@ namespace TickZoom.Api
 		long Verify(Action<TickIO, TickIO, ulong> assertTick, SymbolInfo symbol, int timeout);
 		long Verify(int expectedCount, Action<TickIO, TickIO, ulong> assertTick, SymbolInfo symbol, int timeout);
 		double VerifyPosition(double expectedPosition, SymbolInfo symbol, int timeout);
+		ReceiverState VerifyState(ReceiverState expectedState, SymbolInfo symbol, int timeout);
 		void StartTimeTheFeed();
 		int EndTimeTheFeed();
 		bool TimeTheFeedTask();

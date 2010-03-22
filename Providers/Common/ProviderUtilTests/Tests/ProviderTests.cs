@@ -132,9 +132,14 @@ namespace TickZoom.Test
 	  		Assert.GreaterOrEqual(count,2,"tick count");
 			if(debug) log.Debug("===StopSymbol===");
 	  		provider.SendEvent(verify,symbol,(int)EventType.StopSymbol,null);
-	  		verify.TickQueue.Clear();
-	  		count = verify.Verify(0,assertTick,symbol,10);
-	  		Assert.AreEqual(0,count,"tick count");
+	  		
+	  		// Wait for it to swith out of real time or historical mode.
+	  		var expectedState = ReceiverState.Ready;
+	  		var actualState = verify.VerifyState(expectedState,symbol,5);
+	  		Assert.AreEqual(expectedState,actualState,"after receiving a StopSymbol event, if your provider plugin was sending ticks then it must return either respond with an EndHistorical or EndRealTime event. If it has already sent one of those prior to the StopSymbol, then no reponse is required.");
+	  		
+	  		count = verify.Verify(0,assertTick,symbol,5);
+	  		Assert.AreEqual(0,count,"your provider plugin must not send any more ticks after receiving a StopSymbol event.");
 		}
 	
 		[Test]
