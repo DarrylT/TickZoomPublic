@@ -335,7 +335,10 @@ namespace TickZoom.Common
 		
 		public double StartingEquity {
 			get { return startingEquity; }
-			set { startingEquity = value; }
+			set { if( startingEquity <= 0D) {
+					throw new ApplicationException("StartingEquity must be greater than zero because otherwiese many of the statistic produce division by zero (NaN or Not a Number) errors.");
+				}
+				startingEquity = value; }
 		}
 		
 		public double NetProfit {
