@@ -90,12 +90,13 @@ namespace TickZoom.TickUtil
 		public void Initialize(string folderOrfile, string _symbol) {
 			symbol = Factory.Symbol.LookupSymbol(_symbol);
 			lSymbol = symbol.BinaryIdentifier;
-			if( Directory.Exists( storageFolder + "\\" + folderOrfile )) {
+			string filePath = storageFolder + "\\" + folderOrfile;
+			if( Directory.Exists( filePath)) {
 				fileName = storageFolder + "\\" + folderOrfile + "\\" + _symbol.StripInvalidPathChars() + "_Tick" + ".tck";
 			} else if( File.Exists( folderOrfile)) {
 			    fileName = folderOrfile;
 			} else {
-				throw new ApplicationException("Requires either a file or folder to read data.");
+				throw new ApplicationException("Requires either a file or folder to read data. Tried both " + folderOrfile + " and " + filePath);
 			}
 		}
 		
@@ -355,6 +356,7 @@ namespace TickZoom.TickUtil
 			terminate = true;
 			if( fileReaderTask != null) {
 				fileReaderTask.Stop();
+				fileReaderTask.Join();
 			}
 			if( dataIn != null) {
 				dataIn.Close();

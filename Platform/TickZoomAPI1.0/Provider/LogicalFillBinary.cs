@@ -29,6 +29,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Text;
+
 using TickZoom.Api;
 
 namespace TickZoom.Api
@@ -61,6 +63,20 @@ namespace TickZoom.Api
 
 		public double Position {
 			get { return position; }
+		}
+		
+		public override string ToString()
+		{
+			StringBuilder sb = new StringBuilder();
+			sb.Append( "Logical Order Id: ");
+			sb.Append( orderId);
+			sb.Append( ", Price: ");
+			sb.Append( price);
+			sb.Append( ", Position: ");
+			sb.Append( position);
+			sb.Append( ", Time: ");
+			sb.Append( time);
+			return sb.ToString();
 		}
 		
 	}

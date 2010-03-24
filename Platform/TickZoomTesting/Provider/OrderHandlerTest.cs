@@ -738,6 +738,25 @@ namespace Orders
 		}
 		
 		[Test]
+		public void Test21PendingUnneededBuyMarket() {
+			handler.ClearPhysicalOrders();
+			
+			double position = 0;
+			handler.SetActualPosition(0); // Actual and desired differ!!!
+			
+			object sellOrder1 = new object();
+			handler.AddPhysicalOrder(OrderType.BuyMarket,134.12,15,0,sellOrder1);
+
+			handler.SetDesiredPosition(position);
+			handler.SetLogicalOrders(null);
+			handler.PerformCompare();
+			
+			Assert.AreEqual(0,handler.ChangedOrders.Count);
+			Assert.AreEqual(0,handler.CreatedOrders.Count);
+			Assert.AreEqual(1,handler.CanceledOrders.Count);
+		}
+		
+		[Test]
 		public void Test22PendingWrongSideSellMarket() {
 			handler.ClearPhysicalOrders();
 			
@@ -776,22 +795,64 @@ namespace Orders
 		}
 		
 		[Test]
-		public void Test21PendingUnneededBuyMarket() {
+		public void Test24PendingBuyLimit() {
 			handler.ClearPhysicalOrders();
 			
-			double position = 0;
-			handler.SetActualPosition(0); // Actual and desired differ!!!
+			double position = 10;
+			handler.SetActualPosition(-5); // Actual and desired differ!!!
 			
 			object sellOrder1 = new object();
-			handler.AddPhysicalOrder(OrderType.BuyMarket,134.12,15,0,sellOrder1);
+			handler.AddPhysicalOrder(OrderType.BuyLimit,134.12,15,0,sellOrder1);
 
 			handler.SetDesiredPosition(position);
 			handler.SetLogicalOrders(null);
 			handler.PerformCompare();
 			
 			Assert.AreEqual(0,handler.ChangedOrders.Count);
-			Assert.AreEqual(0,handler.CreatedOrders.Count);
+			Assert.AreEqual(1,handler.CreatedOrders.Count);
 			Assert.AreEqual(1,handler.CanceledOrders.Count);
+		}
+		
+		[Test]
+		public void Test25PendingSellLimit() {
+			handler.ClearPhysicalOrders();
+			
+			double position = -10;
+			handler.SetActualPosition(5); // Actual and desired differ!!!
+			
+			object sellOrder1 = new object();
+			handler.AddPhysicalOrder(OrderType.SellLimit,134.12,15,0,sellOrder1);
+
+			handler.SetDesiredPosition(position);
+			handler.SetLogicalOrders(null);
+			handler.PerformCompare();
+			
+			Assert.AreEqual(0,handler.ChangedOrders.Count);
+			Assert.AreEqual(1,handler.CreatedOrders.Count);
+			Assert.AreEqual(1,handler.CanceledOrders.Count);
+		}
+		
+		[Test]
+		public void Test26PendingBuyAndSellLimit() {
+			handler.ClearPhysicalOrders();
+			
+			CreateLogicalEntry(OrderType.BuyMarket,0,2);
+			
+			double position = 0;
+			handler.SetActualPosition(0); // Actual and desired differ!!!
+			
+			object sellOrder1 = new object();
+			object buyOrder1 = new object();
+			handler.AddPhysicalOrder(OrderType.BuyLimit,15.12,3,0,buyOrder1);
+			handler.AddPhysicalOrder(OrderType.SellLimit,34.12,3,0,sellOrder1);
+
+			handler.SetDesiredPosition(position);
+			handler.SetLogicalOrders(orders);
+			handler.PerformCompare();
+			
+			Assert.AreEqual(0,handler.ChangedOrders.Count);
+			Assert.AreEqual(1,handler.CreatedOrders.Count);
+			Assert.AreEqual(2,handler.CanceledOrders.Count);
 		}
 		
 		public class TestOrderHandler : PhysicalOrderHandler, LogicalOrderHandler {

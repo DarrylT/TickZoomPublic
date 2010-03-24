@@ -53,6 +53,10 @@ namespace Krs.Ats.IBNet
         /// </summary>
         [Description("PartiallyFilled")] PartiallyFilled,
         /// <summary>
+        /// The order is Pending from the Api (unknown for certain yet).
+        /// </summary>
+        [Description("ApiPending")] ApiPending,
+        /// <summary>
         /// No Order Status
         /// </summary>
         [Description("")] None

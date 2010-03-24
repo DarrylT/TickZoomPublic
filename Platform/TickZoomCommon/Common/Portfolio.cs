@@ -32,6 +32,8 @@ namespace TickZoom.Common
 {
 	public class Portfolio : Model, PortfolioInterface
 	{
+		private static readonly Log log = Factory.Log.GetLogger(typeof(Portfolio));
+		private static readonly bool debug = log.IsDebugEnabled;
 		private List<Strategy> strategies = new List<Strategy>();
 		private List<Portfolio> portfolios = new List<Portfolio>();
 		private List<StrategyWatcher> watchers = new List<StrategyWatcher>();
@@ -139,7 +141,7 @@ namespace TickZoom.Common
 				get { return strategy.ActiveOrders; }
 			}
 			
-			public bool ActiveOrdersChanged {
+			public bool IsActiveOrdersChanged {
 				get { return strategy.IsActiveOrdersChanged; }
 			}
 			
@@ -174,7 +176,7 @@ namespace TickZoom.Common
 			if (portfolioType == PortfolioType.SingleSymbol) {
 				bool mergeOrders = false;
 				foreach (var watcher in watchers) {
-					if (watcher.ActiveOrdersChanged) {
+					if (watcher.IsActiveOrdersChanged) {
 						mergeOrders = true;
 						break;
 					}
@@ -184,7 +186,6 @@ namespace TickZoom.Common
 					foreach (var watcher in watchers) {
 						activeOrders.AddRange(watcher.ActiveOrders);
 					}
-					IsActiveOrdersChanged = true;
 				}
 			}
 		}
@@ -206,6 +207,7 @@ namespace TickZoom.Common
 				if (changeCount > 0) {
 					double averagePrice = (totalPrice / changeCount).Round();
 					Position.Change(internalSignal, averagePrice, Ticks[0].Time);
+					Result.Position.Copy(Position);
 				}
 			} else if (portfolioType == PortfolioType.MultiSymbol) {
 				double tempClosedEquity = 0;
@@ -322,7 +324,14 @@ namespace TickZoom.Common
 		
 		public bool IsActiveOrdersChanged {
 			get { return isActiveOrdersChanged; }
-			set { isActiveOrdersChanged = value; }
+			set {
+				if( !value) {
+					foreach( var strategy in strategies) {
+						strategy.IsActiveOrdersChanged = false;
+					}
+				}
+				isActiveOrdersChanged = value; 
+			}
 		}
 		
 		public void RefreshActiveOrders() {

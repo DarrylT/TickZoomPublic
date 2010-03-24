@@ -105,12 +105,15 @@
     <Compile Include="EngineInterfaces\Bars.cs" />
     <Compile Include="EngineInterfaces\CircularList.cs" />
     <Compile Include="EngineInterfaces\FastQueue.cs" />
+    <Compile Include="EngineInterfaces\ISymbolProperties.cs" />
     <Compile Include="EngineInterfaces\NewEventDetail.cs" />
     <Compile Include="EngineInterfaces\PositionChangeDetail.cs" />
     <Compile Include="EngineInterfaces\Provider.cs" />
     <Compile Include="EngineInterfaces\QueueItem.cs" />
+    <Compile Include="EngineInterfaces\QuoteType.cs" />
     <Compile Include="EngineInterfaces\StartSymbolDetail.cs" />
     <Compile Include="EngineInterfaces\SymbolInfo.cs" />
+    <Compile Include="EngineInterfaces\InstrumentType.cs" />
     <Compile Include="EngineInterfaces\Task.cs" />
     <Compile Include="EngineInterfaces\Receiver.cs" />
     <Compile Include="EngineInterfaces\Chain.cs" />
@@ -140,6 +143,7 @@
     <Compile Include="EngineInterfaces\TickIO.cs" />
     <Compile Include="EngineInterfaces\TickQueue.cs" />
     <Compile Include="EngineInterfaces\Ticks.cs" />
+    <Compile Include="EngineInterfaces\TimeAndSales.cs" />
     <Compile Include="EngineInterfaces\Times.cs" />
     <Compile Include="EngineInterfaces\TimeSyncDetail.cs" />
     <Compile Include="EngineInterfaces\TimeSyncGenerator.cs" />

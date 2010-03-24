@@ -212,6 +212,10 @@ namespace TickZoom.Common
 			double pendingAdjustments = 0D;
 			for( int i=0; i<physicalOrders.Count; i++) {
 				var order = physicalOrders[i];
+				if(order.Type != OrderType.BuyMarket &&
+				   order.Type != OrderType.SellMarket) {
+					continue;
+				}
 				if( order.LogicalOrderId == 0) {
 					if( order.Type == OrderType.BuyMarket) {
 						pendingAdjustments += order.Size;

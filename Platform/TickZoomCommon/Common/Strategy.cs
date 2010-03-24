@@ -157,7 +157,7 @@ namespace TickZoom.Common
 			if( order.IsActive ) {
 				// Any change to an active order even if only 
 				// a price change means the list change.
-				isActiveOrdersChanged = true;
+				IsActiveOrdersChanged = true;
 				if( !activeOrders.Contains(order)) {
 					bool found = false;
 					for( int i=0; i<activeOrders.Count; i++) {
@@ -177,7 +177,7 @@ namespace TickZoom.Common
 					activeOrders.Remove(order);
 					// Since this order became inactive, it
 					// means the active list changed.
-					isActiveOrdersChanged = true;
+					IsActiveOrdersChanged = true;
 				}
 			}
 			if( order.IsNextBar) {

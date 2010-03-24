@@ -377,6 +377,7 @@ namespace TickZoom.Common
 		}
 		
 		public void ProcessFill(StrategyInterface strategyInterface, LogicalFill fill) {
+			if( IsDebug) Log.Debug( "Considering fill: " + fill + " for strategy " + strategyInterface);
 			Strategy strategy = (Strategy) strategyInterface;
 			bool cancelAllEntries = false;
 			bool cancelAllExits = false;
@@ -385,13 +386,24 @@ namespace TickZoom.Common
 			LogicalOrder filledOrder = null;
 			foreach( var order in strategy.ActiveOrders) {
 				if( order.Id == orderId) {
-					if( order.TradeDirection == TradeDirection.Entry && !doEntryOrders) return;
-					if( order.TradeDirection == TradeDirection.Exit && !doExitOrders) return;
-					if( order.TradeDirection == TradeDirection.ExitStrategy && !doExitStrategyOrders) return;
+					if( IsDebug) Log.Debug( "Matched fill with orderId: " + orderId);
+					if( order.TradeDirection == TradeDirection.Entry && !doEntryOrders) {
+						if( IsDebug) Log.Debug( "Skipping fill, entry orders fills disabled.");
+						return;
+					}
+					if( order.TradeDirection == TradeDirection.Exit && !doExitOrders) {
+						if( IsDebug) Log.Debug( "Skipping fill, exit orders fills disabled.");
+						return;
+					}
+					if( order.TradeDirection == TradeDirection.ExitStrategy && !doExitStrategyOrders) {
+						if( IsDebug) Log.Debug( "Skipping fill, exit strategy orders fills disabled.");
+						return;
+					}
 					filledOrder = order;
 					if (drawTrade != null) {
 						drawTrade(filledOrder,fill.Price,fill.Position);
 					}
+					if( IsDebug) Log.Debug( "Changing position because of fill");
 					changePosition(strategy.Data.SymbolInfo,fill);
 				}
 			}

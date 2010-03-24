@@ -88,7 +88,7 @@ namespace Krs.Ats.IBNet
                     return fi.GetValue(fi.Name);
                 }
             }
-            return description;
+            throw new InvalidCastException("Cannot convert " + description + " to the " + value.Name + " enum type.");
         }
     }
 }

@@ -25,6 +25,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Threading;
 
 namespace TickZoom.Api
 {
@@ -52,10 +53,13 @@ namespace TickZoom.Api
 						isDeleted = true;
 					} catch( Exception ex) {
 						LogMsg("warning: error removing shadow copy folder: " + GetShadowCopyFolder() + ": " + ex.Message);
+						Thread.Sleep(500);
 					}
 				}
 			}
-			Directory.CreateDirectory(path);
+			if( !Directory.Exists(path) ) {
+				Directory.CreateDirectory(path);
+			}
 		}
 		
 		internal void LogMsg(string message) {
@@ -97,6 +101,8 @@ namespace TickZoom.Api
 			return System.Environment.CurrentDirectory+
 				Path.DirectorySeparatorChar+
 				"ShadowCopy"+
+				Path.DirectorySeparatorChar+
+				System.Diagnostics.Process.GetCurrentProcess().ProcessName +
 				Path.DirectorySeparatorChar;
 		}
 		
@@ -154,7 +160,7 @@ namespace TickZoom.Api
 							File.Copy(fullPath,shadowPath,true);
 							loadPath = shadowPath;
 						} catch( IOException ex) {
-							LogMsg("Unable to create shadow copy of " + fileName + ". Actual error: '" + ex.GetType() + ": " + ex.Message + "'. Ignoring. Continuing.");
+							LogMsg("Unable to copy " + fileName + " into shadow copy folder. Actual error: '" + ex.GetType() + ": " + ex.Message + "'. Ignoring. Continuing.");
 						}
 					}
 		            Assembly assembly = Assembly.LoadFrom(loadPath);

@@ -59,6 +59,7 @@ namespace TickZoom.Common
 		private bool useSyntheticMarkets = true;
 		private bool useSyntheticLimits = true;
 		private bool useSyntheticStops = true;
+		InstrumentType instrumentType = InstrumentType.None;
 		
 		public TimeAndSales TimeAndSales {
 			get { return timeAndSales; }
@@ -186,6 +187,11 @@ namespace TickZoom.Common
 		public bool UseSyntheticStops {
 			get { return useSyntheticStops; }
 			set { useSyntheticStops = value; }
+		}
+		
+		public InstrumentType InstrumentType {
+			get { return instrumentType; }
+			set { instrumentType = value; }
 		}
 	}
 }

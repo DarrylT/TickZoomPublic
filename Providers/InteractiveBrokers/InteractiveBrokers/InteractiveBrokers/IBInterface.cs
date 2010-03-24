@@ -22,6 +22,7 @@
 #endregion
 
 using System;
+using System.Globalization;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -47,7 +48,7 @@ namespace TickZoom.InteractiveBrokers
         private int nextValidId = 0;
         private Dictionary<ulong,SymbolHandler> symbolHandlers = new Dictionary<ulong,SymbolHandler>();
 
-        public IBInterface()
+		public IBInterface()
 		{
         }
         
@@ -75,17 +76,21 @@ namespace TickZoom.InteractiveBrokers
 		Receiver receiver;
         public void Start(Receiver receiver)
         {
-        	log.Info("IBInterface Startup");
-        	this.receiver = (Receiver) receiver;
-        	Initialize();
-			string appDataFolder = Factory.Settings["AppDataFolder"];
-			if( appDataFolder == null) {
-				throw new ApplicationException("Sorry, AppDataFolder must be set in the app.config file.");
-			}
-			string configFile = appDataFolder+@"/Providers/IBProviderService.config";
-			
-			LoadProperties(configFile);
-			
+        	try { 
+	        	log.Info("IBInterface Startup");
+	        	this.receiver = (Receiver) receiver;
+	        	Initialize();
+				string appDataFolder = Factory.Settings["AppDataFolder"];
+				if( appDataFolder == null) {
+					throw new ApplicationException("Sorry, AppDataFolder must be set in the app.config file.");
+				}
+				string configFile = appDataFolder+@"/Providers/IBProviderService.config";
+				
+				LoadProperties(configFile);
+        	} catch( Exception ex) {
+        		log.Error(ex.Message,ex);
+        		throw;
+        	}
         }
 
         Dictionary<string, string> data;
@@ -141,9 +146,14 @@ namespace TickZoom.InteractiveBrokers
 		public void StartSymbol(Receiver receiver, SymbolInfo symbol, StartSymbolDetail detail)
 		{
 			if( debug) log.Debug("StartSymbol " + symbol + ", " + detail.LastTime);
-            Equity equity = new Equity(symbol.Symbol);
+//            Equity equity = new Equity(symbol.Symbol);
+//			Contract contract = new Contract(symbol.Symbol,"SMART",SecurityType.Stock,"USD");
+//            Contract contract = new Contract(symbol.Symbol,"GLOBEX",SecurityType.Future,"USD","201006");
+			Contract contract = SymbolToContract(symbol);
             SymbolHandler handler = GetSymbolHandler(symbol,receiver);
-            client.RequestMarketData((int)symbol.BinaryIdentifier, equity, null, false, false);
+//            tickerid.Add((int)symbol.BinaryIdentifier);
+//            client.RequestMarketData((int)symbol.BinaryIdentifier, contract, null, false, false);
+            client.RequestMarketData((int)symbol.BinaryIdentifier, contract, null, false, false);
             receiver.OnEvent(symbol,(int)EventType.StartRealTime,null);
 		}
 		
@@ -187,8 +197,11 @@ namespace TickZoom.InteractiveBrokers
 			TimeStamp executionTime = new TimeStamp(e.Execution.Time);
 			int logicalOrderId = GetLogicalOrderId( e.Execution.OrderId);
 			double change = e.Execution.Side == ExecutionSide.Bought ? e.Execution.Shares : - e.Execution.Shares;
+			double positionBefore = symbolHandler.Position;
 			symbolHandler.AddPosition( change);
+			if( trace) log.Trace( "Changed symbol position: " + positionBefore + " + " + change + " = " + symbolHandler.Position);
 			LogicalFillBinary binary = new LogicalFillBinary(symbolHandler.Position,e.Execution.Price,executionTime,logicalOrderId);
+			if( debug) log.Debug( "Sending logical fill: " + binary);
             receiver.OnEvent(symbol,(int)EventType.LogicalFill,binary);
         }
 
@@ -208,6 +221,7 @@ namespace TickZoom.InteractiveBrokers
         		case OrderStatus.PendingCancel:
         			deleteFlag = true;
         			break;
+        		case OrderStatus.ApiPending:
         		case OrderStatus.PendingSubmit:
         		case OrderStatus.PreSubmitted:
         		case OrderStatus.PartiallyFilled:
@@ -342,13 +356,15 @@ namespace TickZoom.InteractiveBrokers
 
         private void client_TickSize(object sender, TickSizeEventArgs e)
         {
-        	SymbolHandler buffer = symbolHandlers[(ulong)e.TickerId];
-        	if( e.TickType == TickType.AskSize) {
-        		buffer.AskSize = e.Size;
+        	if(e.Size < 65535) {
+        		SymbolHandler buffer = symbolHandlers[(ulong)e.TickerId];
+        		if( e.TickType == TickType.AskSize) {
+        			buffer.AskSize = e.Size;
         	} else if( e.TickType == TickType.BidSize) {
         		buffer.BidSize = e.Size;
         	} else if( e.TickType == TickType.LastSize) {
         		buffer.LastSize = e.Size;
+        	}
         	}
         }
         
@@ -457,11 +473,38 @@ namespace TickZoom.InteractiveBrokers
         }
         Dictionary<int,int> physicalToLogicalOrderMap = new Dictionary<int, int>();
         
+        private Contract SymbolToContract(SymbolInfo symbol) {
+			Contract contract = null;
+			switch( symbol.InstrumentType) {
+				case InstrumentType.Forex:
+					string[] pairs = symbol.Symbol.Split(new string[] { "/" },StringSplitOptions.RemoveEmptyEntries);
+					if( pairs.Length != 2) {
+						pairs = symbol.Symbol.Split(new string[] { "/" },StringSplitOptions.RemoveEmptyEntries);
+					}
+					if( pairs.Length != 2) {
+						throw new ApplicationException("Invalid forex pair, user either / or . to separate as in 'USD/JPY' or 'USD.JPY'");
+					}
+					contract = new Forex(pairs[0],pairs[1]);
+					break;
+				case InstrumentType.Stock:
+					contract = new Equity(symbol.Symbol);
+					break;
+				case InstrumentType.Future:
+					contract = new Future(symbol.Symbol,"GLOBEX","201006");
+					break;
+				default:
+					throw new ApplicationException("Unrecognized instrument type " + symbol.InstrumentType + " in symbol dictionary for symbol " + symbol);
+			}
+			return contract;
+        }
+        
 		public void OnCreateBrokerOrder(PhysicalOrder physicalOrder)
 		{
 			if( trace) log.Trace( "OnCreateBrokerOrder " + physicalOrder);
 			SymbolInfo symbol = physicalOrder.Symbol;
-			Contract contract = new Contract(symbol.Symbol,"SMART",SecurityType.Stock,"USD");
+			Contract contract = SymbolToContract(symbol);
+//			Contract contract = new Contract(symbol.Symbol,"SMART",SecurityType.Stock,"USD");
+//			Contract contract = new Contract(symbol.Symbol,"GLOBEX",SecurityType.Future,"USD","201006");
 			Order brokerOrder = ToBrokerOrder(physicalOrder);
 			while(nextValidId==0) {
 				Thread.Sleep(10);

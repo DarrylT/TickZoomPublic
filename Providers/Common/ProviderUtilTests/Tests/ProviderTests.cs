@@ -133,7 +133,7 @@ namespace TickZoom.Test
 			if(debug) log.Debug("===StopSymbol===");
 	  		provider.SendEvent(verify,symbol,(int)EventType.StopSymbol,null);
 	  		
-	  		// Wait for it to swith out of real time or historical mode.
+	  		// Wait for it to switch out of real time or historical mode.
 	  		var expectedState = ReceiverState.Ready;
 	  		var actualState = verify.VerifyState(expectedState,symbol,5);
 	  		Assert.AreEqual(expectedState,actualState,"after receiving a StopSymbol event, if your provider plugin was sending ticks then it must return either respond with an EndHistorical or EndRealTime event. If it has already sent one of those prior to the StopSymbol, then no reponse is required.");
@@ -225,7 +225,7 @@ namespace TickZoom.Test
 			int secondsDelay = 25;
 			if(debug) log.Debug("===DemoConnectionTest===");
 			provider.SendEvent(verify,symbol,(int)EventType.StartSymbol,new StartSymbolDetail(TimeStamp.MinValue));
-  			double expectedPosition = 150;
+  			double expectedPosition = 5;
   			provider.SendEvent(verify,symbol,(int)EventType.PositionChange,new PositionChangeDetail(symbol,expectedPosition,null));
   			double position = verify.VerifyPosition(expectedPosition,symbol,secondsDelay);
   			Assert.AreEqual(expectedPosition,position,"position");
@@ -234,12 +234,12 @@ namespace TickZoom.Test
   			position = verify.VerifyPosition(expectedPosition,symbol,secondsDelay);
   			Assert.AreEqual(expectedPosition,position,"position");
 
-  			expectedPosition = 150;
+  			expectedPosition = 5;
   			provider.SendEvent(verify,symbol,(int)EventType.PositionChange,new PositionChangeDetail(symbol,expectedPosition,null));
   			position = verify.VerifyPosition(expectedPosition,symbol,secondsDelay);
   			Assert.AreEqual(expectedPosition,position,"position");
 
-  			expectedPosition = 150;
+  			expectedPosition = 5;
   			provider.SendEvent(verify,symbol,(int)EventType.PositionChange,new PositionChangeDetail(symbol,expectedPosition,null));
   			position = verify.VerifyPosition(expectedPosition,symbol,secondsDelay);
   			Assert.AreEqual(expectedPosition,position,"position");
@@ -250,8 +250,8 @@ namespace TickZoom.Test
 			provider.SendEvent(verify,symbol,(int)EventType.StartSymbol,new StartSymbolDetail(TimeStamp.MinValue));
   			provider.SendEvent(verify,symbol,(int)EventType.PositionChange,new PositionChangeDetail(symbol,0,orders));
   			long count = verify.Verify(1,assertTick,symbol,25);
-			CreateLogicalEntry(OrderType.BuyLimit,15.12,1000);
-			CreateLogicalEntry(OrderType.SellLimit,34.12,1000);
+			CreateLogicalEntry(OrderType.BuyLimit,15.12,3);
+			CreateLogicalEntry(OrderType.SellLimit,34.12,3);
 			CreateLogicalExit(OrderType.SellLimit,40.12);
 			CreateLogicalExit(OrderType.SellStop,5.12);
 			CreateLogicalExit(OrderType.BuyLimit,10.12);
@@ -266,7 +266,7 @@ namespace TickZoom.Test
 		public void TestSpecificLogicalOrder() {
 			provider.SendEvent(verify,symbol,(int)EventType.StartSymbol,new StartSymbolDetail(TimeStamp.MinValue));
   			provider.SendEvent(verify,symbol,(int)EventType.PositionChange,new PositionChangeDetail(symbol,0,orders));
-			CreateLogicalEntry(OrderType.BuyLimit,503.72,100);
+			CreateLogicalEntry(OrderType.BuyLimit,503.72,4);
   			provider.SendEvent(verify,symbol,(int)EventType.PositionChange,new PositionChangeDetail(symbol,0,orders));
   			long count = verify.Verify(2,assertTick,symbol,25);
   			Assert.GreaterOrEqual(count,2,"tick count");
@@ -274,14 +274,13 @@ namespace TickZoom.Test
 		}
 		
 		public void AssertLevel1( TickIO tick, TickIO lastTick, ulong symbol) {
-        	Assert.IsTrue(tick.IsQuote);
+        	Assert.IsTrue(tick.IsQuote || tick.IsTrade);
         	if( tick.IsQuote) {
 	        	Assert.Greater(tick.Bid,0);
 //	        	Assert.Greater(tick.BidLevel(0),0);
 	        	Assert.Greater(tick.Ask,0);
 //	        	Assert.Greater(tick.AskLevel(0),0);
         	}
-        	Assert.IsFalse(tick.IsTrade);
         	if( tick.IsTrade) {
 	        	Assert.Greater(tick.Price,0);
     	    	Assert.Greater(tick.Size,0);
