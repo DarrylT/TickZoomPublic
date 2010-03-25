@@ -401,6 +401,8 @@ namespace TickZoom.Common
     <property name=""Level2Increment"" value=""1"" />
     <property name=""FullPointValue"" value=""50"" />
     <property name=""MinimumTick"" value=""0.25"" />
+    <property name=""TimeAndSales"" value=""ActualTrades"" />
+    <property name=""QuoteType"" value=""Level1"" />
     <category name=""Testing"">
       <symbol name=""ES"">
         <property name=""UseSyntheticLimits"" value=""false"" />

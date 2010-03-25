@@ -52,7 +52,7 @@ namespace TickZoom.Common
 		private ulong binaryIdentifier;
 		private SymbolInfo universalSymbol;
 		private int chartGroup;
-		private QuoteType quoteType = QuoteType.Level2;
+		private QuoteType quoteType = QuoteType.Level1;
 		private TimeAndSales timeAndSales = TimeAndSales.ActualTrades;
 		private string displayTimeZone;
 		private string timeZone;
