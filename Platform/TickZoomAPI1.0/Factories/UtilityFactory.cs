@@ -35,5 +35,6 @@ namespace TickZoom.Api
 		FillSimulator FillSimulator();
 		FillSimulator FillSimulator(StrategyInterface strategy);
 		BreakPointInterface BreakPoint();
+		PositionInterface Position(ModelInterface model);
 	}
 }

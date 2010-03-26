@@ -58,5 +58,8 @@ namespace TickZoom.Common
 		public BreakPointInterface BreakPoint() {
 			return new BreakPoint();
 		}
+		public PositionInterface Position(ModelInterface model) {
+			return new PositionCommon(model);
+		}
 	}
 }

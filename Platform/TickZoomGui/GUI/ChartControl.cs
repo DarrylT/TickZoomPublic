@@ -411,26 +411,25 @@ namespace TickZoom
 		{
 			Color color = Color.Empty;
 			ArrowDirection direction = ArrowDirection.Up;
+			switch( order.Type) {
+				case OrderType.BuyLimit:
+				case OrderType.BuyStop:
+				case OrderType.BuyMarket:
+					color = Color.Green;
+					direction = ArrowDirection.Up;
+					break;
+				case OrderType.SellLimit:
+				case OrderType.SellStop:
+				case OrderType.SellMarket:
+					color = Color.Red;
+					direction = ArrowDirection.Down;
+					break;
+				default: 
+					throw new ApplicationException("Unknown OrderType " + order.Type + " for drawing a trade.");
+			}
 			if( order.TradeDirection == TradeDirection.Exit ||
 			    order.TradeDirection == TradeDirection.ExitStrategy ) {
 				color = Color.Black;	
-			} else {
-				switch( order.Type) {
-					case OrderType.BuyLimit:
-					case OrderType.BuyStop:
-					case OrderType.BuyMarket:
-						color = Color.Green;
-						direction = ArrowDirection.Up;
-						break;
-					case OrderType.SellLimit:
-					case OrderType.SellStop:
-					case OrderType.SellMarket:
-						color = Color.Red;
-						direction = ArrowDirection.Down;
-						break;
-					default: 
-						throw new ApplicationException("Unknown OrderType " + order.Type + " for drawing a trade.");
-				}
 			}
 			// One ticket open on tickzoom is to draw arrows to scale based
 			// on the price range of the chart. This numbers for size and position

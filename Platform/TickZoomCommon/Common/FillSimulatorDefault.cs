@@ -167,8 +167,9 @@ namespace TickZoom.Common
 		private void ProcessBuyMarket(LogicalOrder order, Tick tick)
 		{
 			LogMsg("Buy Market Exit at " + tick);
-			FlattenSignal(tick.Ask, tick, order);
-			TryDrawTrade(order, tick.Ask, position);
+			double price = tick.IsTrade ? tick.Price : tick.Ask;
+			FlattenSignal(price, tick, order);
+			TryDrawTrade(order, price, position);
 		}
 		
 		private void TryDrawTrade(LogicalOrder order, double price, double position) {
@@ -180,25 +181,26 @@ namespace TickZoom.Common
 		private void ProcessSellMarket(LogicalOrder order, Tick tick)
 		{
 			LogMsg("Sell Market Exit at " + tick);
-			FlattenSignal(tick.Ask, tick, order);
-			TryDrawTrade(order, tick.Bid, position);
+			double price = tick.IsTrade ? tick.Price : tick.Bid;
+			FlattenSignal(price, tick, order);
+			TryDrawTrade(order, price, position);
 		}
 
 		private void ProcessBuyStop(LogicalOrder order, Tick tick)
 		{
-			if (tick.Ask >= order.Price) {
+			double price = tick.IsQuote ? tick.Ask : tick.Price;
+			if (price >= order.Price) {
 				LogMsg("Buy Stop Exit at " + tick);
-				FlattenSignal(tick.Ask, tick, order);
-				TryDrawTrade(order, tick.Ask, position);
+				FlattenSignal(price, tick, order);
+				TryDrawTrade(order, price, position);
 			}
 		}
 
 		private void ProcessBuyLimit(LogicalOrder order, Tick tick)
 		{
-			double price = 0;
 			bool isFilled = false;
-			if (tick.Ask <= order.Price) {
-				price = tick.Ask;
+			double price = tick.IsTrade ? tick.Price : tick.Ask;
+			if (price <= order.Price) {
 				isFilled = true;
 			} else if (tick.IsTrade && tick.Price < order.Price) {
 				price = order.Price;
@@ -213,19 +215,19 @@ namespace TickZoom.Common
 
 		private void ProcessSellStop(LogicalOrder order, Tick tick)
 		{
-			if (tick.Bid <= order.Price) {
+			double price = tick.IsTrade ? tick.Price : tick.Bid;
+			if (price <= order.Price) {
 				LogMsg("Sell Stop Exit at " + tick);
-				FlattenSignal(tick.Bid, tick, order);
-				TryDrawTrade(order, tick.Bid, position);
+				FlattenSignal(price, tick, order);
+				TryDrawTrade(order, price, position);
 			}
 		}
 
 		private void ProcessSellLimit(LogicalOrder order, Tick tick)
 		{
-			double price = 0;
+			double price = tick.IsTrade ? tick.Price : tick.Bid;
 			bool isFilled = false;
-			if (tick.Bid >= order.Price) {
-				price = tick.Bid;
+			if (price >= order.Price) {
 				isFilled = true;
 			} else if (tick.IsTrade && tick.Price > order.Price) {
 				price = order.Price;
@@ -274,21 +276,23 @@ namespace TickZoom.Common
 
 		private void ProcessEnterBuyStop(LogicalOrder order, Tick tick)
 		{
-			if (tick.Ask >= order.Price) {
+			double price = tick.IsTrade ? tick.Price : tick.Ask;
+			if (price >= order.Price) {
 				LogMsg("Long Stop Entry at " + tick);
 				
-				CreateLogicalFill(symbol, order.Positions, tick.Ask, tick.Time, order.Id);
-				TryDrawTrade(order, tick.IsQuote ? tick.Ask : tick.Price, order.Positions);
+				CreateLogicalFill(symbol, order.Positions, price, tick.Time, order.Id);
+				TryDrawTrade(order, price, order.Positions);
 				CancelEnterOrders();
 			}
 		}
 
 		private void ProcessEnterSellStop(LogicalOrder order, Tick tick)
 		{
-			if (tick.Ask <= order.Price) {
+			double price = tick.IsQuote ? tick.Ask : tick.Price;
+			if (price <= order.Price) {
 				LogMsg("Short Stop Entry at " + tick);
-				CreateLogicalFill(symbol, order.Positions, tick.Ask, tick.Time, order.Id);
-				TryDrawTrade(order, tick.IsQuote ? tick.Bid : tick.Price, order.Positions);
+				CreateLogicalFill(symbol, order.Positions, price, tick.Time, order.Id);
+				TryDrawTrade(order, price, order.Positions);
 				CancelEnterOrders();
 			}
 		}
@@ -325,10 +329,9 @@ namespace TickZoom.Common
 		
 		private void ProcessEnterBuyLimit(LogicalOrder order, Tick tick)
 		{
-			double price = 0;
+			double price = tick.IsQuote ? tick.Ask : tick.Price;
 			bool isFilled = false;
-			if (tick.Ask <= order.Price) {
-				price = tick.Ask;
+			if (price <= order.Price) {
 				isFilled = true;
 			} else if (tick.IsTrade && tick.Price < order.Price) {
 				price = order.Price;
@@ -357,10 +360,9 @@ namespace TickZoom.Common
 
 		private void ProcessEnterSellLimit(LogicalOrder order, Tick tick)
 		{
-			double price = 0;
+			double price = tick.IsQuote ? tick.Bid : tick.Price;
 			bool isFilled = false;
-			if (tick.Bid >= order.Price) {
-				price = tick.Bid;
+			if (price >= order.Price) {
 				isFilled = true;
 			} else if (tick.IsTrade && tick.Price > order.Price) {
 				price = order.Price;
