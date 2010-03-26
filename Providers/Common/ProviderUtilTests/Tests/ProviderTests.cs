@@ -57,8 +57,8 @@ namespace TickZoom.Test
 		public void Init()
 		{
 			string appData = Factory.Settings["AppDataFolder"];
-			File.Delete( appData + @"\Logs\"+providerAssembly+"Tests.log");
-			File.Delete( appData + @"\Logs\"+providerAssembly+".log");
+			File.Delete( Factory.Log.LogFolder + @"\" + providerAssembly+"Tests.log");
+			File.Delete( Factory.Log.LogFolder + @"\" + providerAssembly+".log");
 			
 		}
 		
@@ -266,11 +266,13 @@ namespace TickZoom.Test
 		public void TestSpecificLogicalOrder() {
 			provider.SendEvent(verify,symbol,(int)EventType.StartSymbol,new StartSymbolDetail(TimeStamp.MinValue));
   			provider.SendEvent(verify,symbol,(int)EventType.PositionChange,new PositionChangeDetail(symbol,0,orders));
-			CreateLogicalEntry(OrderType.BuyLimit,503.72,4);
-  			provider.SendEvent(verify,symbol,(int)EventType.PositionChange,new PositionChangeDetail(symbol,0,orders));
   			long count = verify.Verify(2,assertTick,symbol,25);
   			Assert.GreaterOrEqual(count,2,"tick count");
-  			 Thread.Sleep(2000);
+			CreateLogicalEntry(OrderType.BuyLimit,503.72,4);
+  			provider.SendEvent(verify,symbol,(int)EventType.PositionChange,new PositionChangeDetail(symbol,0,orders));
+  			count = verify.Verify(2,assertTick,symbol,25);
+  			Assert.GreaterOrEqual(count,2,"tick count");
+  			Thread.Sleep(2000);
 		}
 		
 		public void AssertLevel1( TickIO tick, TickIO lastTick, ulong symbol) {

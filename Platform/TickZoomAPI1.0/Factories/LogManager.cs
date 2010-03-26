@@ -32,5 +32,6 @@ namespace TickZoom.Api
 		void Configure();
 		Log GetLogger(Type type);
 		Log GetLogger(string name);
+		string LogFolder { get; } 
 	}	
 }

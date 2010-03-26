@@ -28,9 +28,10 @@
 #endregion
 
 using System;
-using TickZoom.Api;
+using System.IO;
 using log4net;
 using log4net.Appender;
+using TickZoom.Api;
 
 namespace TickZoom.Logging
 {
@@ -56,11 +57,8 @@ namespace TickZoom.Logging
             {
                 try
                 {
-                    // get the log directory
-                    string logDirectory = Factory.Settings["AppDataFolder"];
-
                     // get the log file name from the config file.
-                    string logFileName = value.Replace("AppDataFolder",logDirectory);
+                    string logFileName = value.Replace("LogFolder",Factory.Log.LogFolder);
 
                     base.File = logFileName;
                 }

@@ -42,6 +42,21 @@ namespace TickZoom.Logging
 			Console.WriteLine(domain.FriendlyName+": TickZoom.Logging.LogManagerImpl: Configuring log4net");
 			log4net.Config.XmlConfigurator.Configure();
 		}
+		public string LogFolder {
+			get {
+                // get the log directory
+                string logDirectory = Factory.Settings["AppDataFolder"];
+				string uniqueFolder = Environment.CurrentDirectory;
+				uniqueFolder = uniqueFolder.Replace(Path.DirectorySeparatorChar,'_');
+				uniqueFolder = uniqueFolder.Replace(":","");
+				logDirectory = logDirectory +
+					Path.DirectorySeparatorChar +
+					uniqueFolder + 
+					Path.DirectorySeparatorChar +
+					"Logs";
+				return logDirectory;
+			}
+		}
 		public Log GetLogger(Type type) {
 			LogImpl log;
 			if( map.TryGetValue(type.FullName, out log)) {

@@ -738,8 +738,10 @@ namespace TickZoom.TickUtil
 				if( IsTrade) {
 					return binary.Price.ToDouble();
 				} else {
-					throw new ApplicationException("Sorry. The Price property on a tick can only by accessed\n" +
-					                               "if it has trade data. Please, check the IsTrade property.");
+					string msg = "Sorry. The Price property on a tick can only by accessed\n" +
+					             "if it has trade data. Please, check the IsTrade property.";
+					log.Error("msg");
+					throw new ApplicationException(msg);
 				}
 			}
 		}

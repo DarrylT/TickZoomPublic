@@ -60,10 +60,9 @@ namespace Loaders
 		
 		[TestFixtureSetUp]
 		public virtual void RunStrategy() {
-			string appDataFolder = Factory.Settings["AppDataFolder"];
-			string filePath = appDataFolder + @"\Logs\Trades.log";
+			string filePath = Factory.Log.LogFolder + @"\Trades.log";
 			File.Delete(filePath);
-			filePath = appDataFolder + @"\Logs\BarData.log";
+			filePath = Factory.Log.LogFolder + @"\BarData.log";
 			File.Delete(filePath);
 			SyncTicks.MockTradeCount = 0;
 		}
@@ -114,8 +113,7 @@ namespace Loaders
 		public void LoadTrades() {
 			string fileDir = @"..\..\Platform\ExamplesPluginTests\Loaders\Trades\";
 			string knownGoodPath = fileDir + GetType().Name + "Trades.log";
-			string appDataFolder = Factory.Settings["AppDataFolder"];
-			string newPath = appDataFolder + @"\Logs\Trades.log";
+			string newPath = Factory.Log.LogFolder + @"\Trades.log";
 			if( StoreKnownGood) {
 				File.Copy(newPath,knownGoodPath,true);
 			}
@@ -155,10 +153,9 @@ namespace Loaders
 		public void LoadBarData() {
 			string fileDir = @"..\..\Platform\ExamplesPluginTests\Loaders\Trades\";
 			string filePath = fileDir + GetType().Name + "BarData.log";
-			string appDataFolder = Factory.Settings["AppDataFolder"];
 			goodBarDataMap.Clear();
 			LoadBarData(filePath,goodBarDataMap);
-			filePath = appDataFolder + @"\Logs\BarData.log";
+			filePath = Factory.Log.LogFolder + @"\BarData.log";
 			testBarDataMap.Clear();
 			LoadBarData(filePath,testBarDataMap);
 		}
