@@ -58,7 +58,9 @@ namespace TickZoom.Common
 			if( Strategy.IsActiveOrdersChanged) {
 				Strategy.RefreshActiveOrders();
 				foreach( var order in Strategy.AllOrders) {
-					order.Positions = size;
+					if( order.TradeDirection == TradeDirection.Entry) {
+						order.Positions = size;
+					}
 				}
 			}
 		}
