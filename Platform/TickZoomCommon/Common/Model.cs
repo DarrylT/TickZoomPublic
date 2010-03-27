@@ -71,6 +71,7 @@ namespace TickZoom.Common
 			RequestEvent( EventType.Open);
 			RequestEvent( EventType.Close);
 			RequestEvent( EventType.Tick);
+			RequestEvent( EventType.LogicalFill);
 			RequestEvent( EventType.EndHistorical);
 		}
 
