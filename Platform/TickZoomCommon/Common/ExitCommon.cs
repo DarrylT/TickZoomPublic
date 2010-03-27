@@ -96,21 +96,12 @@ namespace TickZoom.Common
 			orders.sellLimit.IsActive = false;
 		}
 		
-		private void LogExit(string description) {
-			if( Strategy.Chart.IsDynamicUpdate) {
-				Log.Notice("Bar="+Strategy.Chart.DisplayBars.CurrentBar+", " + description);
-			} else {
-        		if( IsDebug) Log.Debug("Bar="+Strategy.Chart.DisplayBars.CurrentBar+", " + description);
-			}
-		}
-
         #region Orders
 
         public void GoFlat() {
         	if( Strategy.Position.IsFlat) {
         		throw new TickZoomException("Strategy must have a position before attempting to go flat.");
         	}
-        	LogExit("GoFlat");
         	if( Strategy.Position.IsLong) {
 	        	orders.sellMarket.Price = 0;
 	        	orders.sellMarket.Positions = Strategy.Position.Size;

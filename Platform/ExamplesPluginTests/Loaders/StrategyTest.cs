@@ -194,13 +194,13 @@ namespace Loaders
 		public void VerifyTradeCount(StrategyInterface strategy) {
 			List<TradeInfo> goodTrades = goodTradeMap[strategy.Name];
 			List<TradeInfo> testTrades = testTradeMap[strategy.Name];
-			Assert.AreEqual(goodTrades.Count,testTrades.Count);
+			Assert.AreEqual(goodTrades.Count,testTrades.Count,"trade count");
 		}
 		
 		public void VerifyBarDataCount(StrategyInterface strategy) {
 			List<BarInfo> goodBarData = goodBarDataMap[strategy.Name];
 			List<BarInfo> testBarData = testBarDataMap[strategy.Name];
-			Assert.AreEqual(goodBarData.Count,testBarData.Count);
+			Assert.AreEqual(goodBarData.Count,testBarData.Count,"bar data count");
 		}
 		
 		public void VerifyTrades(StrategyInterface strategy) {

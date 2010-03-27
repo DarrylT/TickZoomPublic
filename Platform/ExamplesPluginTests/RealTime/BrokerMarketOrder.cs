@@ -74,7 +74,7 @@ namespace MockProvider
 		
 		[Test]
 		public void CheckMockTradeCount() {
-			Assert.AreEqual(77,SyncTicks.MockTradeCount);
+			Assert.AreEqual(207,SyncTicks.MockTradeCount);
 		}
 	}
 }

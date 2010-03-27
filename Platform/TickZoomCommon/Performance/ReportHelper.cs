@@ -37,6 +37,7 @@ namespace TickZoom.Common
 	public class ReportHelper { 
 		public static readonly Log log = Factory.Log.GetLogger(typeof(ReportHelper));
 		public static readonly bool debug = log.IsDebugEnabled;
+		public static readonly bool trace = log.IsTraceEnabled;
 			
 		protected StreamWriter fwriter;
 		
@@ -110,7 +111,7 @@ namespace TickZoom.Common
 				ppl.Add( (double) daily[i].ExitTime, y);
 			}
 			
-			log.Debug( "Chart start = " + ppl[0].Y + ", end = " + ppl[ppl.Count-1].Y );
+			if( trace) log.Trace( "Chart start = " + ppl[0].Y + ", end = " + ppl[ppl.Count-1].Y );
 			
 			LineItem myCurve = myPane.AddCurve( "Profit/Loss Equity Curve", ppl, Color.Blue, SymbolType.None);
 		    myCurve.Line.Fill = new Fill( Color.Blue );

@@ -49,6 +49,8 @@ namespace TickZoom.Common
 	public class SymbolDictionary : IEnumerable<SymbolProperties>
 	{
 		private static readonly Log log = Factory.Log.GetLogger(typeof(SymbolDictionary));
+		private static readonly bool trace = log.IsTraceEnabled;
+		private static readonly bool debug = log.IsDebugEnabled;
 		private static object locker = new object();
 		private SymbolProperties @default;
 		private List<SymbolCategory> categories = new List<SymbolCategory>();
@@ -162,7 +164,7 @@ namespace TickZoom.Common
 			    			string name = reader.GetAttribute("name");
 			    			string value = reader.GetAttribute("value");
 			    			HandleProperty(category.Default, reader.GetAttribute("name"), reader.GetAttribute("value"));
-							log.Debug("Property " + name + " = " + value);
+			    			if( trace) log.Trace("Property " + name + " = " + value);
 			    		} else if( "category".Equals(reader.Name)) {
 			    			SymbolCategory subCategory = new SymbolCategory(category.Default.Copy());
 			    			HandleCategory(subCategory,reader);
@@ -198,7 +200,7 @@ namespace TickZoom.Common
 		
 		private void HandleSymbol(object obj, XmlReader reader) {
 			string tagName = reader.Name;
-			log.Debug("Handle " + obj.GetType().Name);
+			if( trace) log.Trace("Handle " + obj.GetType().Name);
 			if( reader.IsEmptyElement) { return; }			
 			log.Indent();
 			while( reader.Read()) {
@@ -232,7 +234,7 @@ namespace TickZoom.Common
 			Type propertyType = property.PropertyType;
 			object value = TickZoom.Api.Converters.Convert(propertyType,str);
 			property.SetValue(obj,value,null);
-			log.Debug("Property " + property.Name + " = " + value);
+			if( trace) log.Trace("Property " + property.Name + " = " + value);
 		}
 		
 		private void Error( XmlReader reader, string msg) {
