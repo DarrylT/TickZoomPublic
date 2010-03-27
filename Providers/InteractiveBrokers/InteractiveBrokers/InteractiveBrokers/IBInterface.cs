@@ -360,11 +360,14 @@ namespace TickZoom.InteractiveBrokers
         		SymbolHandler buffer = symbolHandlers[(ulong)e.TickerId];
         		if( e.TickType == TickType.AskSize) {
         			buffer.AskSize = e.Size;
-        	} else if( e.TickType == TickType.BidSize) {
-        		buffer.BidSize = e.Size;
-        	} else if( e.TickType == TickType.LastSize) {
-        		buffer.LastSize = e.Size;
-        	}
+	        		buffer.SendQuote();
+	        	} else if( e.TickType == TickType.BidSize) {
+	        		buffer.BidSize = e.Size;
+	        		buffer.SendQuote();
+	        	} else if( e.TickType == TickType.LastSize) {
+	        		buffer.LastSize = e.Size;
+	        		buffer.SendTimeAndSales();
+	        	}
         	}
         }
         
