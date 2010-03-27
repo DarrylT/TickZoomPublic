@@ -38,7 +38,7 @@ namespace TickZoom
 			/// IMPORTANT: You can personalize the name of each model loader.
 			/// </summary>
 			category = "Example";
-			name = "Simple Single-Symbol";
+			name = "Reversal Single-Symbol";
 		}
 		
 		public override void OnInitialize(ProjectProperties properties) {

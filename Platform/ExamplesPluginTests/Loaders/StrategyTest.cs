@@ -152,12 +152,15 @@ namespace Loaders
 		
 		public void LoadBarData() {
 			string fileDir = @"..\..\Platform\ExamplesPluginTests\Loaders\Trades\";
-			string filePath = fileDir + GetType().Name + "BarData.log";
+			string newPath = Factory.Log.LogFolder + @"\BarData.log";
+			string knownGoodPath = fileDir + GetType().Name + "BarData.log";
+			if( StoreKnownGood) {
+				File.Copy(newPath,knownGoodPath,true);
+			}
 			goodBarDataMap.Clear();
-			LoadBarData(filePath,goodBarDataMap);
-			filePath = Factory.Log.LogFolder + @"\BarData.log";
+			LoadBarData(knownGoodPath,goodBarDataMap);
 			testBarDataMap.Clear();
-			LoadBarData(filePath,testBarDataMap);
+			LoadBarData(newPath,testBarDataMap);
 		}
 		
 		public void LoadBarData(string filePath, Dictionary<string,List<BarInfo>> tempBarData) {

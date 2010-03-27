@@ -90,6 +90,7 @@
     <Compile Include="Loaders\ExampleScannerLoader.cs" />
     <Compile Include="Loaders\ExampleReversalLoader.cs" />
     <Compile Include="Loaders\ExampleReversalPortfolioLoader.cs" />
+    <Compile Include="Loaders\ExampleSimpleLoader.cs" />
     <Compile Include="Loaders\ExampleSimulatedLoader.cs" />
     <Compile Include="Loaders\ExampleDualSymbolLoader.cs" />
     <Compile Include="Strategies\BreakoutTrend.cs" />
@@ -100,6 +101,7 @@
     <Compile Include="Strategies\ExampleMultiStrategy.cs" />
     <Compile Include="Strategies\ExampleScannerStrategy.cs" />
     <Compile Include="Strategies\ExampleReversalStrategy.cs" />
+    <Compile Include="Strategies\ExampleSimpleStrategy.cs" />
     <Compile Include="Strategies\ExampleSMAStrategy.cs" />
     <Compile Include="Strategies\FractalStrategy.cs" />
     <Compile Include="Strategies\Horizontal.cs" />

@@ -36,16 +36,14 @@ using TickZoom.Common;
 
 namespace Loaders
 {
-
-	
 	[TestFixture]
-	public class LimitOrderTest : StrategyTest
+	public class MarketOrderTest : StrategyTest
 	{
 		Log log = Factory.Log.GetLogger(typeof(ExampleSimulatedTest));
-		ExampleOrderStrategy strategy;
-		public LimitOrderTest() {
+		Strategy strategy;
+		public MarketOrderTest() {
 			Symbols = "USD/JPY";
-			StoreKnownGood = false;
+			StoreKnownGood = true;
 			ShowCharts = false;
 		}
 			
@@ -64,12 +62,13 @@ namespace Loaders
 	    		starter.CreateChartCallback = new CreateChartCallback(HistoricalCreateChart);
 	    		starter.ShowChartCallback = new ShowChartCallback(HistoricalShowChart);
 				// Run the loader.
-				TestLimitOrderLoader loader = new TestLimitOrderLoader();
+				TestMarketOrderLoader loader = new TestMarketOrderLoader();
 	    		starter.Run(loader);
 	
 	    		// Get the stategy
-	    		strategy = loader.TopModel as ExampleOrderStrategy;
+	    		strategy = loader.TopModel as Strategy;
 	    		LoadTrades();
+	    		LoadBarData();
 			} catch( Exception ex) {
 				log.Error("Setup error.", ex);
 				throw;
@@ -78,19 +77,24 @@ namespace Loaders
 		
 		[Test]
 		public void VerifyCurrentEquity() {
-			Assert.AreEqual( 6380,strategy.Performance.Equity.CurrentEquity,"current equity");
+			Assert.AreEqual( Math.Round(9999.0420,4),Math.Round(strategy.Performance.Equity.CurrentEquity,4),"current equity");
 		}
 		[Test]
 		public void VerifyOpenEquity() {
-			Assert.AreEqual( -490,strategy.Performance.Equity.OpenEquity,"open equity");
+			Assert.AreEqual( -0.01,strategy.Performance.Equity.OpenEquity,"open equity");
 		}
 		[Test]
 		public void VerifyClosedEquity() {
-			Assert.AreEqual( 6870,strategy.Performance.Equity.ClosedEquity,"closed equity");
+			Assert.AreEqual( Math.Round(9999.0520,4),Math.Round(strategy.Performance.Equity.ClosedEquity,4),"closed equity");
 		}
 		[Test]
 		public void VerifyStartingEquity() {
 			Assert.AreEqual( 10000,strategy.Performance.Equity.StartingEquity,"starting equity");
+		}
+		
+		[Test]
+		public void VerifyBarData() {
+			VerifyBarData(strategy);
 		}
 		
 		[Test]
@@ -108,6 +112,4 @@ namespace Loaders
 			CompareChart(strategy,GetChart(strategy.SymbolDefault));
 		}
 	}
-	
-
 }

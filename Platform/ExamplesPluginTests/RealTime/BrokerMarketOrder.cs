@@ -40,16 +40,14 @@ using ZedGraph;
 
 namespace MockProvider
 {
-
-	
 	[TestFixture]
-	public class BrokerDualLimitOrder : DualStrategyLimitOrder {
+	public class BrokerMarketOrder : MarketOrderTest {
 		
-		public BrokerDualLimitOrder() {
+		public BrokerMarketOrder() {
 			ConfigurationManager.AppSettings.Set("ProviderAddress","InProcess");
 			SyncTicks.Enabled = true;
 			DeleteFiles();
-			Symbols = "USD/JPY,EUR/USD";
+			Symbols = "USD/JPY";
 //			BreakPoint.SetEngineConstraint();
 //			BreakPoint.SetTickBreakPoint("2009-06-09 10:49:21.502");
 //			BreakPoint.SetBarBreakPoint(15);
@@ -67,7 +65,6 @@ namespace MockProvider
 			while( true) {
 				try {
 					string appData = Factory.Settings["AppDataFolder"];
-		 			File.Delete( appData + @"\TestServerCache\EURUSD_Tick.tck");
 		 			File.Delete( appData + @"\TestServerCache\USDJPY_Tick.tck");
 					break;
 				} catch( Exception) {
