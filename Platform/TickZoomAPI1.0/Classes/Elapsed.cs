@@ -83,8 +83,8 @@ namespace TickZoom.Api
 			get { return (int) (elapsed * SecondsPerDay); }
 		}
 		
-		public int TotalMilliseconds {
-			get { return (int) (elapsed * MillisecondsPerDay); }
+		public long TotalMilliseconds {
+			get { return (long) (elapsed * MillisecondsPerDay); }
 		}
 		
 		public int TotalHours {
