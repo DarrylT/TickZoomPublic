@@ -38,13 +38,14 @@ using ZedGraph;
 namespace Loaders
 {
 	[TestFixture]
-	public class ExampleSimpleTest : StrategyTest
+	public class ExampleReversalTest : StrategyTest
 	{
+		
 		#region SetupTest
-		Log log = Factory.Log.GetLogger(typeof(ExampleSimpleTest));
+		Log log = Factory.Log.GetLogger(typeof(ExampleReversalTest));
 		protected Strategy strategy;
 		
-		public ExampleSimpleTest() {
+		public ExampleReversalTest() {
 			Symbols = "Daily4Sim";
 		}
 		
@@ -66,11 +67,11 @@ namespace Loaders
 	    		starter.ShowChartCallback = new ShowChartCallback(HistoricalShowChart);
 	    		
 	    		// Run the loader.
-				ExampleSimpleLoader loader = new ExampleSimpleLoader();
+				ExampleReversalLoader loader = new ExampleReversalLoader();
 	    		starter.Run(loader);
 	
 	    		// Get the stategy
-	    		strategy = loader.TopModel as ExampleSimpleStrategy;
+	    		strategy = loader.TopModel as ExampleReversalStrategy;
 			} catch( Exception ex) {
 				log.Error( "Setup failed.", ex);
 				throw;
@@ -82,18 +83,22 @@ namespace Loaders
 		public void VerifyCurrentEquity() {
 			Assert.AreEqual( -213000,strategy.Performance.Equity.CurrentEquity,"current equity");
 		}
+		
 		[Test]
 		public void VerifyOpenEquity() {
 			Assert.AreEqual( -1500,strategy.Performance.Equity.OpenEquity,"open equity");
 		}
+		
 		[Test]
 		public void VerifyClosedEquity() {
 			Assert.AreEqual( -211500,strategy.Performance.Equity.ClosedEquity,"open equity");
 		}
+		
 		[Test]
 		public void VerifyStartingEquity() {
 			Assert.AreEqual( 10000,strategy.Performance.Equity.StartingEquity,"starting equity");
 		}
+		
 		[Test]
 		public void CompareTradeCount() {
 			Assert.AreEqual( 378,strategy.Performance.ComboTrades.Count, "trade count");

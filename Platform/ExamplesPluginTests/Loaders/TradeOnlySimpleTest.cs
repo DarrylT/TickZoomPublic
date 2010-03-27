@@ -59,11 +59,11 @@ namespace Loaders
     		starter.ShowChartCallback = new ShowChartCallback(HistoricalShowChart);
     		
     		// Run the loader.
-			ExampleSimpleLoader loader = new ExampleSimpleLoader();
+			ExampleReversalLoader loader = new ExampleReversalLoader();
     		starter.Run(loader);
 
     		// Get the stategy
-    		strategy = loader.TopModel as ExampleSimpleStrategy;
+    		strategy = loader.TopModel as ExampleReversalStrategy;
 		}
 		#endregion
 		

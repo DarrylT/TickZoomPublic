@@ -47,7 +47,7 @@ namespace Loaders
 		
 		Portfolio multiSymbolPortfolio;			
 		Portfolio singleSymbolPortfolio;			
-   		Strategy exampleSimple;
+   		Strategy exampleReversal;
 			
 		[TestFixtureSetUp]
 		public override void RunStrategy() {
@@ -77,7 +77,7 @@ namespace Loaders
     		fullTickData = multiSymbolPortfolio.Strategies[0] as ExampleOrderStrategy;
     		singleSymbolPortfolio = multiSymbolPortfolio.Portfolios[0] as Portfolio;
     		fourTicksPerBar = singleSymbolPortfolio.Strategies[0] as ExampleOrderStrategy;
-    		exampleSimple = singleSymbolPortfolio.Strategies[1] as ExampleSimpleStrategy;
+    		exampleReversal = singleSymbolPortfolio.Strategies[1] as ExampleReversalStrategy;
 		}
 		
 		#endregion
@@ -90,8 +90,8 @@ namespace Loaders
 			fourTicksEquity -= fourTicksPerBar.Performance.Equity.StartingEquity;
 			Assert.AreEqual(-74800,fourTicksEquity,"four ticks");
 			double exampleEquity = 0;
-			exampleEquity += exampleSimple.Performance.Equity.CurrentEquity;
-			exampleEquity -= exampleSimple.Performance.Equity.StartingEquity;
+			exampleEquity += exampleReversal.Performance.Equity.CurrentEquity;
+			exampleEquity -= exampleReversal.Performance.Equity.StartingEquity;
 			Assert.AreEqual(-223000D,exampleEquity,"example simple");
 			
 			expectedEquity = fourTicksEquity + exampleEquity;

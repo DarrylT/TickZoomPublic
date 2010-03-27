@@ -38,12 +38,12 @@ using ZedGraph;
 namespace Loaders
 {
 	[TestFixture]
-	public class ExampleSimpleTradeOnlyTest : StrategyTest
+	public class ExampleReversalTradeOnlyTest : StrategyTest
 	{
 		#region SetupTest
-		Log log = Factory.Log.GetLogger(typeof(ExampleSimpleTest));
+		Log log = Factory.Log.GetLogger(typeof(ExampleReversalTest));
 		protected Strategy strategy;
-		public ExampleSimpleTradeOnlyTest() {
+		public ExampleReversalTradeOnlyTest() {
 			Symbols = "/ESH0";
 		}
 		
@@ -65,11 +65,11 @@ namespace Loaders
 	    		starter.ShowChartCallback = new ShowChartCallback(HistoricalShowChart);
 	    		
 	    		// Run the loader.
-				ExampleSimpleLoader loader = new ExampleSimpleLoader();
+				ExampleReversalLoader loader = new ExampleReversalLoader();
 	    		starter.Run(loader);
 	
 	    		// Get the stategy
-	    		strategy = loader.TopModel as ExampleSimpleStrategy;
+	    		strategy = loader.TopModel as ExampleReversalStrategy;
 			} catch( Exception ex) {
 				log.Error( "Setup failed.", ex);
 				throw;

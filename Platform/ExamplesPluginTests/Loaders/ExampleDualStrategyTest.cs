@@ -42,7 +42,7 @@ namespace Loaders
 	{
 		#region SetupTest
 		Log log = Factory.Log.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-		ExampleSimpleStrategy exampleSimple;
+		ExampleReversalStrategy exampleReversal;
 		ExampleOrderStrategy fourTicksStrategy;
 		Portfolio portfolio;
 		
@@ -78,7 +78,7 @@ namespace Loaders
 	 			// Get the stategy
 	    		portfolio = loader.TopModel as Portfolio;
 	    		fourTicksStrategy = portfolio.Strategies[0] as ExampleOrderStrategy;
-	    		exampleSimple = portfolio.Strategies[1] as ExampleSimpleStrategy;
+	    		exampleReversal = portfolio.Strategies[1] as ExampleReversalStrategy;
 	    		LoadTrades();
 			} catch( Exception ex) {
 				log.Error("Setup error.",ex);
@@ -89,8 +89,8 @@ namespace Loaders
 		
 		[Test]
 		public void CheckPortfolio() {
-			double expected = exampleSimple.Performance.Equity.CurrentEquity;
-			expected -= exampleSimple.Performance.Equity.StartingEquity;
+			double expected = exampleReversal.Performance.Equity.CurrentEquity;
+			expected -= exampleReversal.Performance.Equity.StartingEquity;
 			expected += fourTicksStrategy.Performance.Equity.CurrentEquity;
 			expected -= fourTicksStrategy.Performance.Equity.StartingEquity;
 			double portfolioTotal = portfolio.Performance.Equity.CurrentEquity;
@@ -101,8 +101,8 @@ namespace Loaders
 		
 		[Test]
 		public void CheckPortfolioClosedEquity() {
-			double expected = exampleSimple.Performance.Equity.ClosedEquity;
-			expected -= exampleSimple.Performance.Equity.StartingEquity;
+			double expected = exampleReversal.Performance.Equity.ClosedEquity;
+			expected -= exampleReversal.Performance.Equity.StartingEquity;
 			expected += fourTicksStrategy.Performance.Equity.ClosedEquity;
 			expected -= fourTicksStrategy.Performance.Equity.StartingEquity;
 			double portfolioTotal = portfolio.Performance.Equity.ClosedEquity;
@@ -113,7 +113,7 @@ namespace Loaders
 		
 		[Test]
 		public void CheckPortfolioOpenEquity() {
-			double expected = exampleSimple.Performance.Equity.OpenEquity;
+			double expected = exampleReversal.Performance.Equity.OpenEquity;
 			expected += fourTicksStrategy.Performance.Equity.OpenEquity;
 			Assert.AreEqual(expected, portfolio.Performance.Equity.OpenEquity);
 			Assert.AreEqual(-1700, portfolio.Performance.Equity.OpenEquity);
@@ -121,10 +121,10 @@ namespace Loaders
 		
 		[Test]
 		public void VerifyTradeCount() {
-			TransactionPairs exampleSimpleRTs = exampleSimple.Performance.ComboTrades;
+			TransactionPairs exampleReversalRTs = exampleReversal.Performance.ComboTrades;
 			TransactionPairs fullTicksRTs = fourTicksStrategy.Performance.ComboTrades;
 			Assert.AreEqual(472,fullTicksRTs.Count, "trade count");
-			Assert.AreEqual(378,exampleSimpleRTs.Count, "trade count");
+			Assert.AreEqual(378,exampleReversalRTs.Count, "trade count");
 		}
 		
 		[Test]
@@ -134,7 +134,7 @@ namespace Loaders
 		
 		[Test]
 		public void CompareBars1() {
-			CompareChart(exampleSimple,GetChart(exampleSimple.SymbolDefault));
+			CompareChart(exampleReversal,GetChart(exampleReversal.SymbolDefault));
 		}
 		
 		[Test]
@@ -149,7 +149,7 @@ namespace Loaders
 	
 		[Test]
 		public void VerifyStrategy2Trades() {
-			VerifyTrades(exampleSimple);
+			VerifyTrades(exampleReversal);
 		}
 		
 		[Test]
@@ -164,7 +164,7 @@ namespace Loaders
 		
 		[Test]
 		public void VerifyStrategy2TradeCount() {
-			VerifyTradeCount(exampleSimple);
+			VerifyTradeCount(exampleReversal);
 		}
 	}
 }

@@ -31,9 +31,9 @@ namespace TickZoom
 	/// <summary>
 	/// Description of Starter.
 	/// </summary>
-	public class ExampleSimplePortfolioLoader : ModelLoaderCommon
+	public class ExampleReversalPortfolioLoader : ModelLoaderCommon
 	{
-		public ExampleSimplePortfolioLoader() {
+		public ExampleReversalPortfolioLoader() {
 			/// <summary>
 			/// IMPORTANT: You can personalize the name of each model loader.
 			/// </summary>
@@ -55,8 +55,8 @@ namespace TickZoom
 			// Okay, adding the simple example
 			for( int i=0; i<properties.Starter.SymbolProperties.Length; i++) {
 				string symbol = properties.Starter.SymbolInfo[i].Symbol;
-				string strategyName = "ExampleSimpleStrategy";
-				string strategyInstanceName = "ExampleSimpleStrategy-"+symbol;
+				string strategyName = "ExampleReversalStrategy";
+				string strategyInstanceName = "ExampleReversalStrategy-"+symbol;
 				ModelInterface fullTicks = CreateStrategy(strategyName,strategyInstanceName);
 				fullTicks.SymbolDefault = symbol;
 		    	AddDependency( "PortfolioCommon", strategyInstanceName);

@@ -10,7 +10,7 @@
     <propertyset name="engine" />
     <strategy name="PortfolioCommon" type="PortfolioCommon">
         <propertyset name="performance" />
-        <strategy name="ExampleSimpleStrategy" type="ExampleSimpleStrategy">
+        <strategy name="ExampleReversalStrategy" type="ExampleReversalStrategy">
             <propertyset name="exitstrategy">
                 <property name="StopLoss" value="0.01" start="0.01" end="1.00" increment="0.10" optimize="true" />
                 <property name="TargetProfit" value="0.01" start="0.01" end="1.00" increment="0.10" optimize="false" />

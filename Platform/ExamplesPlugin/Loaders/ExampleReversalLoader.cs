@@ -28,29 +28,27 @@ using TickZoom.Common;
 
 namespace TickZoom
 {
-	public class ExampleMultiSymbolLoader : ModelLoaderCommon
+	/// <summary>
+	/// Description of Starter.
+	/// </summary>
+	public class ExampleReversalLoader : ModelLoaderCommon
 	{
-		public ExampleMultiSymbolLoader() {
+		public ExampleReversalLoader() {
 			/// <summary>
-			/// You can personalize the name of each model loader.
+			/// IMPORTANT: You can personalize the name of each model loader.
 			/// </summary>
 			category = "Example";
-			name = "Simple Multi-Symbol";
+			name = "Simple Single-Symbol";
 		}
 		
 		public override void OnInitialize(ProjectProperties properties) {
+			AddVariable("ExampleReversalStrategy.ExitStrategy.StopLoss",0.01,1.00,0.10,true);
+			AddVariable("ExampleReversalStrategy.ExitStrategy.TargetProfit",0.01,1.00,0.10,false);
 		}
-	
-		public override void OnLoad(ProjectProperties properties) {
-			foreach( ISymbolProperties symbol in properties.Starter.SymbolProperties) {
-				string name = symbol.Symbol;				
-				Strategy strategy = CreateStrategy("ExampleReversalStrategy","ExampleReversal-"+name);
-				strategy.SymbolDefault = name;
-				strategy.Performance.Equity.GraphEquity = false;
-		    	AddDependency( "Portfolio", strategy);
-			}
-	
-			TopModel = GetPortfolio("Portfolio");
+		
+		public override void OnLoad(ProjectProperties model) {
+	    	TopModel = GetStrategy("ExampleReversalStrategy");
 		}
+		
 	}
 }

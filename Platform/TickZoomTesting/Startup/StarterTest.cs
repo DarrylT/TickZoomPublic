@@ -158,19 +158,19 @@ namespace TickZoom.StarterTest
 			}
 			
 			public override void OnInitialize(ProjectProperties properties) {
-				AddVariable("ExampleSimpleStrategy.ExitStrategy.StopLoss",0.01,1.00,0.10,true);
-				AddVariable("ExampleSimpleStrategy.ExitStrategy.TargetProfit",0.01,1.00,0.10,false);
+				AddVariable("ExampleReversalStrategy.ExitStrategy.StopLoss",0.01,1.00,0.10,true);
+				AddVariable("ExampleReversalStrategy.ExitStrategy.TargetProfit",0.01,1.00,0.10,false);
 			}		
 			
 			public override void OnLoad(ProjectProperties projectProperties)
 			{
-				ModelInterface model = CreateStrategy("ExampleSimpleStrategy");
+				ModelInterface model = CreateStrategy("ExampleReversalStrategy");
 				Strategy strategy = model as Strategy;
 				strategy.Performance.Equity.EnableYearlyStats = true;
 				strategy.Performance.Equity.EnableMonthlyStats = true;
 				strategy.Performance.Equity.EnableWeeklyStats = true;
 				strategy.Performance.Equity.EnableDailyStats = true;
-		    	AddDependency( "Portfolio", "ExampleSimpleStrategy");
+		    	AddDependency( "Portfolio", "ExampleReversalStrategy");
 		    	TopModel = GetPortfolio( "Portfolio");
 			}
 		}
@@ -181,15 +181,15 @@ namespace TickZoom.StarterTest
 			}	
 			
 			public override void OnInitialize(ProjectProperties properties) {
-				AddVariable("ExampleSimpleStrategy.xxxx.StopLoss",0.01,1.00,0.10,true);
-				AddVariable("ExampleSimpleStrategy.xxxx.TargetProfit",0.01,1.00,0.10,true);
+				AddVariable("ExampleReversalStrategy.xxxx.StopLoss",0.01,1.00,0.10,true);
+				AddVariable("ExampleReversalStrategy.xxxx.TargetProfit",0.01,1.00,0.10,true);
 			}		
 			
 			public override void OnLoad(ProjectProperties projectProperties)
 			{
-				ModelInterface model = CreateStrategy("ExampleSimpleStrategy");
+				ModelInterface model = CreateStrategy("ExampleReversalStrategy");
 				Strategy strategy = model as Strategy;
-		    	AddDependency( "Portfolio", "ExampleSimpleStrategy");
+		    	AddDependency( "Portfolio", "ExampleReversalStrategy");
 		    	TopModel = GetPortfolio( "Portfolio");
 			}
 			

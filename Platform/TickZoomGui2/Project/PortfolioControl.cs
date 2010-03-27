@@ -120,7 +120,7 @@ namespace TickZoom
             	log.Debug(ex.ToString());
             }
             project.Nodes.Add(portfolio);
-//	        portfolio.Add("ExampleSimpleStrategy");
+//	        portfolio.Add("ExampleReversalStrategy");
             portfolio.Add("ExampleSMAStrategy");
             this.treeView.Nodes.Add(project);
 			this.treeView.ExpandAll();

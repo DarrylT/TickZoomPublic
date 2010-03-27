@@ -194,10 +194,10 @@ namespace Loaders
 		public override void OnLoad(ProjectProperties properties) {
 			Strategy fullTicks = CreateStrategy("ExampleOrderStrategy","FourTicksData");
 			fullTicks.SymbolDefault = properties.Starter.SymbolInfo[0].Symbol;
-			Strategy fourTicks = CreateStrategy("ExampleSimpleStrategy");
+			Strategy fourTicks = CreateStrategy("ExampleReversalStrategy");
 			fourTicks.SymbolDefault = properties.Starter.SymbolInfo[0].Symbol;
 			AddDependency("Portfolio","FourTicksData");
-			AddDependency("Portfolio","ExampleSimpleStrategy");
+			AddDependency("Portfolio","ExampleReversalStrategy");
 			Portfolio strategy = GetPortfolio("Portfolio");
 			strategy.Performance.GraphTrades = false;
 			TopModel = strategy;

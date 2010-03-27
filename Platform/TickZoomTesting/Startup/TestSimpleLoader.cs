@@ -48,7 +48,7 @@ namespace TickZoom
 		}
 		
 		public override void OnLoad(ProjectProperties model) {
-	    	TopModel = GetStrategy("ExampleSimpleStrategy");
+	    	TopModel = GetStrategy("ExampleReversalStrategy");
 		}
 		
 	}
