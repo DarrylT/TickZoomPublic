@@ -161,6 +161,8 @@ namespace TickZoom.InteractiveBrokers
 		{
 			if( debug) log.Debug("StartSymbol");
             client.CancelMarketData((int)symbol.BinaryIdentifier);
+       		SymbolHandler buffer = symbolHandlers[symbol.BinaryIdentifier];
+       		buffer.Stop();
 			receiver.OnEvent(symbol,(int)EventType.EndRealTime,null);
 		}
 		
@@ -374,11 +376,13 @@ namespace TickZoom.InteractiveBrokers
         private SymbolHandler GetSymbolHandler(SymbolInfo symbol, Receiver receiver) {
         	SymbolHandler symbolHandler;
         	if( symbolHandlers.TryGetValue(symbol.BinaryIdentifier,out symbolHandler)) {
+        		symbolHandler.Start();
         		return symbolHandler;
         	} else {
     	    	symbolHandler = Factory.Utility.SymbolHandler(symbol,receiver);
     	    	symbolHandler.LogicalOrderHandler = Factory.Utility.LogicalOrderHandler(symbol,this);
     	    	symbolHandlers.Add(symbol.BinaryIdentifier,symbolHandler);
+    	    	symbolHandler.Start();
     	    	return symbolHandler;
         	}
         }

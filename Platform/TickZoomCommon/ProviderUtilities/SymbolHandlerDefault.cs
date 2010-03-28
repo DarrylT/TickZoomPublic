@@ -40,14 +40,25 @@ namespace TickZoom.Common
 		public int lastSize;
 		public double last;
         private LogicalOrderHandler logicalOrderHandler;
+        private bool isRunning = false;
+		public void Start()
+		{
+			isRunning = true;
+		}
+		
+		public void Stop()
+		{
+			isRunning = false;
+		}
         
 		public SymbolHandlerDefault(SymbolInfo symbol, Receiver receiver) {
         	this.symbol = symbol;
 			this.receiver = receiver;
 		}
+		
 		public void SendQuote() {
 			if( isQuoteInitialized) {
-				if( symbol.QuoteType == QuoteType.Level1) {
+				if( isRunning && symbol.QuoteType == QuoteType.Level1) {
 					tickIO.Initialize();
 					tickIO.SetSymbol(symbol.BinaryIdentifier);
 					tickIO.SetTime(TimeStamp.UtcNow);
@@ -85,20 +96,27 @@ namespace TickZoom.Common
 		}
         
 		public void SendTimeAndSales() {
-			if( isTradeInitialized) {
-				if( symbol.TimeAndSales == TimeAndSales.ActualTrades) {
-					tickIO.Initialize();
-					tickIO.SetSymbol(symbol.BinaryIdentifier);
-					tickIO.SetTime(TimeStamp.UtcNow);
-					tickIO.SetTrade(Last,LastSize);
-					if( symbol.QuoteType == QuoteType.Level1 && isQuoteInitialized) {
-						tickIO.SetQuote(Bid,Ask,(ushort)BidSize,(ushort)AskSize);
-					}
-					TickBinary binary = tickIO.Extract();
-					receiver.OnEvent(symbol,(int)EventType.Tick,binary);
-				}
-			} else {
+			if( symbol.TimeAndSales != TimeAndSales.ActualTrades ) {
+				return;
+			}
+			if( !isTradeInitialized ) {
 				VerifyTrade();
+				return;
+			}
+			if( symbol.QuoteType == QuoteType.Level1 && !isQuoteInitialized) {
+				VerifyQuote();
+				return;
+			}
+			if( symbol.TimeAndSales == TimeAndSales.ActualTrades) {
+				tickIO.Initialize();
+				tickIO.SetSymbol(symbol.BinaryIdentifier);
+				tickIO.SetTime(TimeStamp.UtcNow);
+				tickIO.SetTrade(Last,LastSize);
+				if( symbol.QuoteType == QuoteType.Level1) {
+					tickIO.SetQuote(Bid,Ask,(ushort)BidSize,(ushort)AskSize);
+				}
+				TickBinary binary = tickIO.Extract();
+				receiver.OnEvent(symbol,(int)EventType.Tick,binary);
 			}
 		}
         
@@ -139,6 +157,10 @@ namespace TickZoom.Common
 		public double Last {
 			get { return last; }
 			set { last = value; }
+		}
+		
+		public bool IsRunning {
+			get { return isRunning; }
 		}
 	}
 }

@@ -27,6 +27,9 @@ using System.Collections.Generic;
 namespace TickZoom.Api
 {
 	public interface SymbolHandler {
+		bool IsRunning { get; }
+		void Start();
+		void Stop();
 		void SendQuote();
 		void SendTimeAndSales();
 		void SetPosition(double position);
