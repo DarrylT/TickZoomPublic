@@ -55,5 +55,8 @@ namespace TickZoom.Api
 			get;
 		}
 
+		bool IsTimeBased {
+			get;
+		}
 	}
 }

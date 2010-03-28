@@ -40,40 +40,38 @@ using ZedGraph;
 
 namespace MockProvider
 {
-
-	
-	[TestFixture]
-	public class BrokerLimitOrderTest : LimitOrderTest {
-		
-		public BrokerLimitOrderTest() {
-			ConfigurationManager.AppSettings.Set("ProviderAddress","InProcess");
-			SyncTicks.Enabled = true;
-			ShowCharts = false;
-			StoreKnownGood = false;
-			DeleteFiles();
-			Symbols = "USD/JPY";
-			
-		}
-		
-		public override Starter CreateStarter()
-		{
-			return new RealTimeStarter();
-		}
-		
-		private void DeleteFiles() {
-			while( true) {
-				try {
-					string appData = Factory.Settings["AppDataFolder"];
-		 			File.Delete( appData + @"\TestServerCache\USDJPY_Tick.tck");
-					break;
-				} catch( Exception) {
-				}
-			}
-		}
-		
-		[Test]
-		public void CheckMockTradeCount() {
-			Assert.AreEqual(38,SyncTicks.MockTradeCount);
-		}
-	}
+//	[TestFixture]
+//	public class BrokerLimitOrderTickBar : LimitOrderTickBarTest {
+//		
+//		public BrokerLimitOrderTickBar() {
+//			ConfigurationManager.AppSettings.Set("ProviderAddress","InProcess");
+//			SyncTicks.Enabled = true;
+//			ShowCharts = false;
+//			StoreKnownGood = false;
+//			DeleteFiles();
+//			Symbols = "USD/JPY";
+//			
+//		}
+//		
+//		public override Starter CreateStarter()
+//		{
+//			return new RealTimeStarter();
+//		}
+//		
+//		private void DeleteFiles() {
+//			while( true) {
+//				try {
+//					string appData = Factory.Settings["AppDataFolder"];
+//		 			File.Delete( appData + @"\TestServerCache\USDJPY_Tick.tck");
+//					break;
+//				} catch( Exception) {
+//				}
+//			}
+//		}
+//		
+//		[Test]
+//		public void CheckMockTradeCount() {
+//			Assert.AreEqual(38,SyncTicks.MockTradeCount);
+//		}
+//	}
 }

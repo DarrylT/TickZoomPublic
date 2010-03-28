@@ -36,14 +36,12 @@ using TickZoom.Common;
 
 namespace Loaders
 {
-
-	
 	[TestFixture]
-	public class LimitOrderTest : StrategyTest
+	public class LimitOrderTickBarTest : StrategyTest
 	{
-		Log log = Factory.Log.GetLogger(typeof(LimitOrderTest));
+		Log log = Factory.Log.GetLogger(typeof(LimitOrderTickBarTest));
 		ExampleOrderStrategy strategy;
-		public LimitOrderTest() {
+		public LimitOrderTickBarTest() {
 			Symbols = "USD/JPY";
 			StoreKnownGood = false;
 			ShowCharts = false;
@@ -60,7 +58,7 @@ namespace Loaders
 	    		starter.ProjectProperties.Starter.EndTime = new TimeStamp(2009,06,10);
 	    		starter.DataFolder = "TestData";
 	    		starter.ProjectProperties.Starter.Symbols = Symbols;
-				starter.ProjectProperties.Starter.IntervalDefault = Intervals.Minute1;
+	    		starter.ProjectProperties.Starter.IntervalDefault = Factory.Engine.DefineInterval(BarUnit.Tick,25);
 	    		starter.CreateChartCallback = new CreateChartCallback(HistoricalCreateChart);
 	    		starter.ShowChartCallback = new ShowChartCallback(HistoricalShowChart);
 				// Run the loader.
@@ -70,6 +68,7 @@ namespace Loaders
 	    		// Get the stategy
 	    		strategy = loader.TopModel as ExampleOrderStrategy;
 	    		LoadTrades();
+	    		LoadBarData();
 			} catch( Exception ex) {
 				log.Error("Setup error.", ex);
 				throw;
@@ -78,15 +77,15 @@ namespace Loaders
 		
 		[Test]
 		public void VerifyCurrentEquity() {
-			Assert.AreEqual( 6380,strategy.Performance.Equity.CurrentEquity,"current equity");
+			Assert.AreEqual( 7210,strategy.Performance.Equity.CurrentEquity,"current equity");
 		}
 		[Test]
 		public void VerifyOpenEquity() {
-			Assert.AreEqual( -490,strategy.Performance.Equity.OpenEquity,"open equity");
+			Assert.AreEqual( 140,strategy.Performance.Equity.OpenEquity,"open equity");
 		}
 		[Test]
 		public void VerifyClosedEquity() {
-			Assert.AreEqual( 6870,strategy.Performance.Equity.ClosedEquity,"closed equity");
+			Assert.AreEqual( 7070,strategy.Performance.Equity.ClosedEquity,"closed equity");
 		}
 		[Test]
 		public void VerifyStartingEquity() {
@@ -104,10 +103,13 @@ namespace Loaders
 		}
 		
 		[Test]
+		public void VerifyBarData() {
+			VerifyBarData(strategy);
+		}
+		
+		[Test]
 		public void CompareBars() {
 			CompareChart(strategy,GetChart(strategy.SymbolDefault));
 		}
 	}
-	
-
 }
