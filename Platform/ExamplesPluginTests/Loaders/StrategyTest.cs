@@ -47,6 +47,7 @@ namespace Loaders
 	{
 		static readonly Log log = Factory.Log.GetLogger(typeof(StrategyTest));
 		static readonly bool debug = log.IsDebugEnabled;
+		private string testFileName;
 		string dataFolder = "TestData";
 		string symbols;
 		List<ChartThread> chartThreads = new List<ChartThread>();
@@ -57,6 +58,14 @@ namespace Loaders
 		Dictionary<string,List<TradeInfo>> testTradeMap = new Dictionary<string,List<TradeInfo>>();
 		public bool ShowCharts = false;
 		public bool StoreKnownGood = false;
+		
+		public StrategyTest() {
+ 			testFileName = GetType().Name;
+		}
+		
+		public void MatchTestResultsOf( Type type) {
+			testFileName = type.Name;
+		}
 		
 		[TestFixtureSetUp]
 		public virtual void RunStrategy() {
@@ -109,10 +118,10 @@ namespace Loaders
 		public virtual Starter CreateStarter() {
 			return new HistoricalStarter();			
 		}
-			
+		
 		public void LoadTrades() {
 			string fileDir = @"..\..\Platform\ExamplesPluginTests\Loaders\Trades\";
-			string knownGoodPath = fileDir + GetType().Name + "Trades.log";
+			string knownGoodPath = fileDir + testFileName + "Trades.log";
 			string newPath = Factory.Log.LogFolder + @"\Trades.log";
 			if( StoreKnownGood) {
 				File.Copy(newPath,knownGoodPath,true);
@@ -153,7 +162,7 @@ namespace Loaders
 		public void LoadBarData() {
 			string fileDir = @"..\..\Platform\ExamplesPluginTests\Loaders\Trades\";
 			string newPath = Factory.Log.LogFolder + @"\BarData.log";
-			string knownGoodPath = fileDir + GetType().Name + "BarData.log";
+			string knownGoodPath = fileDir + testFileName + "BarData.log";
 			if( StoreKnownGood) {
 				File.Copy(newPath,knownGoodPath,true);
 			}
@@ -393,11 +402,10 @@ namespace Loaders
 			Assert.AreEqual(days.BarCount,bars.NPts,"Chart Points");
 		}
    		
-		
 		public string Symbols {
 			get { return symbols; }
 			set { symbols = value; }
 		}
+		
 	}
-
 }

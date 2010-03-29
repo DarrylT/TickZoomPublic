@@ -100,7 +100,6 @@
     <Compile Include="TradingFramework\ExchangeTimeZoneTest.cs" />
     <Compile Include="TradingFramework\ExitStrategyMiscTest.cs" />
     <Compile Include="TradingFramework\ExitStrategyMock.cs" />
-    <Compile Include="TradingFramework\ExitStrategyStopLossTest.cs" />
     <Compile Include="TradingFramework\ChainTest.cs" />
     <Compile Include="TradingFramework\ExitStrategyTickTest.cs" />
     <Compile Include="TradingFramework\MoneyManagerRandomStrategy.cs" />

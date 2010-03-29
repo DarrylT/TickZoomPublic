@@ -42,13 +42,16 @@ namespace TickZoom.Common
 		private static LocationType locationType = LocationType.Platform;
 		
 		public bool TrySetEngine(Data data) {
-			if( breakMode == BreakMode.None || locationType != LocationType.Engine) {
+			if( breakMode == BreakMode.None ) {
+				return false;
+			}
+			if( locationType != LocationType.Engine) {
 				return false;
 			}
 			if( constraintType == ConstraintType.Symbol) {
 				return data.SymbolInfo.Symbol == constraint;
 			}
-			return false;
+			return true;
 		}
 		
 		[Conditional("DEBUG")]

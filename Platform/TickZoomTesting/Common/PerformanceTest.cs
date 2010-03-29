@@ -106,7 +106,7 @@ namespace TickZoom.Common
 			
 			Starter starter = new HistoricalStarter();
 			starter.StartCount = 0;
-			starter.EndCount = starter.StartCount + count;
+			starter.EndCount = starter.StartCount + count + 1;
 			starter.ProjectProperties.Starter.Symbols = "USD_JPY_YEARS";
 			starter.DataFolder = "TestData";
 			starter.Run(random);
@@ -201,7 +201,7 @@ namespace TickZoom.Common
 			expected.ExitPrice = 105.670;
 			expected.ExitTime = new TimeStamp(2005,2,8,11,57,51,479);
 			TransactionPairs rts = manager.ComboTrades;
-			Assert.AreEqual(-.014,Math.Round(rts.CalcProfitLoss(0),3),"First Trade PnL");
+			Assert.AreEqual(-.034,Math.Round(rts.CalcProfitLoss(0),3),"First Trade PnL");
 		}
 		
 		[Test]
@@ -244,7 +244,7 @@ namespace TickZoom.Common
 				log.Notice(i + ": " + weekly[i]);
 			}
 			Assert.AreEqual(5,weekly.Count,"Weekly Count");
-			Assert.AreEqual(-0.802,Math.Round(weekly.OpenProfitLoss,3),"Final trade completion");
+			Assert.AreEqual(-0.782,Math.Round(weekly.OpenProfitLoss,3),"Final trade completion");
 		}
 		[Test]
 		public void MonthlyTesting() {
@@ -254,7 +254,7 @@ namespace TickZoom.Common
 				log.Notice(i + ": " + monthly[i]);
 			}
 			Assert.AreEqual(4,monthly.Count,"Monthly Count");
-			Assert.AreEqual(0.386,Math.Round(monthly.OpenProfitLoss,3),"Final trade completion");
+			Assert.AreEqual(0.406,Math.Round(monthly.OpenProfitLoss,3),"Final trade completion");
 		}
 	}
 }

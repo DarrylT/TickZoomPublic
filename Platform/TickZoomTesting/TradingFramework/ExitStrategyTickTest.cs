@@ -59,7 +59,7 @@ namespace TickZoom.TradingFramework
 			random.IntervalDefault = Intervals.Day1;
 			random.ExitStrategy = exitStrategy;
 			Starter starter = new HistoricalStarter();
-			starter.EndCount = 2047;
+			starter.EndCount = 2048;
 			starter.ProjectProperties.Starter.Symbols = "USD_JPY_YEARS";
 			starter.DataFolder = "TestData";
 			starter.Run(random);
@@ -69,7 +69,7 @@ namespace TickZoom.TradingFramework
 	
 		[Test]
 		public void LongEntry() {
-			TimeStamp expected = new TimeStamp(2004,1,2,9,53,24,931);
+			TimeStamp expected = new TimeStamp("2004-01-02 09:56:32.682");
 			Assert.Greater(exitStrategy.signalChanges.Count,4,"Number of signal Changes");
 			Assert.AreEqual(expected,exitStrategy.signalChanges[2],"Long entry time");
 			Assert.AreEqual(1,exitStrategy.signalDirection[2],"Long entry signal");
@@ -77,7 +77,7 @@ namespace TickZoom.TradingFramework
 			
 		[Test]
 		public void FlatEntry() {
-			TimeStamp expected = new TimeStamp(2004,1,2,9,57,27,901);
+			TimeStamp expected = new TimeStamp("2004-01-02 09:57:49.975");
 			Assert.Greater(exitStrategy.signalDirection.Count,5,"count of signal direction");
 			Assert.AreEqual(0,exitStrategy.signalDirection[3],"Flat entry signal");
 			Assert.AreEqual(expected,exitStrategy.signalChanges[3],"Flat entry time");
