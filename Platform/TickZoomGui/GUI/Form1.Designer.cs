@@ -133,13 +133,15 @@ namespace TickZoom
         	// 
         	// lblProgress
         	// 
-        	this.lblProgress.AutoSize = true;
-        	this.lblProgress.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F);
-        	this.lblProgress.Location = new System.Drawing.Point(12, 149);
-        	this.lblProgress.Name = "lblProgress";
-        	this.lblProgress.Size = new System.Drawing.Size(72, 13);
-        	this.lblProgress.TabIndex = 8;
-        	this.lblProgress.Text = "Awaiting Start";
+        	lock(progressLocker) {
+	        	this.lblProgress.AutoSize = true;
+	        	this.lblProgress.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F);
+	        	this.lblProgress.Location = new System.Drawing.Point(12, 149);
+	        	this.lblProgress.Name = "lblProgress";
+	        	this.lblProgress.Size = new System.Drawing.Size(72, 13);
+	        	this.lblProgress.TabIndex = 8;
+	        	this.lblProgress.Text = "Awaiting Start";
+        	}
         	// 
         	// btnRun
         	// 
@@ -704,6 +706,7 @@ namespace TickZoom
 
         private System.Windows.Forms.ProgressBar prgExecute;
         private System.Windows.Forms.Button btnStop;
+        private object progressLocker = new object();
         private System.Windows.Forms.Label lblProgress;
         
 

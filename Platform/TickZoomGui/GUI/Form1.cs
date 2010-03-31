@@ -326,7 +326,9 @@ namespace TickZoom
         	StopProcess();
             // Set the progress bar back to 0 and the label
             prgExecute.Value = 0;
-            lblProgress.Text = "Execute Stopped";
+            lock(progressLocker) {
+            	lblProgress.Text = "Execute Stopped";
+            }
         }
 
         void StartTimePickerCloseUp(object sender, EventArgs e)
@@ -506,7 +508,9 @@ namespace TickZoom
             // Make progress on the progress bar
             prgExecute.Value = Math.Min(100,PercentProgress);
             // Display the current progress on the form
-            lblProgress.Text = progress.Text + ": " + progress.Current + " out of " + progress.Final + " (" + PercentProgress + "%)";
+            lock(progressLocker) {
+            	lblProgress.Text = progress.Text + ": " + progress.Current + " out of " + progress.Final + " (" + PercentProgress + "%)";
+            }
         }
         
 		private Exception taskException;
