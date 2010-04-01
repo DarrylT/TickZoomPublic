@@ -29,6 +29,7 @@
 
 
 using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using TickZoom;
 using TickZoom.Api;
@@ -40,6 +41,8 @@ namespace Loaders
 	[TestFixture]
 	public class ExampleMixedTest : StrategyTest
 	{
+		List<StrategyInterface> strategies = new List<StrategyInterface>();
+		
 		#region SetupTest
 		Log log = Factory.Log.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 		ExampleOrderStrategy fourTicksPerBar;
@@ -48,6 +51,11 @@ namespace Loaders
 		Portfolio multiSymbolPortfolio;			
 		Portfolio singleSymbolPortfolio;			
    		Strategy exampleReversal;
+   		
+   		public ExampleMixedTest() {
+			ShowCharts = false;
+			StoreKnownGood = false;
+   		}
 			
 		[TestFixtureSetUp]
 		public override void RunStrategy() {
@@ -78,6 +86,12 @@ namespace Loaders
     		singleSymbolPortfolio = multiSymbolPortfolio.Portfolios[0] as Portfolio;
     		fourTicksPerBar = singleSymbolPortfolio.Strategies[0] as ExampleOrderStrategy;
     		exampleReversal = singleSymbolPortfolio.Strategies[1] as ExampleReversalStrategy;
+    		strategies.Add(multiSymbolPortfolio);
+    		strategies.Add(fullTickData);
+    		strategies.Add(singleSymbolPortfolio);
+    		strategies.Add(fourTicksPerBar);
+    		LoadTrades();
+    		LoadBarData();
 		}
 		
 		#endregion
@@ -191,5 +205,83 @@ namespace Loaders
 		public void CompareBars1() {
 			CompareChart(fourTicksPerBar,GetChart(fourTicksPerBar.SymbolDefault));
 		}
+		
+		[Test]
+		public void VerifyFullTickTrades() {
+			VerifyTrades(fullTickData);
+		}
+		
+		[Test]
+		public void VerifyFullTickTradeCount() {
+			VerifyTradeCount(fullTickData);
+		}
+		
+		[Test]
+		public void VerifyFullTickBarDataCount() {
+			VerifyBarDataCount(fullTickData);
+		}
+		
+		[Test]
+		public void VerifyFullTickBarData() {
+			VerifyBarData(fullTickData);
+		}
+	
+		[Test]
+		public void VerifyFourTicksTrades() {
+			VerifyTrades(fourTicksPerBar);
+		}
+		
+		// FourTicks
+		[Test]
+		public void VerifyFourTicksTradeCount() {
+			VerifyTradeCount(fourTicksPerBar);
+		}
+		
+		[Test]
+		public void VerifyFourTicksBarData() {
+			VerifyBarData(fourTicksPerBar);
+		}
+		
+		[Test]
+		public void VerifyFourTicksBarDataCount() {
+			VerifyBarDataCount(fourTicksPerBar);
+		}
+
+		// Portfolio
+		[Test]
+		public void VerifySingleSymbolTrades() {
+			VerifyTrades(singleSymbolPortfolio);
+		}
+		
+		[Test]
+		public void VerifySingleSymbolTradeCount() {
+			VerifyTradeCount(singleSymbolPortfolio);
+		}
+		
+		[Test]
+		public void VerifySingleSymbolBarData() {
+			VerifyBarData(singleSymbolPortfolio);
+		}
+		
+		[Test]
+		public void VerifySingleSymbolBarDataCount() {
+			VerifyBarDataCount(singleSymbolPortfolio);
+		}
+		
+		[Test]
+		public void VerifyMultiSymbolBarData() {
+			VerifyBarData(multiSymbolPortfolio);
+		}
+		
+		[Test]
+		public void VerifyMultiSymbolBarDataCount() {
+			VerifyBarDataCount(multiSymbolPortfolio);
+		}
+		
+//		[Test]
+//		public void VerifyBarDataCount(
+//			[Values(0,1,2,3)] int index) {
+//			VerifyBarDataCount(strategies[index]);
+//		}
 	}
 }
