@@ -52,6 +52,8 @@ namespace Loaders
 		string symbols;
 		List<ChartThread> chartThreads = new List<ChartThread>();
 		List<TickAggregator> aggregators = new List<TickAggregator>();
+		Dictionary<string,List<StatsInfo>> goodStatsMap = new Dictionary<string,List<StatsInfo>>();
+		Dictionary<string,List<StatsInfo>> testStatsMap = new Dictionary<string,List<StatsInfo>>();
 		Dictionary<string,List<BarInfo>> goodBarDataMap = new Dictionary<string,List<BarInfo>>();
 		Dictionary<string,List<BarInfo>> testBarDataMap = new Dictionary<string,List<BarInfo>>();
 		Dictionary<string,List<TradeInfo>> goodTradeMap = new Dictionary<string,List<TradeInfo>>();
@@ -72,6 +74,8 @@ namespace Loaders
 			string filePath = Factory.Log.LogFolder + @"\Trades.log";
 			File.Delete(filePath);
 			filePath = Factory.Log.LogFolder + @"\BarData.log";
+			File.Delete(filePath);
+			filePath = Factory.Log.LogFolder + @"\Stats.log";
 			File.Delete(filePath);
 			SyncTicks.MockTradeCount = 0;
 		}
@@ -115,6 +119,13 @@ namespace Loaders
 			public double Close;
 		}
 		
+		public class StatsInfo {
+			public TimeStamp Time;
+			public double ClosedEquity;
+			public double OpenEquity;
+			public double CurrentEquity;
+		}
+		
 		public virtual Starter CreateStarter() {
 			return new HistoricalStarter();			
 		}
@@ -133,6 +144,7 @@ namespace Loaders
 		}
 		
 		public void LoadTrades(string filePath, Dictionary<string,List<TradeInfo>> tempTrades) {
+			if( !File.Exists(filePath)) return;
 			using( FileStream fileStream = new FileStream(filePath,FileMode.Open,FileAccess.Read,FileShare.ReadWrite)) {
 				StreamReader file = new StreamReader(fileStream);
 				string line;
@@ -200,6 +212,46 @@ namespace Loaders
 			}
 		}
 		
+		public void LoadStats() {
+			string fileDir = @"..\..\Platform\ExamplesPluginTests\Loaders\Trades\";
+			string newPath = Factory.Log.LogFolder + @"\Stats.log";
+			string knownGoodPath = fileDir + testFileName + "Stats.log";
+			if( StoreKnownGood) {
+				File.Copy(newPath,knownGoodPath,true);
+			}
+			goodStatsMap.Clear();
+			LoadStats(knownGoodPath,goodStatsMap);
+			testStatsMap.Clear();
+			LoadStats(newPath,testStatsMap);
+		}
+		
+		public void LoadStats(string filePath, Dictionary<string,List<StatsInfo>> tempStats) {
+			using( FileStream fileStream = new FileStream(filePath,FileMode.Open,FileAccess.Read,FileShare.ReadWrite)) {
+				StreamReader file = new StreamReader(fileStream);
+				string line;
+				while( (line = file.ReadLine()) != null) {
+					string[] fields = line.Split(',');
+					int fieldIndex = 0;
+					string strategyName = fields[fieldIndex++];
+					
+					StatsInfo statsInfo = new StatsInfo();
+					statsInfo.Time = new TimeStamp(fields[fieldIndex++]);
+					statsInfo.ClosedEquity = double.Parse(fields[fieldIndex++]);
+					statsInfo.OpenEquity = double.Parse(fields[fieldIndex++]);
+					statsInfo.CurrentEquity = double.Parse(fields[fieldIndex++]);
+
+					List<StatsInfo> statsList;
+					if( tempStats.TryGetValue(strategyName,out statsList)) {
+						statsList.Add(statsInfo);
+					} else {
+						statsList = new List<StatsInfo>();
+						statsList.Add(statsInfo);
+						tempStats.Add(strategyName,statsList);
+					}
+				}
+			}
+		}
+		
 		public void VerifyTradeCount(StrategyInterface strategy) {
 			List<TradeInfo> goodTrades = goodTradeMap[strategy.Name];
 			List<TradeInfo> testTrades = testTradeMap[strategy.Name];
@@ -223,6 +275,25 @@ namespace Loaders
 				Assert.AreEqual(goodTrade,testTrade,"Trade at " + i);
 				Assert.AreEqual(goodInfo.ProfitLoss,testInfo.ProfitLoss,"ProfitLoss at " + i);
 				Assert.AreEqual(goodInfo.ClosedEquity,testInfo.ClosedEquity,"ClosedEquity at " + i);
+			}
+		}
+		
+		public void VerifyStatsCount(StrategyInterface strategy) {
+			List<StatsInfo> goodStats = goodStatsMap[strategy.Name];
+			List<StatsInfo> testStats = testStatsMap[strategy.Name];
+			Assert.AreEqual(goodStats.Count,testStats.Count,"Stats count");
+		}
+		
+		public void VerifyStats(StrategyInterface strategy) {
+			List<StatsInfo> goodStats = goodStatsMap[strategy.Name];
+			List<StatsInfo> testStats = testStatsMap[strategy.Name];
+			for( int i=0; i<testStats.Count && i<goodStats.Count; i++) {
+				StatsInfo testInfo = testStats[i];
+				StatsInfo goodInfo = goodStats[i];
+				Assert.AreEqual(goodInfo.Time,testInfo.Time,"Stats time at " + i);
+				Assert.AreEqual(goodInfo.ClosedEquity,testInfo.ClosedEquity,"Closed Equity time at " + i);
+				Assert.AreEqual(goodInfo.OpenEquity,testInfo.OpenEquity,"Open Equity time at " + i);
+				Assert.AreEqual(goodInfo.CurrentEquity,testInfo.CurrentEquity,"Current Equity time at " + i);
 			}
 		}
 		

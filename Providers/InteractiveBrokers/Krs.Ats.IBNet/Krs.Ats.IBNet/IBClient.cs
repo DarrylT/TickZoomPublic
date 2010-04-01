@@ -3545,8 +3545,17 @@ namespace Krs.Ats.IBNet
                         int version = ReadInt();
                         int id = ReadInt();
                         string orderstat = ReadStr();
-                        Krs.Ats.IBNet.OrderStatus status = (string.IsNullOrEmpty(orderstat) ? Krs.Ats.IBNet.OrderStatus.None :
-                            (Krs.Ats.IBNet.OrderStatus) EnumDescConverter.GetEnumValue(typeof (Krs.Ats.IBNet.OrderStatus), orderstat));
+                        Krs.Ats.IBNet.OrderStatus status;
+                        if( string.IsNullOrEmpty(orderstat)) {
+                        	status = Krs.Ats.IBNet.OrderStatus.None;
+                        } else {
+                        	object enumValue = EnumDescConverter.GetEnumValue(typeof (Krs.Ats.IBNet.OrderStatus), orderstat);
+                        	if( enumValue is Krs.Ats.IBNet.OrderStatus) {
+                        		status = (Krs.Ats.IBNet.OrderStatus) enumValue;
+                        	} else {
+                        		throw new InvalidCastException("The order status " + orderstat + " was unrecognized as an OrderStatus enum value.");
+                        	}
+                        }
                         int filled = ReadInt();
                         int remaining = ReadInt();
                         decimal avgFillPrice = ReadDecimal();

@@ -26,6 +26,9 @@ using System.IO;
 
 namespace TickZoom.Api
 {
+	public interface AsyncReceiver : Receiver {
+		void Stop();
+	}
 	public interface Receiver {
 		void OnEvent(SymbolInfo symbol, int eventType, object eventDetail);
 	    ReceiverState OnGetReceiverState(SymbolInfo symbol);

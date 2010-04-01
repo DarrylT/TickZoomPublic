@@ -163,7 +163,7 @@ namespace TickZoom.Common
 			    		if( "property".Equals(reader.Name) ) {
 			    			string name = reader.GetAttribute("name");
 			    			string value = reader.GetAttribute("value");
-			    			HandleProperty(category.Default, reader.GetAttribute("name"), reader.GetAttribute("value"));
+			    			HandleProperty(reader,category.Default, reader.GetAttribute("name"), reader.GetAttribute("value"));
 			    			if( trace) log.Trace("Property " + name + " = " + value);
 			    		} else if( "category".Equals(reader.Name)) {
 			    			SymbolCategory subCategory = new SymbolCategory(category.Default.Copy());
@@ -208,7 +208,7 @@ namespace TickZoom.Common
 			    switch( reader.NodeType) {
 			    	case XmlNodeType.Element:
 			    		if( "property".Equals(reader.Name) ) {
-			    			HandleProperty(obj, reader.GetAttribute("name"), reader.GetAttribute("value"));
+			    			HandleProperty(reader,obj, reader.GetAttribute("name"), reader.GetAttribute("value"));
 			    		} else {
 			    			Error(reader,"End of " + tagName + " was expected instead of end of " + reader.Name);
 			    		}
@@ -226,10 +226,11 @@ namespace TickZoom.Common
 			Error(reader,"Unexpected end of file");
 		}
 		
-		private void HandleProperty( object obj, string name, string str) {
+		private void HandleProperty( XmlReader reader, object obj, string name, string str) {
 			PropertyInfo property = obj.GetType().GetProperty(name);
 			if( property == null) {
-				throw new ApplicationException( obj.GetType() + " does not have the property: " + name);
+				Warning(reader,obj.GetType() + " does not have the property: " + name);
+				return;
 			}
 			Type propertyType = property.PropertyType;
 			object value = TickZoom.Api.Converters.Convert(propertyType,str);
@@ -245,6 +246,15 @@ namespace TickZoom.Common
 			}
 			log.Debug(msg + lineStr);
 			throw new ApplicationException(msg + lineStr);
+		}
+		
+		private void Warning( XmlReader reader, string msg) {
+			IXmlLineInfo lineInfo = reader as IXmlLineInfo;
+			string lineStr = "";
+			if( lineInfo != null) {
+				lineStr += " on line " + lineInfo.LineNumber + " at position " + lineInfo.LinePosition;
+			}
+			log.Warn(msg + lineStr);
 		}
 		
 		public SymbolProperties Get(string symbol) {

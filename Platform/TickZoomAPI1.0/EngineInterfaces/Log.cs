@@ -64,11 +64,6 @@ namespace TickZoom.Api
         	set;
         }
         
-		string Symbol {
-			get;
-			set;
-		}
-        
         void Indent();
         
 		void Outdent();

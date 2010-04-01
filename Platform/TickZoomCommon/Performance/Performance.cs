@@ -40,6 +40,8 @@ namespace TickZoom.Common
 		private static readonly bool barDataInfo = barDataLog.IsInfoEnabled;
 		private static readonly Log tradeLog = Factory.Log.GetLogger("TradeLog");
 		private static readonly bool tradeInfo = tradeLog.IsInfoEnabled;
+		private static readonly Log statsLog = Factory.Log.GetLogger("StatsLog");
+		private static readonly bool statsInfo = statsLog.IsInfoEnabled;
 		TransactionPairs comboTrades;
 		TransactionPairsBinary comboTradesBinary;
 		bool graphTrades = true;
@@ -201,6 +203,21 @@ namespace TickZoom.Common
 				sb.Append(",");
 				sb.Append(bars.Close[0]);
 				barDataLog.Info( sb.ToString());
+			}
+			if( statsInfo) {
+				Bars bars = model.Bars;
+				TimeStamp time = bars.Time[0];
+				StringBuilder sb = new StringBuilder();
+				sb.Append(model.Name);
+				sb.Append(",");
+				sb.Append(time);
+				sb.Append(",");
+				sb.Append(equity.ClosedEquity);
+				sb.Append(",");
+				sb.Append(equity.OpenEquity);
+				sb.Append(",");
+				sb.Append(equity.CurrentEquity);
+				statsLog.Info( sb.ToString());
 			}
 			return true;
 		}

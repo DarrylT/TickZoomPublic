@@ -162,7 +162,6 @@ namespace TickZoom.TickUtil
 		int count = 0;
 		int start;
 		private bool StartupTask() {
-		    log.Symbol = symbol.Symbol;
 		    for( int retry=0; retry<3; retry++) {
 			    try { 
 				    position = 0;
@@ -275,7 +274,6 @@ namespace TickZoom.TickUtil
 		    			if( isFirstTick) {
 							receiver.OnEvent(symbol,(int)EventType.StartHistorical,null);
 							if( !quietMode) {
-								log.Symbol = symbol.Symbol;
 								LogInfo("Starting loading for " + symbol + " from " + tickIO.ToPosition());
 							}
 		    				isFirstTick = false;
@@ -286,9 +284,6 @@ namespace TickZoom.TickUtil
 	    					log.Debug("Read a tick " + tickIO);
 	    				} else if( trace) {
 	    					TickIO logTickIO = tickIO as TickIO;
-	    					if( logTickIO != null) {
-	    						log.Symbol = logTickIO.Symbol;
-	    					}
 	    					log.Trace("Read a tick " + tickIO);
 	    				}
 	    				tick.Symbol = symbol.BinaryIdentifier;
@@ -320,9 +315,8 @@ namespace TickZoom.TickUtil
 		private bool FinishTask() {
 			try {
 				if( !quietMode && isDataRead ) {
-					log.Symbol = symbol.Symbol;
 					LogInfo("Processing ended for " + symbol + " at " + tickIO.ToPosition());
-		    		}
+	    		}
 				int end = Environment.TickCount;
 				if( !quietMode) {
 		    		LogInfo( "Processed " + count + " ticks in " + (end-start)  + " ms.");

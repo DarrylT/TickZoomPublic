@@ -108,29 +108,15 @@ namespace MiscTest
 			form.DefaultCombo.Text = "Tick";
 			form.RealTimeButtonClick(null,null);
 			WaitComplete(10, () => { return form.PortfolioDocs.Count == 2; } );
+//			WaitComplete(10, () => { return form.PortfolioDocs.Count == 2 &&
+//			             		form.PortfolioDocs[0].Visible &&
+//			             		form.PortfolioDocs[1].Visible; } );
 			Assert.AreEqual(2,form.PortfolioDocs.Count,"Charts");
 			form.btnStop_Click(null,null);
 			WaitComplete(10, () => { return !form.ProcessWorker.IsBusy; } );
 			Assert.IsFalse(form.ProcessWorker.IsBusy,"ProcessWorker.Busy");
 		}
 		
-		[Test]
-		public void TestRealTime()
-		{
-			form.TxtSymbol.Text = "MSFT";
-			form.DefaultBox.Text = "10";
-			form.DefaultCombo.Text = "Tick";
-			form.RealTimeButtonClick(null,null);
-			WaitComplete(30, () => { return form.PortfolioDocs.Count == 1; } );
-			Assert.AreEqual(1,form.PortfolioDocs.Count,"Charts");
-			form.btnStop_Click(null,null);
-			
-			WaitComplete(30, () => { return !form.ProcessWorker.IsBusy; } );
-			Assert.IsFalse(form.ProcessWorker.IsBusy,"ProcessWorker.Busy");
-			
-			Assert.Greater(form.LogOutput.Lines.Length,2,"number of log lines");
-		}
-
 		private void DeleteFiles() {
 			while( true) {
 				try {
@@ -152,7 +138,8 @@ namespace MiscTest
 			form.EndTime = DateTime.Now;
 			form.RealTimeButtonClick(null,null);
 //			form.HistoricalButtonClick(null,null);
-			WaitComplete(20, () => { return form.PortfolioDocs.Count == 1; } );
+			WaitComplete(20, () => { return form.PortfolioDocs.Count == 1 &&
+			             		form.PortfolioDocs[0].Visible; } );
 			Assert.AreEqual(1,form.PortfolioDocs.Count,"Charts");
 			WaitComplete(20, () => { return false; } );
 			form.btnStop_Click(null,null);

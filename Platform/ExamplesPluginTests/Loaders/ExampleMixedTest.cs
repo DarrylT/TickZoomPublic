@@ -92,6 +92,7 @@ namespace Loaders
     		strategies.Add(fourTicksPerBar);
     		LoadTrades();
     		LoadBarData();
+    		LoadStats();
 		}
 		
 		#endregion
@@ -227,6 +228,16 @@ namespace Loaders
 		}
 	
 		[Test]
+		public void VerifyFullTickStatsCount() {
+			VerifyStatsCount(fullTickData);
+		}
+		
+		[Test]
+		public void VerifyFullTickStats() {
+			VerifyStats(fullTickData);
+		}
+		
+		[Test]
 		public void VerifyFourTicksTrades() {
 			VerifyTrades(fourTicksPerBar);
 		}
@@ -247,6 +258,16 @@ namespace Loaders
 			VerifyBarDataCount(fourTicksPerBar);
 		}
 
+		[Test]
+		public void VerifyFourTickStatsCount() {
+			VerifyStatsCount(fourTicksPerBar);
+		}
+		
+		[Test]
+		public void VerifyFourTickStats() {
+			VerifyStats(fourTicksPerBar);
+		}
+		
 		// Portfolio
 		[Test]
 		public void VerifySingleSymbolTrades() {
@@ -269,19 +290,24 @@ namespace Loaders
 		}
 		
 		[Test]
-		public void VerifyMultiSymbolBarData() {
-			VerifyBarData(multiSymbolPortfolio);
+		public void VerifySingleSymbolStatsCount() {
+			VerifyStatsCount(singleSymbolPortfolio);
 		}
 		
 		[Test]
-		public void VerifyMultiSymbolBarDataCount() {
-			VerifyBarDataCount(multiSymbolPortfolio);
+		public void VerifySingleSymbolStats() {
+			VerifyStats(singleSymbolPortfolio);
 		}
 		
-//		[Test]
-//		public void VerifyBarDataCount(
-//			[Values(0,1,2,3)] int index) {
-//			VerifyBarDataCount(strategies[index]);
-//		}
+		[Test]
+		public void VerifyMultiSymbolStatsCount() {
+			VerifyStatsCount(multiSymbolPortfolio);
+		}
+		
+		[Test]
+		public void VerifyMultiSymbolStats() {
+			VerifyStats(multiSymbolPortfolio);
+		}
+		
 	}
 }

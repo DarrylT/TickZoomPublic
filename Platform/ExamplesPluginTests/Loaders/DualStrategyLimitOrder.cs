@@ -141,7 +141,7 @@ namespace Loaders
 		
 		[Test]
 		public void CompareBars() {
-			CompareChart(portfolio,GetChart(portfolio.SymbolDefault));
+			CompareChart(strategy1,GetChart(strategy1.SymbolDefault));
 		}
 	}
 	

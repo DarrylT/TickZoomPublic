@@ -143,7 +143,6 @@ namespace TickZoom.TickUtil
 				writeQueue.Dequeue(ref tick);
 				tickIO.Inject(tick);
 				if( trace) {
-					log.Symbol = tickIO.Symbol;
 					log.TimeStamp = tickIO.Time;
 					log.Trace("Writing to file: " + tickIO);
 				}
