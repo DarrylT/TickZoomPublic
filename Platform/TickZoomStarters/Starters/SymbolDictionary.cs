@@ -426,10 +426,12 @@ namespace TickZoom.Common
         <property name=""UseSyntheticMarkets"" value=""false"" />
       </symbol>
       <symbol name=""/ESZ9"" />
-	  <symbol name=""/ESH0"">
-	        <property name=""TimeAndSales"" value=""ActualTrades"" />
-	        <property name=""QuoteType"" value=""None"" />
-	  </symbol>
+      <category name=""TradeOnly"">
+        <property name=""TimeAndSales"" value=""ActualTrades"" />
+        <property name=""QuoteType"" value=""None"" />
+        <symbol name=""/ESH0""/>
+        <symbol name=""/ESH0TradeBar""/>
+      </category>
     </category>
   </category>
 </category>";

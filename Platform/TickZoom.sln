@@ -52,6 +52,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logging", "TickZoomLogging\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZedGraph", "ZedGraph\ZedGraph.csproj", "{67EBC93F-0D47-4F6E-979F-E5622E1025E9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Engine", "..\..\TickZoomEngine\Engine.csproj", "{7106C1B6-B4CF-495A-95C1-FE9F6A0726F8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -118,6 +120,10 @@ Global
 		{E12CA83B-0ACF-4E59-8C6C-F4D51A3DDC3C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E12CA83B-0ACF-4E59-8C6C-F4D51A3DDC3C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E12CA83B-0ACF-4E59-8C6C-F4D51A3DDC3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7106C1B6-B4CF-495A-95C1-FE9F6A0726F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7106C1B6-B4CF-495A-95C1-FE9F6A0726F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7106C1B6-B4CF-495A-95C1-FE9F6A0726F8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7106C1B6-B4CF-495A-95C1-FE9F6A0726F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

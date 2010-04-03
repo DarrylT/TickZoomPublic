@@ -283,7 +283,6 @@ namespace TickZoom.TickUtil
 	    				if( debug && count<5) {
 	    					log.Debug("Read a tick " + tickIO);
 	    				} else if( trace) {
-	    					TickIO logTickIO = tickIO as TickIO;
 	    					log.Trace("Read a tick " + tickIO);
 	    				}
 	    				tick.Symbol = symbol.BinaryIdentifier;

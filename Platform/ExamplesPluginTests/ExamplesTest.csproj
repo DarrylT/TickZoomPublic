@@ -76,6 +76,7 @@
     <Compile Include="Loaders\StrategyTest.cs" />
     <Compile Include="Loaders\TestLimitOrderLoader.cs" />
     <Compile Include="Loaders\TestMarketOrderLoader.cs" />
+    <Compile Include="Loaders\TradeOnlyLimitOrderTest.cs" />
     <Compile Include="Loaders\TradeOnlySimpleTest.cs" />
     <Compile Include="MiscTest\DefectsTest.cs" />
     <Compile Include="MiscTest\MQ_BadFakeTickLoader.cs" />
@@ -86,6 +87,7 @@
     <Compile Include="RealTime\BrokerDualLimitOrder.cs" />
     <Compile Include="RealTime\BrokerLimitOrderTickBar.cs" />
     <Compile Include="RealTime\BrokerMarketOrder.cs" />
+    <Compile Include="RealTime\BrokerTradeOnlyLimitOrderTest.cs" />
     <Compile Include="RealTime\ExperimentWithEnums.cs" />
     <Compile Include="RealTime\BrokerLimitOrderTest.cs" />
     <None Include="app.config" />
