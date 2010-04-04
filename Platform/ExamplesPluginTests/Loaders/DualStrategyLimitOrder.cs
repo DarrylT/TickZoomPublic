@@ -48,8 +48,8 @@ namespace Loaders
 			Symbols = "USD/JPY,EUR/USD";
 			ShowCharts = false;
 			StoreKnownGood = false;
-			BreakPoint.SetBarBreakPoint(15);
-			BreakPoint.SetSymbolConstraint("EUR/USD");
+//			BreakPoint.SetBarBreakPoint(15);
+//			BreakPoint.SetSymbolConstraint("EUR/USD");
 		}
 			
 		[TestFixtureSetUp]

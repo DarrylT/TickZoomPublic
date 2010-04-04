@@ -9,7 +9,7 @@
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <SourceAnalysisOverrideSettingsFile>C:\Documents and Settings\Wayne Walter\Application Data\ICSharpCode/SharpDevelop3.0\Settings.SourceAnalysis</SourceAnalysisOverrideSettingsFile>
-    <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <NoStdLib>False</NoStdLib>
     <WarningLevel>4</WarningLevel>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
@@ -126,6 +126,10 @@
     <Compile Include="Performance\TradeStats.cs" />
     <Compile Include="Performance\TradeStatsReport.cs" />
     <Compile Include="Performance\Transaction.cs" />
+    <Compile Include="Performance\TransactionPairsBinary.cs" />
+    <Compile Include="Performance\TransactionPairsPage.cs" />
+    <Compile Include="Performance\PagesStore.cs" />
+    <Compile Include="Performance\TransactionPairsPages.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ProviderUtilities\LogicalOrderHandlerDefault.cs" />
     <Compile Include="ProviderUtilities\AssemblyAttributes.cs" />

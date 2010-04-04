@@ -67,7 +67,7 @@ namespace TickZoom.Common
 					return 0D;
 				} else {
 					System.Diagnostics.Debug.Assert(currentPrice!=null);
-					return ProfitInPosition(transactionPairs.Current,currentPrice(transactionPairs.Current.Direction));
+					return ProfitInPosition(transactionPairs.Tail,currentPrice(transactionPairs.Tail.Direction));
 				}
 			}
 		}
@@ -77,11 +77,11 @@ namespace TickZoom.Common
 		/// if still open. Zero if the most recent rade already closed.
 		/// </summary>
 		public double OpenProfitLoss {
-			get { if( Count == 0 || transactionPairs.Current.Completed) {
+			get { if( Count == 0 || transactionPairs.Tail.Completed) {
 					return 0D;
 				} else {
 					System.Diagnostics.Debug.Assert(currentPrice!=null);
-					return ProfitInPosition(transactionPairs.Current,currentPrice(transactionPairs.Current.Direction));
+					return ProfitInPosition(transactionPairs.Tail,currentPrice(transactionPairs.Tail.Direction));
 				}
 			}
 		}

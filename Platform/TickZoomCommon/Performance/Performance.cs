@@ -152,9 +152,9 @@ namespace TickZoom.Common
 		}
 		
 		private void ChangeComboSizeInternal() {
-			TransactionPairBinary combo = comboTradesBinary.Current;
+			TransactionPairBinary combo = comboTradesBinary.Tail;
 			combo.ChangeSize(context.Position.Current,context.Position.Price);
-			comboTradesBinary.Current = combo;
+			comboTradesBinary.Tail = combo;
 		}
 		
 		private void ExitComboTradeInternal(PositionInterface position) {
@@ -162,12 +162,12 @@ namespace TickZoom.Common
 		}
 					
 		public void ExitComboTrade(PositionInterface position) {
-			TransactionPairBinary comboTrade = comboTradesBinary.Current;
+			TransactionPairBinary comboTrade = comboTradesBinary.Tail;
 			comboTrade.ExitPrice = position.Price;
 			comboTrade.ExitTime = position.Time;
 			comboTrade.ExitBar = model.Chart.ChartBars.BarCount;
 			comboTrade.Completed = true;
-			comboTradesBinary.Current = comboTrade;
+			comboTradesBinary.Tail = comboTrade;
 			double pnl = profitLoss.CalculateProfit(comboTrade.Direction,comboTrade.EntryPrice,comboTrade.ExitPrice);
 			Equity.OnChangeClosedEquity( pnl);
 			if( tradeInfo) tradeLog.Info( model.Name + "," + Equity.ClosedEquity + "," + pnl + "," + comboTrade);
@@ -283,7 +283,9 @@ namespace TickZoom.Common
 		public TransactionPairs ComboTrades {
 			get { 
 				if( comboTradesBinary.Count > 0) {
-					comboTradesBinary.Current.TryUpdate(model.Ticks[0]);
+					TransactionPairBinary binary = comboTradesBinary.Tail;
+					binary.TryUpdate(model.Ticks[0]);
+					comboTradesBinary.Tail = binary;
 				}
 				return comboTrades;
 			}

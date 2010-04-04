@@ -304,7 +304,7 @@ namespace TickZoom.Common
 		public double ProfitToday {
 			get { 
 				if( dailyBinary.Count > 0) {
-			         return CurrentEquity - dailyBinary.Current.EntryPrice;
+			         return CurrentEquity - dailyBinary.Tail.EntryPrice;
 				} else {
 					 return CurrentEquity;
 				}
@@ -315,7 +315,7 @@ namespace TickZoom.Common
 		public double ProfitForWeek {
 			get { 
 				if( weeklyBinary.Count > 0) {
-			         return CurrentEquity - weeklyBinary.Current.EntryPrice;
+			         return CurrentEquity - weeklyBinary.Tail.EntryPrice;
 				} else {
 					 return CurrentEquity;
 				}
@@ -326,7 +326,7 @@ namespace TickZoom.Common
 		public double ProfitForMonth {
 			get { 
 				if( monthlyBinary.Count > 0) {
-			         return CurrentEquity - monthlyBinary.Current.EntryPrice;
+			         return CurrentEquity - monthlyBinary.Tail.EntryPrice;
 				} else {
 					 return CurrentEquity;
 				}

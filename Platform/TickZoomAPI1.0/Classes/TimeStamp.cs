@@ -747,6 +747,12 @@ namespace TickZoom.Api
 			return new TimeStamp( DateTimeTotimeStamp( dt ) / (double) MillisecondsPerDay );
 		}
 		
+		public static explicit operator TimeStamp( long value)
+		{
+			
+			return new TimeStamp( value );
+		}
+		
 		public static bool operator >=( TimeStamp lhs, TimeStamp rhs)
 		{
 			return lhs.CompareTo(rhs) >= 0;

@@ -27,73 +27,11 @@ using TickZoom.Api;
 
 namespace TickZoom.Common
 {
+
+	
 	[Obsolete("Please use TransactionPairsBinary instead.")]
 	public class RoundTurnsBinary : TransactionPairsBinary
 	{
 		
-	}
-	
-	public class TransactionPairsBinary
-	{
-		string name = "TradeList";
-		List<TransactionPairBinary> transactionPairs = new List<TransactionPairBinary>();
-		int totalProfit = 0;
-		public TransactionPairsBinary()
-		{
-		}
-		
-		public void Add(TransactionPairBinary trade) {
-			CalcTotalProfit();
-			transactionPairs.Add(trade);
-		}
-		public TransactionPairsBinary GetCompletedList(TimeStamp time, double price, int bar) {
-			if( transactionPairs.Count > 0) {
-				TransactionPairBinary pair = transactionPairs[transactionPairs.Count-1];
-				if( !pair.Completed ) {
-					pair.ExitPrice = price;
-					pair.ExitTime = time;
-					pair.ExitBar = bar;
-					transactionPairs[transactionPairs.Count-1] = pair;
-				}
-			}
-			return this;
-		}
-		
-		public TransactionPairBinary Current {
-			get { return transactionPairs[transactionPairs.Count-1]; }
-			set { transactionPairs[transactionPairs.Count-1] = value; }
-		}
-		
-		public int Count { 
-			get { return transactionPairs.Count; }
-		}
-		
-		public TransactionPairBinary this [int index] {
-		    get { 
-				return transactionPairs[index];
-			}
-		    set { transactionPairs[index] = value;  }
-		}
-		private void CalcTotalProfit() {
-			totalProfit = 0;
-		}
-		public int TotalProfit {
-			get { return totalProfit; }
-		}
-		
-		public override string ToString()
-		{
-			if( name != "") {
-				return base.ToString() + ": " + name;
-			} else {
-				return base.ToString();
-			}
-			
-		}
-		
-		public string Name {
-			get { return name; }
-			set { name = value; }
-		}
 	}
 }

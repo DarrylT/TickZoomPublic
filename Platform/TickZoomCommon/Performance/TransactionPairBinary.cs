@@ -23,29 +23,26 @@
 
 using System;
 using TickZoom.Api;
+using System.Runtime.InteropServices;
 
 namespace TickZoom.Common
 {
-	public class TransactionPairBinary 
+	public struct TransactionPairBinary 
 	{
 		private static readonly Log log = Factory.Log.GetLogger(typeof(TransactionPair));
 		private static readonly bool debug = log.IsDebugEnabled;
 		private static readonly bool trace = log.IsTraceEnabled;
 		public static readonly string TIMEFORMAT = "yyyy-MM-dd HH:mm:ss.fff";
-		private TimeStamp entryTime;
-		private TimeStamp exitTime;
+		private long entryTime;
+		private long exitTime;
 		private double direction;
 		private double entryPrice;
-		private int entryBar;
 		private double exitPrice;
-		private int exitBar;
 		private double maxPrice;
 		private double minPrice;
+		private int entryBar;
+		private int exitBar;
 		private bool completed;
-		
-		public TransactionPairBinary() {
-			
-		}
 		
 		public static TransactionPairBinary Parse(string value) {
 			TransactionPairBinary pair = new TransactionPairBinary();
@@ -54,10 +51,10 @@ namespace TickZoom.Common
 			pair.direction = double.Parse(fields[field++]);
 			pair.entryBar = int.Parse(fields[field++]);
 			pair.entryPrice = double.Parse(fields[field++]);
-			pair.entryTime = TimeStamp.Parse(fields[field++]);
+			pair.entryTime = TimeStamp.Parse(fields[field++]).Internal;
 			pair.exitBar = int.Parse(fields[field++]);
 			pair.exitPrice = double.Parse(fields[field++]);
-			pair.exitTime = TimeStamp.Parse(fields[field++]);
+			pair.exitTime = TimeStamp.Parse(fields[field++]).Internal;
 			pair.maxPrice = double.Parse(fields[field++]);
 			pair.minPrice = double.Parse(fields[field++]);
 			return pair;
@@ -103,7 +100,7 @@ namespace TickZoom.Common
 				} else {
 					UpdatePrice(tick.IsQuote ? tick.Ask : tick.Price);
 				}
-				exitTime = tick.Time;
+				exitTime = tick.Time.Internal;
 			}
 		}
 		
@@ -191,13 +188,13 @@ namespace TickZoom.Common
 		}
 		
 		public TimeStamp EntryTime {
-			get { return entryTime; }
-			set { entryTime = value; }
+			get { return (TimeStamp) entryTime; }
+			set { entryTime = value.Internal; }
 		}
 		
 		public TimeStamp ExitTime {
-			get { return exitTime; }
-			set { exitTime = value; }
+			get { return (TimeStamp) exitTime; }
+			set { exitTime = value.Internal; }
 		}
 	}
 }
