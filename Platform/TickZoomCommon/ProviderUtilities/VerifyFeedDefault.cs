@@ -248,7 +248,15 @@ namespace TickZoom.Common
 
 		public int EndTimeTheFeed()
 		{
-			task.Join();
+			int seconds = 60;
+			int start = Environment.TickCount;
+			int end = start + seconds * 1000;
+			while( task.IsAlive && Environment.TickCount < end) {
+				Thread.Sleep(100);
+			}
+			if( task.IsAlive) {
+				throw new ApplicationException("TimeTheFeek took more than " + seconds + " seconds timeout.");
+			}
 			int endTime = Environment.TickCount;
 			int elapsed = endTime - startTime;
 			log.Notice("Processed " + count + " ticks in " + elapsed + "ms or " + (count * 1000 / elapsed) + "ticks/sec");
