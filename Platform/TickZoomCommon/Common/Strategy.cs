@@ -297,6 +297,15 @@ namespace TickZoom.Common
 			}
 		}
 		
+		public LogicalOrder GetOrder(int orderId) {
+			foreach( var order in allOrders) {
+				if( order.Id == orderId){
+					return order;
+				}
+			}
+			throw new ApplicationException("Logical Order Id " + orderId + " was not found.");
+		}
+		
 		public IList<LogicalOrder> ActiveOrders {
 			get {
 				return tempActiveOrders;

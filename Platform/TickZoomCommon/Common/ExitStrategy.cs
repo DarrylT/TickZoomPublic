@@ -70,12 +70,14 @@ namespace TickZoom.Common
 		{
 			if( eventType == EventType.Initialize) {
 				Strategy.AddInterceptor( EventType.Tick, this);
+				Strategy.AddInterceptor( EventType.LogicalFill, this);
 				OnInitialize();
 			}
 			context.Invoke();
 			this.context = context;
-			if( eventType == EventType.Tick) {
-				OnProcessPosition((Tick) eventDetail);
+			if( eventType == EventType.Tick ||
+			    eventType == EventType.LogicalFill) {
+				OnProcessPosition();
 			}
 		}
 				
@@ -98,7 +100,8 @@ namespace TickZoom.Common
 			Strategy.Drawing.Color = Color.Black;
 		}
 		
-		public void OnProcessPosition(Tick tick) {
+		public void OnProcessPosition() {
+			Tick tick = Strategy.Data.Ticks[0];
 			// Handle ActiveNow orders.
 			
 			if( stopTradingToday || stopTradingThisWeek || stopTradingThisMonth ) {

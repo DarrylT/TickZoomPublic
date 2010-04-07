@@ -157,7 +157,8 @@ namespace TickZoom.Common
 		public override void OnEvent(EventContext context, EventType eventType, object eventDetail)
 		{
 			base.OnEvent(context, eventType, eventDetail);
-			if( eventType == EventType.Tick) {
+			if( eventType == EventType.Tick ||
+			    eventType == EventType.LogicalFill) {
 				if( context.Position == null) {
 					context.Position = new PositionCommon(this);
 				}

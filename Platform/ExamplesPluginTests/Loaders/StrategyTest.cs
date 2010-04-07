@@ -134,6 +134,7 @@ namespace Loaders
 			string fileDir = @"..\..\Platform\ExamplesPluginTests\Loaders\Trades\";
 			string knownGoodPath = fileDir + testFileName + "Trades.log";
 			string newPath = Factory.Log.LogFolder + @"\Trades.log";
+			if( !File.Exists(newPath)) return;
 			if( StoreKnownGood) {
 				File.Copy(newPath,knownGoodPath,true);
 			}
@@ -175,6 +176,7 @@ namespace Loaders
 			string fileDir = @"..\..\Platform\ExamplesPluginTests\Loaders\Trades\";
 			string newPath = Factory.Log.LogFolder + @"\BarData.log";
 			string knownGoodPath = fileDir + testFileName + "BarData.log";
+			if( !File.Exists(newPath)) return;
 			if( StoreKnownGood) {
 				File.Copy(newPath,knownGoodPath,true);
 			}
@@ -216,6 +218,7 @@ namespace Loaders
 			string fileDir = @"..\..\Platform\ExamplesPluginTests\Loaders\Trades\";
 			string newPath = Factory.Log.LogFolder + @"\Stats.log";
 			string knownGoodPath = fileDir + testFileName + "Stats.log";
+			if( !File.Exists(newPath)) return;
 			if( StoreKnownGood) {
 				File.Copy(newPath,knownGoodPath,true);
 			}
@@ -253,8 +256,12 @@ namespace Loaders
 		}
 		
 		public void VerifyTradeCount(StrategyInterface strategy) {
-			List<TradeInfo> goodTrades = goodTradeMap[strategy.Name];
-			List<TradeInfo> testTrades = testTradeMap[strategy.Name];
+			List<TradeInfo> goodTrades = null;
+			goodTradeMap.TryGetValue(strategy.Name,out goodTrades);
+			List<TradeInfo> testTrades = null;
+			testTradeMap.TryGetValue(strategy.Name,out testTrades);
+			Assert.IsNotNull(goodTrades, "good trades");
+			Assert.IsNotNull(testTrades, "test trades");
 			Assert.AreEqual(goodTrades.Count,testTrades.Count,"trade count");
 		}
 		
@@ -265,8 +272,12 @@ namespace Loaders
 		}
 		
 		public void VerifyTrades(StrategyInterface strategy) {
-			List<TradeInfo> goodTrades = goodTradeMap[strategy.Name];
-			List<TradeInfo> testTrades = testTradeMap[strategy.Name];
+			List<TradeInfo> goodTrades = null;
+			goodTradeMap.TryGetValue(strategy.Name,out goodTrades);
+			List<TradeInfo> testTrades = null;
+			testTradeMap.TryGetValue(strategy.Name,out testTrades);
+			Assert.IsNotNull(goodTrades, "good trades");
+			Assert.IsNotNull(testTrades, "test trades");
 			for( int i=0; i<testTrades.Count && i<goodTrades.Count; i++) {
 				TradeInfo testInfo = testTrades[i];
 				TradeInfo goodInfo = goodTrades[i];

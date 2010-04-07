@@ -54,8 +54,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeService", "TickZoomBla
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Engine", "..\..\TickZoomEngine\Engine.csproj", "{7106C1B6-B4CF-495A-95C1-FE9F6A0726F8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProviderCommon", "..\..\ProviderCommon\ProviderCommon.csproj", "{AC3D6049-AD4C-4E73-86D3-2A537574B432}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -126,10 +124,6 @@ Global
 		{7106C1B6-B4CF-495A-95C1-FE9F6A0726F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7106C1B6-B4CF-495A-95C1-FE9F6A0726F8}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7106C1B6-B4CF-495A-95C1-FE9F6A0726F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AC3D6049-AD4C-4E73-86D3-2A537574B432}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AC3D6049-AD4C-4E73-86D3-2A537574B432}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AC3D6049-AD4C-4E73-86D3-2A537574B432}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AC3D6049-AD4C-4E73-86D3-2A537574B432}.Release|Any CPU.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -39,6 +39,7 @@ namespace TickZoom.Api
 		void ProcessFill(StrategyInterface strategy, LogicalFill logicalFill);
 		Func<LogicalOrder, double, double, int> DrawTrade { get; set; }
 		Action<SymbolInfo, LogicalFill> ChangePosition { get; set; }
+		Action<LogicalFillBinary> CreateLogicalFill{ get; set; }
 		bool UseSyntheticMarkets { get; set; }
 		bool UseSyntheticLimits { get; set; }
 		bool UseSyntheticStops { get; set; }

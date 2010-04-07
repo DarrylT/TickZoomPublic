@@ -79,14 +79,16 @@ namespace TickZoom.Common
 			if( EventType.Initialize == eventType) {
 				model.AddInterceptor( EventType.Close, this);
 				model.AddInterceptor( EventType.Tick, this);
+				model.AddInterceptor( EventType.LogicalFill, this);
 				OnInitialize();
 			}
 			if( EventType.Close == eventType && eventDetail == null) {
 				OnIntervalClose();
 			}
 			context.Invoke();
-			if( EventType.Tick == eventType) {
-				OnProcessTick((Tick)eventDetail);
+			if( eventType == EventType.LogicalFill ||
+			    eventType == EventType.Tick) {
+				OnProcessFill();
 			}
 		}
 		
@@ -97,7 +99,7 @@ namespace TickZoom.Common
 
 		}
 		
-		public bool OnProcessTick(Tick tick)
+		public bool OnProcessFill()
 		{
 			if( context.Position.Current != position.Current) {
 				positionChanges.Add(context.Position.Current);

@@ -42,6 +42,7 @@ namespace TickZoom.Common
 		private IList<LogicalOrder> activeOrders;
 		private double position;
 		private Action<SymbolInfo, LogicalFill> changePosition;
+		private Action<LogicalFillBinary> createLogicalFill;
 		private Func<LogicalOrder, double, double, int> drawTrade;
 		private bool useSyntheticMarkets = true;
 		private bool useSyntheticStops = true;
@@ -149,8 +150,7 @@ namespace TickZoom.Common
 
 		private void FlattenSignal(double price, Tick tick, LogicalOrder order)
 		{
-			LogicalFillBinary fill = new LogicalFillBinary(0,price,tick.Time,order.Id);
-			changePosition(symbol, fill);
+			CreateLogicalFillHelper(0,price,tick.Time,order);
 			CancelExitOrders(order.TradeDirection);
 		}
 
@@ -213,6 +213,7 @@ namespace TickZoom.Common
 			}
 		}
 
+		TimeStamp debugTS = new TimeStamp("1983-05-17 13:00:00.002");
 		private void ProcessSellStop(LogicalOrder order, Tick tick)
 		{
 			double price = tick.IsTrade ? tick.Price : tick.Bid;
@@ -280,7 +281,7 @@ namespace TickZoom.Common
 			if (price >= order.Price) {
 				LogMsg("Long Stop Entry at " + tick);
 				
-				CreateLogicalFill(symbol, order.Positions, price, tick.Time, order.Id);
+				CreateLogicalFillHelper(order.Positions, price, tick.Time, order);
 				TryDrawTrade(order, price, order.Positions);
 				CancelEnterOrders();
 			}
@@ -291,7 +292,7 @@ namespace TickZoom.Common
 			double price = tick.IsQuote ? tick.Ask : tick.Price;
 			if (price <= order.Price) {
 				LogMsg("Short Stop Entry at " + tick);
-				CreateLogicalFill(symbol, order.Positions, price, tick.Time, order.Id);
+				CreateLogicalFillHelper(order.Positions, price, tick.Time, order);
 				TryDrawTrade(order, price, order.Positions);
 				CancelEnterOrders();
 			}
@@ -305,7 +306,7 @@ namespace TickZoom.Common
 		{
 			LogMsg("Long Market Entry at " + tick);
 			double price = tick.IsQuote ? tick.Ask : tick.Price;
-			CreateLogicalFill(symbol, order.Positions, price, tick.Time, order.Id);
+			CreateLogicalFillHelper(order.Positions, price, tick.Time, order);
 			if (drawTrade != null) {
 				drawTrade(order, price, order.Positions);
 			}
@@ -322,9 +323,9 @@ namespace TickZoom.Common
 			}
 		}
 		
-		private void CreateLogicalFill(SymbolInfo symbol, double position, double price, TimeStamp time, int logicalOrderId) {
-			LogicalFillBinary fill = new LogicalFillBinary(position,price,time,logicalOrderId);
-			changePosition(symbol,fill);
+		private void CreateLogicalFillHelper(double position, double price, TimeStamp time, LogicalOrder order) {
+			LogicalFillBinary fill = new LogicalFillBinary(position,price,time,order.Id);
+			createLogicalFill(fill);
 		}
 		
 		private void ProcessEnterBuyLimit(LogicalOrder order, Tick tick)
@@ -339,7 +340,7 @@ namespace TickZoom.Common
 			}
 			if (isFilled) {
 				LogMsg("Long Limit Entry at " + tick);
-				CreateLogicalFill(symbol, order.Positions, price, tick.Time, order.Id);
+				CreateLogicalFillHelper(order.Positions, price, tick.Time, order);
 				if (drawTrade != null) {
 					drawTrade(order, price, order.Positions);
 				}
@@ -351,7 +352,7 @@ namespace TickZoom.Common
 		{
 			LogMsg("Short Market Entry at " + tick);
 			double price = tick.IsQuote ? tick.Bid : tick.Price;
-			CreateLogicalFill(symbol, -order.Positions, price, tick.Time, order.Id);
+			CreateLogicalFillHelper(-order.Positions, price, tick.Time, order);
 			if (drawTrade != null) {
 				drawTrade(order, price, -order.Positions);
 			}
@@ -370,7 +371,7 @@ namespace TickZoom.Common
 			}
 			if (isFilled) {
 				LogMsg("Short Limit Entry at " + tick);
-				CreateLogicalFill(symbol, -order.Positions, price, tick.Time, order.Id);
+				CreateLogicalFillHelper(-order.Positions, price, tick.Time, order);
 				if (drawTrade != null) {
 					drawTrade(order, price, -order.Positions);
 				}
@@ -506,6 +507,11 @@ namespace TickZoom.Common
 		public bool GraphTrades {
 			get { return graphTrades; }
 			set { graphTrades = value; }
+		}
+		
+		public Action<LogicalFillBinary> CreateLogicalFill {
+			get { return createLogicalFill; }
+			set { createLogicalFill = value; }
 		}
 	}
 }
