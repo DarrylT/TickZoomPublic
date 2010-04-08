@@ -273,6 +273,11 @@ namespace TickZoom.Common
 			get { return position; }
 		}
 		
+		public override bool OnWriteReport(string folder)
+		{
+			return performance.WriteReport(Name,folder);
+		}
+
 		public virtual double OnGetFitness()
 		{
 			EquityStats stats = Performance.Equity.CalculateStatistics();

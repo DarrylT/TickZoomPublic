@@ -30,9 +30,7 @@ using TickZoom.Api;
 
 namespace TickZoom.Common
 {
-	/// <summary>
-	/// Description of StrategySupport.
-	/// </summary>
+
 	public class EnterCommon : StrategySupport
 	{
 		public class InternalOrders {
