@@ -47,6 +47,7 @@ namespace TickZoom.Common
 		private bool useSyntheticMarkets = true;
 		private bool useSyntheticStops = true;
 		private bool useSyntheticLimits = true;
+		private bool doReverseOrders = true;
 		private bool doEntryOrders = true;
 		private bool doExitOrders = true;
 		private bool doExitStrategyOrders = false;
@@ -82,6 +83,9 @@ namespace TickZoom.Common
 					}
 					if (doExitOrders && order.TradeDirection == TradeDirection.Exit) {
 						OnProcessExitOrder(order, tick);
+					}
+					if (doReverseOrders && order.TradeDirection == TradeDirection.Reverse) {
+						OnProcessReverseOrder(order, tick);
 					}
 					if (doExitStrategyOrders && order.TradeDirection == TradeDirection.ExitStrategy) {
 						OnProcessExitOrder(order, tick);
@@ -148,12 +152,92 @@ namespace TickZoom.Common
 			}
 		}
 
-		private void FlattenSignal(double price, Tick tick, LogicalOrder order)
+		private void OnProcessReverseOrder(LogicalOrder order, Tick tick)
+		{
+			if (IsTrace)
+				Log.Trace("OnProcessEnterOrder()");
+			if (IsLong) {
+				if (order.Type == OrderType.BuyStop || order.Type == OrderType.BuyLimit) {
+					order.IsActive = false;
+				}
+			}
+			if (IsShort) {
+				 if (order.Type == OrderType.SellStop || order.Type == OrderType.SellLimit) {
+					order.IsActive = false;
+				}
+			}
+
+			if (IsLong) {
+				switch (order.Type) {
+					case OrderType.SellMarket:
+						if (useSyntheticMarkets) {
+							ProcessReverseSellMarket(order, tick);
+						}
+						break;
+					case OrderType.SellStop:
+						if (useSyntheticStops) {
+							ProcessReverseSellStop(order, tick);
+						}
+						break;
+					case OrderType.SellLimit:
+						if (useSyntheticLimits) {
+							ProcessReverseSellLimit(order, tick);
+						}
+						break;
+				}
+			}
+
+			if (IsShort) {
+				switch (order.Type) {
+					case OrderType.BuyMarket:
+						if (useSyntheticMarkets) {
+							ProcessReverseBuyMarket(order, tick);
+						}
+						break;
+					case OrderType.BuyStop:
+						if (useSyntheticStops) {
+							ProcessReverseBuyStop(order, tick);
+						}
+						break;
+					case OrderType.BuyLimit:
+						if (useSyntheticLimits) {
+							ProcessReverseBuyLimit(order, tick);
+						}
+						break;
+				}
+			}
+		}
+		
+		private void FlattenPosition(double price, Tick tick, LogicalOrder order)
 		{
 			CreateLogicalFillHelper(0,price,tick.Time,order);
 			CancelExitOrders(order.TradeDirection);
 		}
 
+		private void ModifyPosition( double position, double price, TimeStamp time, LogicalOrder order) {
+			CreateLogicalFillHelper(position, price, time, order);
+			if (drawTrade != null) {
+				drawTrade(order, price, position);
+			}
+			CancelEnterOrders();
+		}
+		
+		private void ReversePosition(double price, Tick tick, LogicalOrder order)
+		{
+			CreateLogicalFillHelper(order.Positions,price,tick.Time,order);
+			CancelReverseOrders();
+		}
+		
+		public void CancelReverseOrders() {
+			for (int i = activeOrders.Count - 1; i >= 0; i--) {
+				LogicalOrder order = activeOrders[i];
+				if (order.TradeDirection == TradeDirection.Exit ||
+				   order.TradeDirection == TradeDirection.Reverse) {
+					order.IsActive = false;
+				}
+			}
+		}
+		
 		public void CancelExitOrders(TradeDirection tradeDirection)
 		{
 			for (int i = activeOrders.Count - 1; i >= 0; i--) {
@@ -164,25 +248,25 @@ namespace TickZoom.Common
 			}
 		}
 
-		private void ProcessBuyMarket(LogicalOrder order, Tick tick)
-		{
-			LogMsg("Buy Market Exit at " + tick);
-			double price = tick.IsTrade ? tick.Price : tick.Ask;
-			FlattenSignal(price, tick, order);
-			TryDrawTrade(order, price, position);
-		}
-		
 		private void TryDrawTrade(LogicalOrder order, double price, double position) {
 			if (drawTrade != null && graphTrades == true) {
 				drawTrade(order, price, position);
 			}
 		}
 
+		private void ProcessBuyMarket(LogicalOrder order, Tick tick)
+		{
+			LogMsg("Buy Market Exit at " + tick);
+			double price = tick.IsTrade ? tick.Price : tick.Ask;
+			FlattenPosition(price, tick, order);
+			TryDrawTrade(order, price, position);
+		}
+		
 		private void ProcessSellMarket(LogicalOrder order, Tick tick)
 		{
 			LogMsg("Sell Market Exit at " + tick);
 			double price = tick.IsTrade ? tick.Price : tick.Bid;
-			FlattenSignal(price, tick, order);
+			FlattenPosition(price, tick, order);
 			TryDrawTrade(order, price, position);
 		}
 
@@ -191,7 +275,7 @@ namespace TickZoom.Common
 			double price = tick.IsQuote ? tick.Ask : tick.Price;
 			if (price >= order.Price) {
 				LogMsg("Buy Stop Exit at " + tick);
-				FlattenSignal(price, tick, order);
+				FlattenPosition(price, tick, order);
 				TryDrawTrade(order, price, position);
 			}
 		}
@@ -208,18 +292,17 @@ namespace TickZoom.Common
 			}
 			if (isFilled) {
 				LogMsg("Buy Limit Exit at " + tick);
-				FlattenSignal(price, tick, order);
+				FlattenPosition(price, tick, order);
 				TryDrawTrade(order, price, position);
 			}
 		}
 
-		TimeStamp debugTS = new TimeStamp("1983-05-17 13:00:00.002");
 		private void ProcessSellStop(LogicalOrder order, Tick tick)
 		{
 			double price = tick.IsTrade ? tick.Price : tick.Bid;
 			if (price <= order.Price) {
 				LogMsg("Sell Stop Exit at " + tick);
-				FlattenSignal(price, tick, order);
+				FlattenPosition(price, tick, order);
 				TryDrawTrade(order, price, position);
 			}
 		}
@@ -236,11 +319,75 @@ namespace TickZoom.Common
 			}
 			if (isFilled) {
 				LogMsg("Sell Stop Limit at " + tick);
-				FlattenSignal(price, tick, order);
+				FlattenPosition(price, tick, order);
 				TryDrawTrade(order, price, position);
 			}
 		}
 
+		private void ProcessReverseBuyMarket(LogicalOrder order, Tick tick)
+		{
+			LogMsg("Buy Market Exit at " + tick);
+			double price = tick.IsTrade ? tick.Price : tick.Ask;
+			ModifyPosition(order.Positions, price, tick.Time, order);
+		}
+		
+		private void ProcessReverseSellMarket(LogicalOrder order, Tick tick)
+		{
+			LogMsg("Sell Market Exit at " + tick);
+			double price = tick.IsTrade ? tick.Price : tick.Bid;
+			ModifyPosition(-order.Positions, price, tick.Time, order);
+		}
+
+		private void ProcessReverseBuyStop(LogicalOrder order, Tick tick)
+		{
+			double price = tick.IsQuote ? tick.Ask : tick.Price;
+			if (price >= order.Price) {
+				LogMsg("Buy Stop Exit at " + tick);
+				ModifyPosition(order.Positions, price, tick.Time, order);
+			}
+		}
+
+		private void ProcessReverseBuyLimit(LogicalOrder order, Tick tick)
+		{
+			bool isFilled = false;
+			double price = tick.IsTrade ? tick.Price : tick.Ask;
+			if (price <= order.Price) {
+				isFilled = true;
+			} else if (tick.IsTrade && tick.Price < order.Price) {
+				price = order.Price;
+				isFilled = true;
+			}
+			if (isFilled) {
+				LogMsg("Buy Limit Reverse at " + tick);
+				ModifyPosition(order.Positions, price, tick.Time, order);
+			}
+		}
+
+		private void ProcessReverseSellStop(LogicalOrder order, Tick tick)
+		{
+			double price = tick.IsTrade ? tick.Price : tick.Bid;
+			if (price <= order.Price) {
+				LogMsg("Sell Stop Exit at " + tick);
+				ModifyPosition(-order.Positions, price, tick.Time, order);
+			}
+		}
+
+		private void ProcessReverseSellLimit(LogicalOrder order, Tick tick)
+		{
+			double price = tick.IsTrade ? tick.Price : tick.Bid;
+			bool isFilled = false;
+			if (price >= order.Price) {
+				isFilled = true;
+			} else if (tick.IsTrade && tick.Price > order.Price) {
+				price = order.Price;
+				isFilled = true;
+			}
+			if (isFilled) {
+				LogMsg("Sell Stop Limit at " + tick);
+				ModifyPosition(-order.Positions, price, tick.Time, order);
+			}
+		}
+		
 #endregion
 		
 

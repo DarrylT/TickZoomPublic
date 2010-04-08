@@ -38,11 +38,15 @@ namespace TickZoom.Common
 	{
 		EnterTiming enter;
 		ExitTiming exit;
+		ReverseTiming reverse;
 		
-		public OrderHandlers(EnterCommon enterNow, EnterCommon enterNextBar, ExitCommon exitNow, ExitCommon exitNextBar)
+		public OrderHandlers(EnterCommon enterNow, EnterCommon enterNextBar,
+		                     ExitCommon exitNow, ExitCommon exitNextBar,
+		                     ReverseCommon reverseNow, ReverseCommon reverseNextBar)
 		{
 			this.enter = new EnterTiming(enterNow,enterNextBar);
 			this.exit = new ExitTiming(exitNow,exitNextBar);
+			this.reverse = new ReverseTiming(reverseNow,reverseNextBar);
 		}
 		
 		public EnterTiming Enter {
@@ -51,6 +55,10 @@ namespace TickZoom.Common
 		
 		public ExitTiming Exit {
 			get { return exit; }
+		}
+		
+		public ReverseTiming Reverse {
+			get { return reverse; }
 		}
 		
 		public class EnterTiming {
@@ -67,6 +75,24 @@ namespace TickZoom.Common
 			}
 			
 			public EnterCommon NextBar {
+				get { return nextBar; }
+			}
+		}
+		
+		public class ReverseTiming {
+			ReverseCommon activeNow;
+			ReverseCommon nextBar;
+			
+			public ReverseTiming( ReverseCommon now, ReverseCommon nextBar) {
+				this.activeNow = now;
+				this.nextBar = nextBar;
+			}
+			
+			public ReverseCommon ActiveNow {
+				get { return activeNow; }
+			}
+			
+			public ReverseCommon NextBar {
 				get { return nextBar; }
 			}
 		}

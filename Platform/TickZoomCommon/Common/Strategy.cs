@@ -47,6 +47,8 @@ namespace TickZoom.Common
 		private bool isActiveOrdersChanged = false;
 		
 		OrderHandlers orders;
+		ReverseCommon reverseActiveNow;
+		ReverseCommon reverseNextBar;
 		ExitCommon exitActiveNow;
 		EnterCommon enterActiveNow;
 		ExitCommon exitNextBar;
@@ -67,19 +69,22 @@ namespace TickZoom.Common
 			Chain.Dependencies.Clear();
 			isStrategy = true;
 			result = new Result(this);
-			/// <summary>
-			/// 
-			/// </summary>
 			
 			exitActiveNow = new ExitCommon(this);
 			enterActiveNow = new EnterCommon(this);
+			reverseActiveNow = new ReverseCommon(this);
+			reverseNextBar = new ReverseCommon(this);
+			reverseNextBar.Orders = reverseActiveNow.Orders;
+			reverseNextBar.IsNextBar = true;
 			exitNextBar = new ExitCommon(this);
 			exitNextBar.Orders = exitActiveNow.Orders;
 			exitNextBar.IsNextBar = true;
 			enterNextBar = new EnterCommon(this);
 			enterNextBar.Orders = enterActiveNow.Orders;
 			enterNextBar.IsNextBar = true;
-			orders = new OrderHandlers(enterActiveNow,enterNextBar,exitActiveNow,exitNextBar);
+			orders = new OrderHandlers(enterActiveNow,enterNextBar,
+			                           exitActiveNow,exitNextBar,
+			                           reverseActiveNow,reverseNextBar);
 			
 			// Interceptors.
 			performance = new Performance(this);
@@ -96,6 +101,8 @@ namespace TickZoom.Common
 		
 		public override void OnConfigure()
 		{
+			reverseActiveNow.OnInitialize();
+			reverseNextBar.OnInitialize();
 			exitActiveNow.OnInitialize();
 			enterActiveNow.OnInitialize();
 			exitNextBar.OnInitialize();

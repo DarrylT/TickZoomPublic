@@ -53,12 +53,14 @@ namespace TickZoom.Common
 				Strategy.AddInterceptor(EventType.Open,this);
 				Strategy.AddInterceptor(EventType.Close,this);
 				Strategy.AddInterceptor(EventType.Tick,this);
+//				Strategy.AddInterceptor(EventType.LogicalFill,this);
 			}
 			context.Invoke();
 			if( Strategy.IsActiveOrdersChanged) {
 				Strategy.RefreshActiveOrders();
 				foreach( var order in Strategy.AllOrders) {
-					if( order.TradeDirection == TradeDirection.Entry) {
+					if( order.TradeDirection == TradeDirection.Entry ||
+					    order.TradeDirection == TradeDirection.Reverse) {
 						order.Positions = size;
 					}
 				}
