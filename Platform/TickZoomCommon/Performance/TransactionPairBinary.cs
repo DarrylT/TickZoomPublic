@@ -117,10 +117,11 @@ namespace TickZoom.Common
 		}
 		
 		public void ChangeSize( double newSize, double price) {
-			double sizeChange = newSize - Direction;
 			double sum = entryPrice * Direction;
-			sum += sizeChange * price;
-			entryPrice = sum / newSize;
+			double sizeChange = newSize - Direction;
+			double sum2 = sizeChange * price;
+			double newPrice = (sum + sum2) / newSize;
+			entryPrice = newPrice;
 			Direction = newSize;
 		}
 		

@@ -62,6 +62,9 @@ namespace TickZoom.Common
 			} else {
 				double transactionCosts = (slippage + commission)*fullPointValue*Math.Abs(position);
 				double pnl = ((exit - entry) * position * fullPointValue) - transactionCosts;
+				if( pnl < -200000) {
+					int x = 0;
+				}
 				return pnl.Round();
 			}
 		}

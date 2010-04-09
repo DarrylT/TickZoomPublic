@@ -36,6 +36,8 @@ namespace TickZoom.Common
 {
 	public class Performance : StrategyInterceptor
 	{
+		private static readonly Log log = Factory.Log.GetLogger(typeof(Performance));
+		private static readonly bool debug = log.IsDebugEnabled;
 		private static readonly Log barDataLog = Factory.Log.GetLogger("BarDataLog");
 		private static readonly bool barDataInfo = barDataLog.IsInfoEnabled;
 		private static readonly Log tradeLog = Factory.Log.GetLogger("TradeLog");

@@ -54,7 +54,7 @@ namespace TickZoom.Common
 		bool graphEquity = false;
 		IndicatorCommon equity;
 		ProfitLoss equityProfitLoss;
-		bool isPortfolio;
+		bool isMultiSymbolPortfolio;
 		PortfolioInterface portfolio;
 		bool enableYearlyStats = false;
 		bool enableMonthlyStats = false;
@@ -92,8 +92,8 @@ namespace TickZoom.Common
 		public void OnInitialize()
 		{
 			portfolio = model as PortfolioInterface;
-			if( portfolio != null) {
-				isPortfolio = true; // portfolio.PortfolioType == PortfolioType.MultiSymbol;
+			if( portfolio != null && portfolio.PortfolioType == PortfolioType.MultiSymbol) {
+				isMultiSymbolPortfolio = true; // portfolio.PortfolioType == PortfolioType.MultiSymbol;
 			}
 			daily  = new TransactionPairs(GetCurrentEquity,equityProfitLoss,dailyBinary);
 			dailyBinary.Name = "Daily";
@@ -169,6 +169,7 @@ namespace TickZoom.Common
 			return true;
 		}
 		
+		TimeStamp dbgTime = new TimeStamp("2008-01-02 02:58:00");
 		public bool OnIntervalClose()
 		{
 			if( graphEquity) {
@@ -369,7 +370,7 @@ namespace TickZoom.Common
 		[Browsable(false)]
 		public double OpenEquity {
 			get { 
-				if( isPortfolio) {
+				if( isMultiSymbolPortfolio) {
 					return portfolio.GetOpenEquity();
 				} else {
 					return performance.ComboTrades.OpenProfitLoss;
