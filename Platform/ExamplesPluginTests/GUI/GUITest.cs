@@ -87,10 +87,13 @@ namespace MiscTest
 			form.TxtSymbol.Text = "USD/JPY";
 			form.DefaultBox.Text = "1";
 			form.DefaultCombo.Text = "Hour";
-			form.HistoricalButtonClick(null,null);
-			WaitComplete(30, () => { return !form.ProcessWorker.IsBusy; } );
-			Assert.AreEqual(form.PortfolioDocs.Count,1,"Charts");
-			Assert.IsFalse(form.ProcessWorker.IsBusy,"ProcessWorker.Busy");
+			for( int i=0; i<10; i++) {
+				form.HistoricalButtonClick(null,null);
+				WaitComplete(30, () => { return !form.ProcessWorker.IsBusy; } );
+				Assert.AreEqual(form.PortfolioDocs.Count,i+1,"Charts");
+				Assert.IsTrue(form.PortfolioDocs[i].Visible,"Chart visible");
+				Assert.IsFalse(form.ProcessWorker.IsBusy,"ProcessWorker.Busy");
+			}
 		}
 		
 		public void WaitForEngine() {

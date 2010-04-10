@@ -55,7 +55,7 @@ namespace TickZoom.TickUtil
 	    private Receiver receiver;
 		Task fileReaderTask;
 		private static List<Reader<Y>> readerList = new List<Reader<Y>>();
-		private static object locker = new object();
+	    private object taskLocker = new object();
 		bool terminate = false;
 		string storageFolder;
 		MemoryStream memory;
@@ -67,9 +67,7 @@ namespace TickZoom.TickUtil
        		if( storageFolder == null) {
        			throw new ApplicationException( "Must set AppDataFolder property in app.config");
        		}
-			lock(locker) {
-				readerList.Add(this);
-			}
+			readerList.Add(this);
 			memory = new MemoryStream();
 			memory.SetLength(TickImpl.minTickSize);
 			buffer = memory.GetBuffer();
@@ -248,67 +246,69 @@ namespace TickZoom.TickUtil
 		}
 		
 		private bool FileReader() {
-			if( terminate || !receiver.CanReceive(symbol)) {
-				return false;
-			}
-			try {
-	    		if( position < length && !CancelPending) {
-					ReadTick();
-	    			if( dataVersion == 0) {
-	    				dataVersion = tickIO.DataVersion;			
-	    			}
-	    			tick = tickIO.Extract();
-					isDataRead = true;
-	    			
-	    			if( maxCount > 0 && count > maxCount) {
-					if(debug) log.Debug("Ending data read because count reached " + maxCount + " ticks.");
-						FinishTask();
-	    			}
-	    			
-					if( IsAtEnd(tick)) {
-						FinishTask();
-						return false;
-	    			}
-	    
-	    			if( IsAtStart(tick)) {
-		    			if( isFirstTick) {
-							receiver.OnEvent(symbol,(int)EventType.StartHistorical,null);
-							if( !quietMode) {
-								LogInfo("Starting loading for " + symbol + " from " + tickIO.ToPosition());
-							}
-		    				isFirstTick = false;
-		    			}
-				
-	    				count++;
-	    				if( debug && count<5) {
-	    					log.Debug("Read a tick " + tickIO);
-	    				} else if( trace) {
-	    					log.Trace("Read a tick " + tickIO);
-	    				}
-	    				tick.Symbol = symbol.BinaryIdentifier;
-	    				receiver.OnEvent(symbol,(int)EventType.Tick,tick);
-					}
-					
-					if( position > nextUpdate) {
-						try {
-				    		progressCallback("Loading bytes...", position, length);
-						} catch( Exception ex) {
-							log.Debug( "Exception on progressCallback: " + ex.Message);
-						}
-				    	nextUpdate = position + progressDivisor;
-					}
-				} else {
-					FinishTask();
+			lock( taskLocker) {
+				if( terminate || !receiver.CanReceive(symbol)) {
 					return false;
 				}
-			} catch( ObjectDisposedException) {
-				FinishTask();
-				return false;
-			} catch( Exception ex) {
-				log.Warn( "Exception thrown in Reader class", ex);
-				throw;
+				try {
+		    		if( position < length && !CancelPending) {
+						ReadTick();
+		    			if( dataVersion == 0) {
+		    				dataVersion = tickIO.DataVersion;			
+		    			}
+		    			tick = tickIO.Extract();
+						isDataRead = true;
+		    			
+		    			if( maxCount > 0 && count > maxCount) {
+						if(debug) log.Debug("Ending data read because count reached " + maxCount + " ticks.");
+							FinishTask();
+		    			}
+		    			
+						if( IsAtEnd(tick)) {
+							FinishTask();
+							return false;
+		    			}
+		    
+		    			if( IsAtStart(tick)) {
+			    			if( isFirstTick) {
+								receiver.OnEvent(symbol,(int)EventType.StartHistorical,null);
+								if( !quietMode) {
+									LogInfo("Starting loading for " + symbol + " from " + tickIO.ToPosition());
+								}
+			    				isFirstTick = false;
+			    			}
+					
+		    				count++;
+		    				if( debug && count<5) {
+		    					log.Debug("Read a tick " + tickIO);
+		    				} else if( trace) {
+		    					log.Trace("Read a tick " + tickIO);
+		    				}
+		    				tick.Symbol = symbol.BinaryIdentifier;
+		    				receiver.OnEvent(symbol,(int)EventType.Tick,tick);
+						}
+						
+						if( position > nextUpdate) {
+							try {
+					    		progressCallback("Loading bytes...", position, length);
+							} catch( Exception ex) {
+								log.Debug( "Exception on progressCallback: " + ex.Message);
+							}
+					    	nextUpdate = position + progressDivisor;
+						}
+					} else {
+						FinishTask();
+						return false;
+					}
+				} catch( ObjectDisposedException) {
+					FinishTask();
+					return false;
+				} catch( Exception ex) {
+					log.Warn( "Exception thrown in Reader class", ex);
+					throw;
+				}
+			    return true;
 			}
-		    return true;
 		}
 		
 		private bool FinishTask() {
@@ -346,29 +346,27 @@ namespace TickZoom.TickUtil
 		}
 		
 		public void Stop() {
-			terminate = true;
-			if( fileReaderTask != null) {
-				fileReaderTask.Stop();
-				fileReaderTask.Join();
-			}
-			if( dataIn != null) {
-				dataIn.Close();
-			}
-			lock(locker) {
+			lock( taskLocker) {
+				terminate = true;
+				if( fileReaderTask != null) {
+					fileReaderTask.Stop();
+					fileReaderTask.Join();
+				}
+				if( dataIn != null) {
+					dataIn.Close();
+				}
 				readerList.Remove(this);
-			}
-			if( receiver != null && receiver.CanReceive(symbol)) {
-				receiver.OnEvent(null,(int)EventType.Terminate,null);
+				if( receiver != null && receiver.CanReceive(symbol)) {
+					receiver.OnEvent(null,(int)EventType.Terminate,null);
+				}
 			}
 		}
 		
 		public static void CloseAll() {
-			lock( locker) {
-				for( int i=0; i<readerList.Count; i++) {
-					readerList[i].Stop();
-				}
-				readerList.Clear();
+			for( int i=0; i<readerList.Count; i++) {
+				readerList[i].Stop();
 			}
+			readerList.Clear();
 		}
 		
 		void progressCallback( string text, Int64 current, Int64 final) {

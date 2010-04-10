@@ -26,7 +26,7 @@ using System.Threading;
 
 namespace TickZoom.Api
 {
-	public class TaskLock {
+	public class TaskLock : IDisposable {
 	    private int isLocked = 0;
 	    
 		public bool IsLocked {
@@ -38,19 +38,30 @@ namespace TickZoom.Api
 	    }
 	    
 		public void Lock() {
-			int lockSpins = 0;
+//			int lockSpins = 0;
 			while( !TryLock()) {
-	    		Interlocked.Increment(ref lockSpins);
+//	    		Interlocked.Increment(ref lockSpins);
 				Factory.Parallel.Yield();
-	    		if( lockSpins > 1000000) {
-	    			throw new ApplicationException("Deadlock error");
-	    		}
+//	    		if( lockSpins > 1000000) {
+//	    			throw new ApplicationException("Deadlock error");
+//	    		}
 	    	}
+	    }
+	    
+	    public TaskLock Using() {
+	    	Lock();
+	    	return this;
 	    }
 	    
 	    public void Unlock() {
 	    	isLocked = 0;
 	    }
+	    
+		
+		public void Dispose()
+		{
+			Unlock();
+		}
 	}
 
 }

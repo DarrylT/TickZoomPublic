@@ -45,6 +45,8 @@ namespace TickZoom.Common
 		private volatile bool isRealTime = false;
 		private TaskLock syncTicks;
 		private volatile ReceiverState receiverState = ReceiverState.Ready;
+		private Task task;
+		private static object taskLocker = new object();
 
 		public TickQueue TickQueue {
 			get { return tickQueue; }
@@ -236,7 +238,6 @@ namespace TickZoom.Common
 		}
 		
 		long count = 0;
-		Task task;
 		int startTime;
 		public void StartTimeTheFeed()
 		{
@@ -266,28 +267,30 @@ namespace TickZoom.Common
 
 		public bool TimeTheFeedTask()
 		{
-			try {
-				if (!tickQueue.CanDequeue)
-					return false;
-				tickQueue.Dequeue(ref tickBinary);
-				tick.Inject(tickBinary);
-				if (debug && count < 5) {
-					log.Debug("Received a tick " + tick);
-					countLog++;
-				}
-				count++;
-				if (count % 1000000 == 0) {
-					log.Notice("Read " + count + " ticks");
-				}
-				return true;
-			} catch (QueueException ex) {
-				if( HandleQueueException(ex)) {
+			lock(taskLocker) {
+				try {
+					if (!tickQueue.CanDequeue)
+						return false;
+					tickQueue.Dequeue(ref tickBinary);
+					tick.Inject(tickBinary);
+					if (debug && count < 5) {
+						log.Debug("Received a tick " + tick);
+						countLog++;
+					}
+					count++;
+					if (count % 1000000 == 0) {
+						log.Notice("Read " + count + " ticks");
+					}
 					return true;
-				} else {
-					Factory.Parallel.CurrentTask.Stop();
+				} catch (QueueException ex) {
+					if( HandleQueueException(ex)) {
+						return true;
+					} else {
+						Factory.Parallel.CurrentTask.Stop();
+					}
 				}
+				return false;
 			}
-			return false;
 		}
 
 		public void OnRealTime(SymbolInfo symbol)
@@ -338,7 +341,9 @@ namespace TickZoom.Common
 		}
 		public void Close()
 		{
-			tickQueue.Terminate();
+			lock( taskLocker) {
+				tickQueue.Terminate();
+			}
 		}
 
 		public void OnEndHistorical(SymbolInfo symbol)
