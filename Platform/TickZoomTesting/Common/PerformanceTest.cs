@@ -187,6 +187,9 @@ namespace TickZoom.Common
 //			for( int i = 0; i< manager.Trades.Count; i++) {
 //				TickConsole.WriteLine(i + ": " + manager.Trades[i]);
 //			}
+//			for( int i=0; i< random.Ticks.Count; i++) {
+//				log.Info(random.Ticks[i]);
+//			}
 			return (PerformanceInner) random.Performance;
 		}
 		

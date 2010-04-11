@@ -100,11 +100,6 @@ namespace TickZoom.Api
 			get;
 		}
 		
-		TickQueue[] WriterQueues {
-			get;
-			set;
-		}
-		
 		ReportWriter ReportWriter {
 			get;
 			set;
