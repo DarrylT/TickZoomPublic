@@ -45,8 +45,9 @@ namespace MiscTest
 	[TestFixture]
 	public class GUITest
 	{
-		Form1 form;
-		
+		private static Log log = Factory.Log.GetLogger(typeof(GUITest));
+		private static bool debug = log.IsDebugEnabled;
+		private Form1 form;
 		[SetUp]
 		public void Setup() {
 			DeleteFiles();
@@ -54,16 +55,15 @@ namespace MiscTest
     		foreach( Process proc in processes) {
     			proc.Kill();
     		}
-			form = new Form1();
-			form.Show();
-			WaitForEngine();
-		}
-
-		[TearDown]
-		public void TearDown() {
-			form.Close();
 		}
 		
+		private Form1 CreateForm() {
+			Form1 form = new Form1();
+			form.Show();
+			WaitForEngine(form);
+			return form;
+		}
+
 		private void WaitComplete(int seconds) {
 			WaitComplete(seconds,null);
 		}
@@ -84,19 +84,22 @@ namespace MiscTest
 		[Test]
 		public void TestStartRun()
 		{
-			form.TxtSymbol.Text = "USD/JPY";
-			form.DefaultBox.Text = "1";
-			form.DefaultCombo.Text = "Hour";
-			for( int i=0; i<10; i++) {
-				form.HistoricalButtonClick(null,null);
-				WaitComplete(30, () => { return !form.ProcessWorker.IsBusy; } );
-				Assert.AreEqual(form.PortfolioDocs.Count,i+1,"Charts");
-				Assert.IsTrue(form.PortfolioDocs[i].Visible,"Chart visible");
-				Assert.IsFalse(form.ProcessWorker.IsBusy,"ProcessWorker.Busy");
+			using( form = CreateForm()) {
+				form.TxtSymbol.Text = "USD/JPY";
+				form.DefaultBox.Text = "1";
+				form.DefaultCombo.Text = "Hour";
+				for( int i=0; i<10; i++) {
+					log.Notice("Processing #" + (i+1));
+					form.HistoricalButtonClick(null,null);
+					WaitComplete(30, () => { return !form.ProcessWorker.IsBusy && form.PortfolioDocs[i].Visible; } );
+					Assert.AreEqual(form.PortfolioDocs.Count,i+1,"Charts");
+					Assert.IsTrue(form.PortfolioDocs[i].Visible,"Chart visible failed at " + i);
+					Assert.IsFalse(form.ProcessWorker.IsBusy,"ProcessWorker.Busy");
+				}
 			}
 		}
 		
-		public void WaitForEngine() {
+		public void WaitForEngine(Form1 form) {
 			while( !form.IsEngineLoaded) {
 				Thread.Sleep(1);
 				Application.DoEvents();
@@ -106,18 +109,21 @@ namespace MiscTest
 		[Test]
 		public void TestRealTimeNoHistorical()
 		{
-			form.TxtSymbol.Text = "IBM,GBP/USD";
-			form.DefaultBox.Text = "10";
-			form.DefaultCombo.Text = "Tick";
-			form.RealTimeButtonClick(null,null);
-			WaitComplete(10, () => { return form.PortfolioDocs.Count == 2; } );
-//			WaitComplete(10, () => { return form.PortfolioDocs.Count == 2 &&
-//			             		form.PortfolioDocs[0].Visible &&
-//			             		form.PortfolioDocs[1].Visible; } );
-			Assert.AreEqual(2,form.PortfolioDocs.Count,"Charts");
-			form.btnStop_Click(null,null);
-			WaitComplete(10, () => { return !form.ProcessWorker.IsBusy; } );
-			Assert.IsFalse(form.ProcessWorker.IsBusy,"ProcessWorker.Busy");
+			using( form = CreateForm()) {
+				form.TxtSymbol.Text = "IBM,GBP/USD";
+				form.DefaultBox.Text = "10";
+				form.DefaultCombo.Text = "Tick";
+				form.RealTimeButtonClick(null,null);
+				WaitComplete(30, () => { return form.PortfolioDocs.Count == 2 &&
+				             		form.PortfolioDocs[0].Visible &&
+				             		form.PortfolioDocs[1].Visible; } );
+				Assert.AreEqual(2,form.PortfolioDocs.Count,"Charts");
+				Assert.IsTrue(form.PortfolioDocs[0].Visible &&
+				             		form.PortfolioDocs[1].Visible,"Charts Visible");
+				form.btnStop_Click(null,null);
+				WaitComplete(10, () => { return !form.ProcessWorker.IsBusy; } );
+				Assert.IsFalse(form.ProcessWorker.IsBusy,"ProcessWorker.Busy");
+			}
 		}
 		
 		private void DeleteFiles() {
@@ -135,44 +141,44 @@ namespace MiscTest
 		[Test]
 		public void TestCapturedDataMatchesProvider()
 		{
-			form.TxtSymbol.Text = "/ESZ9";
-			form.DefaultBox.Text = "1";
-			form.DefaultCombo.Text = "Minute";
-			form.EndTime = DateTime.Now;
-			form.RealTimeButtonClick(null,null);
-//			form.HistoricalButtonClick(null,null);
-			WaitComplete(20, () => { return form.PortfolioDocs.Count == 1 &&
-			             		form.PortfolioDocs[0].Visible; } );
-			Assert.AreEqual(1,form.PortfolioDocs.Count,"Charts");
-			WaitComplete(20, () => { return false; } );
-			form.btnStop_Click(null,null);
-			WaitComplete(20, () => { return !form.ProcessWorker.IsBusy; } );
-			Assert.IsFalse(form.ProcessWorker.IsBusy,"ProcessWorker.Busy");
-			Assert.Greater(form.LogOutput.Lines.Length,2,"number of log lines");
-			string appData = Factory.Settings["AppDataFolder"];
-			string compareFile1 = appData + @"\MockProviderData\ESZ9_Tick.tck";
-			string compareFile2 = appData + @"\TestServerCache\ESZ9_Tick.tck";
-			AutoUpdate auto = new AutoUpdate();
-			string hash1 = auto.GetMD5HashFromFile(compareFile1);
-			string hash2 = auto.GetMD5HashFromFile(compareFile2);
-			TickReader reader1 = new TickReader();
-			reader1.Initialize(compareFile1,form.TxtSymbol.Text);
-			TickReader reader2 = new TickReader();
-			reader2.Initialize(compareFile2,form.TxtSymbol.Text);
-			TickBinary tick1 = new TickBinary();
-			TickBinary tick2 = new TickBinary();
-			try {
-				while(true) {
-					reader1.ReadQueue.Dequeue(ref tick1);
-					reader2.ReadQueue.Dequeue(ref tick2);
-					Assert.AreEqual(tick1,tick2);
+			using( form = CreateForm()) {
+				form.TxtSymbol.Text = "/ESZ9";
+				form.DefaultBox.Text = "1";
+				form.DefaultCombo.Text = "Minute";
+				form.EndTime = DateTime.Now;
+				form.RealTimeButtonClick(null,null);
+				WaitComplete(20, () => { return form.PortfolioDocs.Count == 1 &&
+				             		form.PortfolioDocs[0].Visible; } );
+				Assert.AreEqual(1,form.PortfolioDocs.Count,"Charts");
+				WaitComplete(20, () => { return false; } );
+				form.btnStop_Click(null,null);
+				WaitComplete(20, () => { return !form.ProcessWorker.IsBusy; } );
+				Assert.IsFalse(form.ProcessWorker.IsBusy,"ProcessWorker.Busy");
+				Assert.Greater(form.LogOutput.Lines.Length,2,"number of log lines");
+				string appData = Factory.Settings["AppDataFolder"];
+				string compareFile1 = appData + @"\MockProviderData\ESZ9_Tick.tck";
+				string compareFile2 = appData + @"\TestServerCache\ESZ9_Tick.tck";
+				AutoUpdate auto = new AutoUpdate();
+				string hash1 = auto.GetMD5HashFromFile(compareFile1);
+				string hash2 = auto.GetMD5HashFromFile(compareFile2);
+				TickReader reader1 = new TickReader();
+				reader1.Initialize(compareFile1,form.TxtSymbol.Text);
+				TickReader reader2 = new TickReader();
+				reader2.Initialize(compareFile2,form.TxtSymbol.Text);
+				TickBinary tick1 = new TickBinary();
+				TickBinary tick2 = new TickBinary();
+				try {
+					while(true) {
+						reader1.ReadQueue.Dequeue(ref tick1);
+						reader2.ReadQueue.Dequeue(ref tick2);
+						Assert.AreEqual(tick1,tick2);
+					}
+				} catch( QueueException ex) {
+					Assert.AreEqual(ex.EntryType,EventType.EndHistorical);
 				}
-			} catch( QueueException ex) {
-				Assert.AreEqual(ex.EntryType,EventType.EndHistorical);
+				reader1.Dispose();
+				reader2.Dispose();
 			}
-			reader1.Stop();
-			reader2.Stop();
 		}
 	}
-
 }

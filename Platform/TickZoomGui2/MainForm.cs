@@ -478,7 +478,7 @@ namespace TickZoom
 
         void MainFormClosing(object sender, FormClosingEventArgs e)
         {
-            Api.Factory.Engine.TickEngine.Close();
+            Factory.Engine.Release();
         }
         
         public TextBox Output {

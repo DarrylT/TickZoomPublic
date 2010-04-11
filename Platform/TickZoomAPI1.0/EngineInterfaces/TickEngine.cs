@@ -30,7 +30,7 @@ namespace TickZoom.Api
 	/// <summary>
 	/// Description of TickEngine.
 	/// </summary>
-	public interface TickEngine
+	public interface TickEngine 
 	{
 		ShowChartCallback ShowChartCallback {
 			get;
@@ -182,8 +182,6 @@ namespace TickZoom.Api
     		get;
     		set;
     	}
-    	
-    	void Close();
     	
     	long TickCount {
     		get;

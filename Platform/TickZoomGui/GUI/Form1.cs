@@ -53,6 +53,7 @@ namespace TickZoom
     {
         // The progress of the task in percentage
         private static int PercentProgress;
+        private SynchronizationContext context;
         // The delegate which we will call from the thread to update the form
         // When to pause
 //        bool goPause = false;
@@ -82,7 +83,12 @@ namespace TickZoom
         public Form1()
         {
         	log = Factory.Log.GetLogger(typeof(Form1));
-//	        initialInterval = Intervals.Day1;
+			context = SynchronizationContext.Current;
+            if(context == null)
+            {
+                context = new SynchronizationContext();
+                SynchronizationContext.SetSynchronizationContext(context);
+            }
 	        intervalDefault = initialInterval;
 			intervalEngine = initialInterval;
 			intervalChartDisplay = initialInterval;
@@ -164,21 +170,13 @@ namespace TickZoom
    		
         private void Echo(string msg)
         {
-            if (logOutput.InvokeRequired)
-            {
-                SetTextCallback d = new SetTextCallback(Echo);
-                try {
-                	this.Invoke(d, new object[] { msg });
-                } catch( ObjectDisposedException) {
-                	// Any error here can't be logged.
-                }
-            }
-            else
-            {
+       		context.Send(new SendOrPostCallback(
+       		delegate(object state)
+       	    {
                 logOutput.Text += msg + "\r\n";
                 logOutput.SelectionStart = logOutput.Text.Length;
                 logOutput.ScrollToCaret();
-            }
+       		}), null);
         }
         
         private void ProcessMessages()
@@ -498,19 +496,23 @@ namespace TickZoom
 		
 		void ProcessWorkerProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-        	Progress progress = (Progress) e.UserState;
-            // Calculate the task progress in percentages
-            if( progress.Final > 0) {
-            	PercentProgress = Convert.ToInt32((progress.Current * 100) / progress.Final);
-            } else {
-            	PercentProgress = 0;
-            }
-            // Make progress on the progress bar
-            prgExecute.Value = Math.Min(100,PercentProgress);
-            // Display the current progress on the form
-            lock(progressLocker) {
-            	lblProgress.Text = progress.Text + ": " + progress.Current + " out of " + progress.Final + " (" + PercentProgress + "%)";
-            }
+       		context.Post(new SendOrPostCallback(
+       		delegate(object state)
+       	    {
+	        	Progress progress = (Progress) e.UserState;
+	            // Calculate the task progress in percentages
+	            if( progress.Final > 0) {
+	            	PercentProgress = Convert.ToInt32((progress.Current * 100) / progress.Final);
+	            } else {
+	            	PercentProgress = 0;
+	            }
+	            // Make progress on the progress bar
+	            prgExecute.Value = Math.Min(100,PercentProgress);
+	            // Display the current progress on the form
+	            lock(progressLocker) {
+	            	lblProgress.Text = progress.Text + ": " + progress.Current + " out of " + progress.Final + " (" + PercentProgress + "%)";
+	            }
+       		}), null);
         }
         
 		private Exception taskException;
@@ -536,11 +538,6 @@ namespace TickZoom
         
         void StopProcess() {
         	commandWorker.CancelAsync();
-        	if( isEngineLoaded) {
-	        	Api.Factory.Engine.TickEngine.Close();
-        	}
-        	
-			TickReader.CloseAll();
         }
 
         void Terminate() {
@@ -551,7 +548,6 @@ namespace TickZoom
         	StopProcess();
         	CloseCharts();
             commandWorker.CancelAsync();
-            Api.Factory.Engine.TickEngine.Close();
             Factory.Engine.Release();
             Factory.Provider.Release();
             TickReader.CloseAll();

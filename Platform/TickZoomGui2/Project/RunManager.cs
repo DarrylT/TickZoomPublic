@@ -175,7 +175,7 @@ namespace TickZoom
         private void btnStop_Click(object sender, EventArgs e)
         {
         	processWorker.CancelAsync();
-        	Api.Factory.Engine.TickEngine.Close();
+        	Factory.Engine.Release();
         	TickReader.CloseAll();
             // Close the web response and the streams
             // Set the progress bar back to 0 and the label

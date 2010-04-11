@@ -91,20 +91,6 @@ namespace Loaders
 			}
 		}
 		
-		public virtual Provider LoadHistoricalDataAsFakeRealTimeData(string[] symbols, TimeStamp startTime, TimeStamp endTime) {
-			log.Debug("Creating Aggregator");
-			TickAggregator aggregator = new TickAggregator();
-			for(int i=0; i<symbols.Length; i++) {
-	    		TickReader tickReader = new TickReader();
-	    		tickReader.StartTime = startTime;
-//	    		tickReader.EndTime = endTime;
-	    		tickReader.Initialize(dataFolder,symbols[i]);
-				aggregator.Add(Factory.Symbol.LookupSymbol(symbols[i]),tickReader,startTime);
-			}
-			aggregators.Add(aggregator);
-			return aggregator;
-		}
-		
 		public class TradeInfo {
 			public double ClosedEquity;
 			public double ProfitLoss;
@@ -311,6 +297,8 @@ namespace Loaders
 		public void VerifyBarData(StrategyInterface strategy) {
 			List<BarInfo> goodBarData = goodBarDataMap[strategy.Name];
 			List<BarInfo> testBarData = testBarDataMap[strategy.Name];
+			Assert.IsNotNull(goodBarData, "good bar data");
+			Assert.IsNotNull(testBarData, "test test data");
 			for( int i=0; i<testBarData.Count && i<goodBarData.Count; i++) {
 				BarInfo testInfo = testBarData[i];
 				BarInfo goodInfo = goodBarData[i];

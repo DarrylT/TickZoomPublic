@@ -76,16 +76,12 @@ namespace TickZoom.Common
 				OnInitialize();
 			}
 			context.Invoke();
-			if( EventType.Open == eventType) {
-				if( eventDetail != null) {
-					OnIntervalOpen((Interval)eventDetail);
-				}
+			if( EventType.OpenInterval == eventType) {
+				OnIntervalOpen((Interval)eventDetail);
 			} else if( EventType.Close == eventType) {
-				if( eventDetail == null) {
-					OnIntervalClose();
-				} else {
-					OnIntervalClose((Interval)eventDetail);
-				}
+				OnIntervalClose();
+			} else if( EventType.CloseInterval == eventType) {
+				OnIntervalClose((Interval)eventDetail);
 			}
 		}
 
@@ -132,8 +128,9 @@ namespace TickZoom.Common
 				model.RequestUpdate(Intervals.Day1);
 			}
 			
-			model.AddInterceptor( EventType.Open, this);
+			model.AddInterceptor( EventType.OpenInterval, this);
 			model.AddInterceptor( EventType.Close, this);
+			model.AddInterceptor( EventType.CloseInterval, this);
 			isInitialized = true;
 		}
 		

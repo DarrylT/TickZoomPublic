@@ -70,6 +70,8 @@ namespace TickZoom.Common
 
 			RequestEvent( EventType.Open);
 			RequestEvent( EventType.Close);
+			RequestEvent( EventType.OpenInterval);
+			RequestEvent( EventType.CloseInterval);
 			RequestEvent( EventType.Tick);
 			RequestEvent( EventType.LogicalFill);
 			RequestEvent( EventType.EndHistorical);
@@ -287,22 +289,20 @@ namespace TickZoom.Common
 					OnInitialize();
 					break;
 				case EventType.Open:
-					if( eventDetail == null) {
-						OnBeforeIntervalOpen();
-						OnIntervalOpen();
-					} else {
-						OnBeforeIntervalOpen((Interval)eventDetail);
-						OnIntervalOpen((Interval)eventDetail);
-					}
+					OnBeforeIntervalOpen();
+					OnIntervalOpen();
+					break;
+				case EventType.OpenInterval:
+					OnBeforeIntervalOpen((Interval)eventDetail);
+					OnIntervalOpen((Interval)eventDetail);
 					break;
 				case EventType.Close:
-					if( eventDetail == null) {
-						OnBeforeIntervalClose();
-						OnIntervalClose();
-					} else {
-						OnBeforeIntervalClose((Interval)eventDetail);
-						OnIntervalClose((Interval)eventDetail);
-					}
+					OnBeforeIntervalClose();
+					OnIntervalClose();
+					break;
+				case EventType.CloseInterval:
+					OnBeforeIntervalClose((Interval)eventDetail);
+					OnIntervalClose((Interval)eventDetail);
 					break;
 				case EventType.Tick:
 					OnProcessTick((Tick)eventDetail);

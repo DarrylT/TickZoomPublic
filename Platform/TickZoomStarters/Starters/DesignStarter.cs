@@ -108,6 +108,8 @@ namespace TickZoom.Common
 	}
 
 	public class DesignProvider : Provider {
+		private object taskLocker = new object();
+ 		private volatile bool isDisposed = false;
 		
 		public void StartSymbol(Receiver receiver, SymbolInfo symbol, object eventDetail)
 		{
@@ -149,9 +151,21 @@ namespace TickZoom.Common
 		{
 		}
 		
-		public void Stop()
-		{
-		}
+	    public void Dispose() 
+	    {
+	        Dispose(true);
+	        GC.SuppressFinalize(this);      
+	    }
+	
+	    protected virtual void Dispose(bool disposing)
+	    {
+       		if( !isDisposed) {
+	    		lock( taskLocker) {
+		            isDisposed = true;   
+	    		}
+    		}
+	    }
+	    
 		public void SendEvent( Receiver receiver, SymbolInfo symbol, int eventType, object eventDetail) {
 			switch( (EventType) eventType) {
 				case EventType.Connect:
@@ -171,12 +185,11 @@ namespace TickZoom.Common
 					PositionChange(receiver,symbol,positionChange.Position,positionChange.Orders);
 					break;
 				case EventType.Terminate:
-					Stop();
+					Dispose();
 					break;
 				default:
 					throw new ApplicationException("Unexpected event type: " + (EventType) eventType);
 			}
 		}
 	}
-		
 }

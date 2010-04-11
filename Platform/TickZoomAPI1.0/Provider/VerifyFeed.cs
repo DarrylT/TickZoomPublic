@@ -26,7 +26,7 @@ using System.Collections.Generic;
 
 namespace TickZoom.Api
 {
-	public interface VerifyFeed : Receiver
+	public interface VerifyFeed : Receiver, IDisposable
 	{
 		long VerifyEvent(Action<SymbolInfo,int,object> assertEvent, SymbolInfo symbol, int timeout);
 		long Verify(Action<TickIO, TickIO, ulong> assertTick, SymbolInfo symbol, int timeout);
@@ -34,7 +34,7 @@ namespace TickZoom.Api
 		double VerifyPosition(double expectedPosition, SymbolInfo symbol, int timeout);
 		ReceiverState VerifyState(ReceiverState expectedState, SymbolInfo symbol, int timeout);
 		void StartTimeTheFeed();
-		int EndTimeTheFeed();
+		int EndTimeTheFeed(int expectedTickCount, int timeoutSeconds);
 		bool TimeTheFeedTask();
 		TickQueue TickQueue { get; }
 		bool IsRealTime { get; }

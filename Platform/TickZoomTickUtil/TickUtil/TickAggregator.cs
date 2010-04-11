@@ -49,6 +49,7 @@ namespace TickZoom.TickUtil
 		private static int staticId;
 		private static object locker = new object();
 		private Task runTask;
+		private object taskLocker = new object();
 		
 		public TickAggregator() {
 			if(debug) log.Debug("Constructor");
@@ -94,57 +95,56 @@ namespace TickZoom.TickUtil
 		
 		int countLog = 0;
 		private bool Process() {
-			if( !isProcessStarted) {
-				ProcessStartup();
-				isProcessStarted = false;
-			}
-			if( symbolQueues.Count == 0 ||
-			   !receiver.CanReceive(null)) {
-				return false;
-			}
-			int nextQueue = 0;
-   			for( int i=1; i<symbolQueues.Count; i++) {
-				if( symbolQueues[i].NextTick.UtcTime < symbolQueues[nextQueue].NextTick.UtcTime ) {
-	   				nextQueue = i;
-		   		}
-	   		}
-			tick = symbolQueues[nextQueue].NextTick;
-			if( debug && countLog < 5) {
-				log.Debug("Queuing tick with symbol=" + tick.Symbol.ToString() + " " + tick);
-				countLog++;
-			} else if( trace) {
-				log.Trace("Queuing tick with symbol=" + tick.Symbol + ", " + tick);
-			}
-			SymbolInfo symbol = Factory.Symbol.LookupSymbol(tick.Symbol);
-			receiver.OnEvent(symbol,(int)EventType.Tick,tick);
-			try {
-				SymbolQueue inputQueue = symbolQueues[nextQueue];
-				inputQueue.Receive(ref tick);
-				inputQueue.NextTick = tick;
-				inputQueue.NextTick.Symbol = inputQueue.Symbol.BinaryIdentifier;
-				return true;
-			} catch( QueueException ex) {
-				if( ex.EntryType == EventType.EndHistorical) {
-					if( symbolQueues.Count <= 1) {
-						receiver.OnEvent(null,(int)EventType.Terminate,null);
-						Factory.Parallel.CurrentTask.Stop();
-					} else {
-						symbolQueues.RemoveAt(nextQueue);
-					}
-				} else {
-					throw new ApplicationException("Queue returned invalid entry type: " + ex.EntryType, ex);
+			lock( taskLocker) {
+				if( isDisposed) return false;
+				if( !isProcessStarted) {
+					ProcessStartup();
+					isProcessStarted = false;
 				}
+				if( symbolQueues.Count == 0 ||
+				   !receiver.CanReceive(null)) {
+					return false;
+				}
+				int nextQueue = 0;
+	   			for( int i=1; i<symbolQueues.Count; i++) {
+					if( symbolQueues[i].NextTick.UtcTime < symbolQueues[nextQueue].NextTick.UtcTime ) {
+		   				nextQueue = i;
+			   		}
+		   		}
+				tick = symbolQueues[nextQueue].NextTick;
+				if( debug && countLog < 5) {
+					log.Debug("Queuing tick with symbol=" + tick.Symbol.ToString() + " " + tick);
+					countLog++;
+				} else if( trace) {
+					log.Trace("Queuing tick with symbol=" + tick.Symbol + ", " + tick);
+				}
+				SymbolInfo symbol = Factory.Symbol.LookupSymbol(tick.Symbol);
+				receiver.OnEvent(symbol,(int)EventType.Tick,tick);
+				try {
+					SymbolQueue inputQueue = symbolQueues[nextQueue];
+					inputQueue.Receive(ref tick);
+					inputQueue.NextTick = tick;
+					inputQueue.NextTick.Symbol = inputQueue.Symbol.BinaryIdentifier;
+					return true;
+				} catch( QueueException ex) {
+					if( ex.EntryType == EventType.EndHistorical) {
+						if( symbolQueues.Count <= 1) {
+							receiver.OnEvent(null,(int)EventType.Terminate,null);
+							Factory.Parallel.CurrentTask.Stop();
+						} else {
+							symbolQueues.RemoveAt(nextQueue);
+						}
+					} else {
+						throw new ApplicationException("Queue returned invalid entry type: " + ex.EntryType, ex);
+					}
+				}
+				return true;
 			}
-			return true;
 		}
 		
 		public void Stop(Receiver receiver)
 		{
-			runTask.Stop();
-			for( int i=0; i<symbolQueues.Count; i++) {
-				symbolQueues[i].Provider.SendEvent(symbolQueues[i],symbolQueues[i].Symbol,(int)EventType.StopSymbol,null);
-			}
-			runTask.Join();
+			Dispose();
 		}
 		
 		public void StartSymbol(Receiver receiver, SymbolInfo symbol, TimeStamp lastTimeStamp)
@@ -197,5 +197,35 @@ namespace TickZoom.TickUtil
 					throw new ApplicationException("Unexpected event type: " + (EventType) eventType);
 			}
 		}
+		
+ 		private volatile bool isDisposed = false;
+	    public void Dispose() 
+	    {
+	        Dispose(true);
+	        GC.SuppressFinalize(this);      
+	    }
+	
+	    protected virtual void Dispose(bool disposing)
+	    {
+       		if( !isDisposed) {
+	    		lock( taskLocker) {
+		            isDisposed = true;   
+		            if (disposing) {
+		            	if( runTask != null) {
+							runTask.Stop();
+							runTask.Join();
+		            	}
+		            	if( symbolQueues != null) {
+							for( int i=0; i<symbolQueues.Count; i++) {
+								symbolQueues[i].Provider.Dispose();
+							}
+		            		symbolQueues.Clear();
+		            	}
+		            }
+		            runTask = null;
+		            symbolQueues = null;
+	    		}
+    		}
+	    }
 	}
 }

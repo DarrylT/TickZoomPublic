@@ -84,7 +84,7 @@ namespace TickZoom.Common
 				model.AddInterceptor( EventType.LogicalFill, this);
 				OnInitialize();
 			}
-			if( EventType.Close == eventType && eventDetail == null) {
+			if( EventType.Close == eventType) {
 				OnIntervalClose();
 			}
 			context.Invoke();

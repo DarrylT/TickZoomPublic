@@ -66,15 +66,12 @@ namespace Loaders
 				
 				// Set up chart
 		    	starter.CreateChartCallback = new CreateChartCallback(HistoricalCreateChart);
-	    		starter.ShowChartCallback = null;
+	    		starter.ShowChartCallback = HistoricalShowChart;
 	
 				// Run the loader.
 				ModelLoaderCommon loader = new ExampleDualStrategyLoader();
 	    		starter.Run(loader);
 	
-	 			ShowChartCallback showChartCallback = new ShowChartCallback(HistoricalShowChart);
-	 			showChartCallback();
-	 
 	 			// Get the stategy
 	    		portfolio = loader.TopModel as Portfolio;
 	    		fourTicksStrategy = portfolio.Strategies[0] as ExampleOrderStrategy;

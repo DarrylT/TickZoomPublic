@@ -17,6 +17,7 @@ namespace TickZoom
             {
                 components.Dispose();
                 commandWorker.CancelAsync();
+                Terminate();
             }
             base.Dispose(disposing);
         }

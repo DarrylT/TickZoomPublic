@@ -52,6 +52,8 @@ namespace TickZoom.Common
 			if( eventType == EventType.Initialize) {
 				Strategy.AddInterceptor(EventType.Open,this);
 				Strategy.AddInterceptor(EventType.Close,this);
+				Strategy.AddInterceptor(EventType.OpenInterval,this);
+				Strategy.AddInterceptor(EventType.CloseInterval,this);
 				Strategy.AddInterceptor(EventType.Tick,this);
 //				Strategy.AddInterceptor(EventType.LogicalFill,this);
 			}

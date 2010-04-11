@@ -56,7 +56,7 @@ namespace TickZoom.TickUtil
 		Task fileReaderTask;
 		private static List<Reader<Y>> readerList = new List<Reader<Y>>();
 	    private object taskLocker = new object();
-		bool terminate = false;
+		private volatile bool isDisposed = false;
 		string storageFolder;
 		MemoryStream memory;
 		byte[] buffer;
@@ -213,7 +213,7 @@ namespace TickZoom.TickUtil
 	    		log.Error( "ERROR: " + e);
 	    	}
 			if( dataIn != null) {
-				terminate = true;
+				isDisposed = true;
 				dataIn.Close();
 				dataIn = null;
 			}
@@ -247,7 +247,7 @@ namespace TickZoom.TickUtil
 		
 		private bool FileReader() {
 			lock( taskLocker) {
-				if( terminate || !receiver.CanReceive(symbol)) {
+				if( isDisposed || !receiver.CanReceive(symbol)) {
 					return false;
 				}
 				try {
@@ -337,7 +337,7 @@ namespace TickZoom.TickUtil
 		    		} catch ( Exception ex) {
 		    			log.Error( "ERROR: " + ex);
 		    		} finally {
-				terminate = true;
+				isDisposed = true;
 		    			if( dataIn != null) {
 		    				dataIn.Close();
 		    			}
@@ -345,26 +345,35 @@ namespace TickZoom.TickUtil
 			return true;
 		}
 		
-		public void Stop() {
-			lock( taskLocker) {
-				terminate = true;
-				if( fileReaderTask != null) {
-					fileReaderTask.Stop();
-					fileReaderTask.Join();
-				}
-				if( dataIn != null) {
-					dataIn.Close();
-				}
-				readerList.Remove(this);
-				if( receiver != null && receiver.CanReceive(symbol)) {
-					receiver.OnEvent(null,(int)EventType.Terminate,null);
-				}
-			}
-		}
+	    public void Dispose() 
+	    {
+	        Dispose(true);
+	        GC.SuppressFinalize(this);      
+	    }
+	
+	    protected virtual void Dispose(bool disposing)
+	    {
+       		if( !isDisposed) {
+	    		lock( taskLocker) {
+					isDisposed = true;
+					if( fileReaderTask != null) {
+						fileReaderTask.Stop();
+						fileReaderTask.Join();
+					}
+					if( dataIn != null) {
+						dataIn.Close();
+					}
+					readerList.Remove(this);
+					if( receiver != null && receiver.CanReceive(symbol)) {
+						receiver.OnEvent(null,(int)EventType.Terminate,null);
+					}
+	    		}
+    		}
+	    }
 		
 		public static void CloseAll() {
 			for( int i=0; i<readerList.Count; i++) {
-				readerList[i].Stop();
+				readerList[i].Dispose();
 			}
 			readerList.Clear();
 		}

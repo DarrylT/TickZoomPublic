@@ -37,7 +37,7 @@ using TickZoom.TickUtil;
 
 namespace TickZoom.Common
 {
-	public class VerifyFeedDefault : Receiver, VerifyFeed
+	public class VerifyFeedDefault : Receiver, VerifyFeed, IDisposable
 	{
 		private static readonly Log log = Factory.Log.GetLogger(typeof(VerifyFeed));
 		private static readonly bool debug = log.IsDebugEnabled;
@@ -217,7 +217,12 @@ namespace TickZoom.Common
 		}
 		
 		private bool HandleQueueException( QueueException ex) {
+			log.Notice("QueueException: " + ex.EntryType);
 			switch (ex.EntryType) {
+				case EventType.StartHistorical:
+					receiverState = ReceiverState.Historical;
+					isRealTime = false;
+					break;
 				case EventType.StartRealTime:
 					receiverState = ReceiverState.RealTime;
 					isRealTime = true;
@@ -230,6 +235,8 @@ namespace TickZoom.Common
 					isRealTime = false;
 					break;
 				case EventType.Terminate:
+					receiverState = ReceiverState.Stop;
+					isRealTime = false;
 					return true;
 				default:
 					throw new ApplicationException("Unexpected QueueException: " + ex.EntryType);
@@ -237,7 +244,7 @@ namespace TickZoom.Common
 			return false;
 		}
 		
-		long count = 0;
+		volatile int count = 0;
 		int startTime;
 		public void StartTimeTheFeed()
 		{
@@ -247,27 +254,23 @@ namespace TickZoom.Common
 			task = Factory.Parallel.Loop(this, TimeTheFeedTask);
 		}
 
-		public int EndTimeTheFeed()
+		public int EndTimeTheFeed(int expectedTickCount, int timeoutSeconds)
 		{
-			int seconds = 60;
-			int start = Environment.TickCount;
-			int end = start + seconds * 1000;
-			while( task.IsAlive && Environment.TickCount < end) {
+			int end = startTime + timeoutSeconds * 1000;
+			while( count < expectedTickCount && Environment.TickCount < end) {
 				Thread.Sleep(100);
 			}
-			if( task.IsAlive) {
-				throw new ApplicationException("TimeTheFeek took more than " + seconds + " seconds timeout.");
-			}
-			int endTime = Environment.TickCount;
-			int elapsed = endTime - startTime;
-			log.Notice("Processed " + count + " ticks in " + elapsed + "ms or " + (count * 1000 / elapsed) + "ticks/sec");
 			Factory.TickUtil.TickQueue("Stats").LogStats();
-			return elapsed / 1000;
+			Dispose();
+			return count;
 		}
 
 		public bool TimeTheFeedTask()
 		{
 			lock(taskLocker) {
+				if( isDisposed) {
+					return false;
+				}
 				try {
 					if (!tickQueue.CanDequeue)
 						return false;
@@ -283,11 +286,7 @@ namespace TickZoom.Common
 					}
 					return true;
 				} catch (QueueException ex) {
-					if( HandleQueueException(ex)) {
-						return true;
-					} else {
-						Factory.Parallel.CurrentTask.Stop();
-					}
+					HandleQueueException(ex);
 				}
 				return false;
 			}
@@ -331,24 +330,49 @@ namespace TickZoom.Common
 
 		public void OnStop()
 		{
-			Close();
+			Dispose();
 		}
 
 		public void OnError(string error)
 		{
 			log.Error(error);
-			tickQueue.Terminate();
+			Dispose();
 		}
-		public void Close()
-		{
-			lock( taskLocker) {
-				tickQueue.Terminate();
-			}
-		}
-
+		
+ 		private volatile bool isDisposed = false;
+	    public void Dispose() 
+	    {
+	        Dispose(true);
+	        GC.SuppressFinalize(this);      
+	    }
+	
+	    protected virtual void Dispose(bool disposing)
+	    {
+       		if( !isDisposed) {
+	    		lock( taskLocker) {
+		            isDisposed = true;   
+		            if (disposing) {
+		            	if( task != null) {
+			            	task.Stop();
+			            	task.Join();
+							tickQueue.Terminate();
+		            	}
+		            }
+		            task = null;
+		            // Leave tickQueue set so any extraneous
+		            // events will see the queue is already terminated.
+//		            tickQueue = null;
+	    		}
+    		}
+	    }
+	    
 		public void OnEndHistorical(SymbolInfo symbol)
 		{
-			tickQueue.EnQueue(EventType.EndHistorical, symbol);
+			try {
+				tickQueue.EnQueue(EventType.EndHistorical, symbol);
+			} catch (QueueException) {
+				// Queue was already ended.
+			}
 		}
 
 		public void OnEndRealTime(SymbolInfo symbol)

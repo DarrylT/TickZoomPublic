@@ -49,7 +49,9 @@ namespace TickZoom.Api
 		
 		// Events visible to Platform
 		Open=3000,
+		OpenInterval,
 		Close,
+		CloseInterval,
 		Tick,
         PositionChange,
 		LogicalFill,

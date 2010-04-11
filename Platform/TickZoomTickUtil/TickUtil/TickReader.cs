@@ -75,7 +75,7 @@ namespace TickZoom.TickUtil
         public void Stop(Receiver receiver)
         {
             if (debug) log.Debug("Stop(" + receiver + ")");
-            Stop();
+            Dispose();
         }
 
         public void StartSymbol(Receiver receiver, SymbolInfo symbol, object eventDetail)
@@ -123,7 +123,7 @@ namespace TickZoom.TickUtil
 					PositionChange(receiver,symbol,positionChange.Position,positionChange.Orders);
 					break;
 				case EventType.Terminate:
-					Stop();
+					Dispose();
 					break;
 				default:
 					throw new ApplicationException("Unexpected event type: " + (EventType) eventType);

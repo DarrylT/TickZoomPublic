@@ -203,7 +203,8 @@ namespace TickZoom
 			
 			priceGraphPane = createPane();
 			
-			string[] yLables = { "Fun 1", "Fun 2", "Fun 3" };
+			string[] yLables = 
+			{ "Fun 1", "Fun 2", "Fun 3" };
 			ColorSymbolRotator rotator = new ColorSymbolRotator();
 		}
 		
