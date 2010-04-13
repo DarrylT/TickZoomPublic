@@ -183,10 +183,24 @@ namespace TickZoom.InteractiveBrokers
 			client.RequestOpenOrders();
 		}
 		
-		public void Stop()
-		{	
-        	client.Disconnect();
-		}
+ 		private volatile bool isDisposed = false;
+	    public void Dispose() 
+	    {
+	        Dispose(true);
+	        GC.SuppressFinalize(this);      
+	    }
+	
+	    protected virtual void Dispose(bool disposing)
+	    {
+       		if( !isDisposed) {
+	            isDisposed = true;   
+	            if (disposing) {
+	            	if( client!=null) {
+			        	client.Disconnect();
+	            	}
+	            }
+    		}
+	    }
 		
         private void client_ExecDetails(object sender, ExecDetailsEventArgs e)
         {
@@ -566,7 +580,7 @@ namespace TickZoom.InteractiveBrokers
 					PositionChange(receiver,symbol,positionChange.Position,positionChange.Orders);
 					break;
 				case EventType.Terminate:
-					Stop();
+					Dispose();
 					break; 
 				default:
 					throw new ApplicationException("Unexpected event type: " + (EventType) eventType);

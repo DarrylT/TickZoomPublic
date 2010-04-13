@@ -611,11 +611,25 @@ namespace TickZoom.MBTrading
 			instrumentReaders.Signal(symbol.Symbol,signal);
 		}
 		
-		public void Stop()
-		{	
-			if( receiver != null) 
-			LogoutInternal();
-		}
+		
+ 		private volatile bool isDisposed = false;
+	    public void Dispose() 
+	    {
+	        Dispose(true);
+	        GC.SuppressFinalize(this);      
+	    }
+	
+	    protected virtual void Dispose(bool disposing)
+	    {
+       		if( !isDisposed) {
+	            isDisposed = true;   
+	            if (disposing) {
+	            	if( receiver != null) {
+						LogoutInternal();
+	            	}
+	            }
+    		}
+	    }
 		
 		public void SendEvent( Receiver receiver, SymbolInfo symbol, int eventType, object eventDetail) {
 			switch( (EventType) eventType) {
@@ -636,7 +650,7 @@ namespace TickZoom.MBTrading
 					PositionChange(receiver,symbol,positionChange.Position,positionChange.Orders);
 					break;
 				case EventType.Terminate:
-					Stop();
+					Dispose();
 					break;
 				default:
 					throw new ApplicationException("Unexpected event type: " + (EventType) eventType);
