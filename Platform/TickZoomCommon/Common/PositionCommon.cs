@@ -47,9 +47,6 @@ namespace TickZoom.Common
 
 		public PositionCommon(ModelInterface model)
 		{
-			if( model == null) {
-				int x = 0;
-			}
 			this.model = model;
 		}
 		
@@ -87,10 +84,6 @@ namespace TickZoom.Common
 		
 		public virtual void Change( double position, double price, TimeStamp time) {
 			if( current != position) {
-				if( model.Name == "ScalpingController" &&
-				   price < 1) {
-					int x = 0;
-				}
 				this.time = time;
 				this.price = price;
 				this.current = position;

@@ -41,5 +41,29 @@ namespace TickZoom.Common
 		{
 			return new ModelPropertyCommon(name,start1,start,end,increment,isActive);
 		}
+		/// <summary>
+		/// Contructs a new Historical Starter for running a historical 
+		/// test pass. 
+		/// </summary>
+		/// <param name="releaseResources">
+		/// Pass false for the Starter it to leave the memory resources from
+		/// the last Starter. Pass true for the Starter to release
+		/// all memory resources from any previous Starter before beginning.
+		/// NOTE: If you pass false, then your code must
+		/// call Factory.Engine.Release() to release memory to
+		/// avoid a memory leak.
+		/// </param>
+		/// <returns></returns>
+		public Starter HistoricalStarter(bool releaseResources) {
+			return new HistoricalStarter(releaseResources);
+		}
+		/// <summary>
+		/// Contructs a new Historical Starter for running a historical 
+		/// test pass. Releases all memory resources upon completion.
+		/// </summary>
+		/// <returns></returns>
+		public Starter HistoricalStarter() {
+			return new HistoricalStarter();
+		}
 	}
 }

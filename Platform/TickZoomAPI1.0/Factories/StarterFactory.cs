@@ -37,5 +37,6 @@ namespace TickZoom.Api
 	public interface StarterFactory
 	{
 		ModelProperty ModelProperty(string name,string start1,double start,double end,double increment,bool isActive);
+		Starter HistoricalStarter();
 	}
 }
