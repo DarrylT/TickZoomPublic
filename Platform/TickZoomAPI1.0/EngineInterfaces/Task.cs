@@ -34,6 +34,8 @@ namespace TickZoom.Api
 	public interface Task {
 		void Stop();
 		void Join();
+		void Pause();
+		void Resume();
 		void Catch();
 		/// <summary>
 		/// Briefly boost priority. Usefulf for a dependendant
