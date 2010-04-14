@@ -31,7 +31,6 @@ using System.Text;
 using System.Threading;
 
 using TickZoom.Api;
-using TickZoom.TickUtil;
 
 namespace TickZoom.Common
 {
@@ -47,7 +46,7 @@ namespace TickZoom.Common
 		}
 		
 		TickWriter tickWriter;
-		TickImpl tickImpl = new TickImpl();
+		TickIO tickIO = Factory.TickUtil.TickIO();
 
 		string path = Factory.Settings["AppDataFolder"] + @"\DataCache\";		// *** specify the path to the input file here
 		SymbolInfo symbol;									// take user input symbol
@@ -204,19 +203,19 @@ namespace TickZoom.Common
 			utcTime.AddSeconds( - timeZone.UtcOffset(tickTime));
 			double price = insertPrice;
 			
-			tickImpl.Initialize();
-			tickImpl.SetSymbol(symbol.BinaryIdentifier);
-			tickImpl.SetTime(utcTime);
-			tickImpl.SetQuote(price, price);
+			tickIO.Initialize();
+			tickIO.SetSymbol(symbol.BinaryIdentifier);
+			tickIO.SetTime(utcTime);
+			tickIO.SetQuote(price, price);
 
 			if( tickWriter == null) {
-	 			tickWriter = new TickWriter(true);
+				tickWriter = Factory.TickUtil.TickWriter(true);
 	 			tickWriter.KeepFileOpen = true;
 				string folder = "DataCache";
 				tickWriter.Initialize(folder, symbol.Symbol);
 			}
 			
-			tickWriter.Add(tickImpl);
+			tickWriter.Add(tickIO);
 			
 			countTicksOut++;
 		}

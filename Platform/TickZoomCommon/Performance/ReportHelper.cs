@@ -26,9 +26,9 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
-using ZedGraph;
 
 using TickZoom.Api;
+using ZedGraph;
 
 namespace TickZoom.Common
 {

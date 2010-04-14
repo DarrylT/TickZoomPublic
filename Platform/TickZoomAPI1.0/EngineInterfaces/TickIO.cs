@@ -85,6 +85,13 @@ namespace TickZoom.Api
 		/// <param name="contentMask">Controls what to copy from the other tick</param>
 		void Copy(TickIO other, byte contentMask);
 		
+		/// <summary>
+		/// Makes a copy of the 'other' tick onto this one using the original tick's content mask.
+		/// So the new tick will be a "deep copy" replicate of the original.
+		/// </summary>
+		/// <param name="other">The other tick to copy from.</param>
+		void Copy(TickIO other);
+		
 		long lBid {
 			get;
 		}

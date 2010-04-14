@@ -33,7 +33,6 @@ using System.Collections.Generic;
 using System.Threading;
 
 using TickZoom.Api;
-using TickZoom.TickUtil;
 
 namespace TickZoom.Common
 {
@@ -75,11 +74,11 @@ namespace TickZoom.Common
 		{
 			return Verify(2, assertTick, symbol, timeout);
 		}
-		TickImpl lastTick = new TickImpl();
+		TickIO lastTick = Factory.TickUtil.TickIO();
 		
 		int countLog = 0;
 		TickBinary tickBinary = new TickBinary();
-		TickImpl tick = new TickImpl();
+		TickIO tickIO = Factory.TickUtil.TickIO();
 		public long Verify(int expectedCount, Action<TickIO, TickIO, ulong> assertTick, SymbolInfo symbol, int timeout)
 		{
 			if (debug) log.Debug("VerifyFeed");
@@ -177,17 +176,17 @@ namespace TickZoom.Common
 		{
 			try {
 				tickQueue.Dequeue(ref tickBinary);
-				tick.Inject(tickBinary);
+				tickIO.Inject(tickBinary);
 				if (debug && countLog < 5) {
-					log.Debug("Received a tick " + tick);
+					log.Debug("Received a tick " + tickIO);
 					countLog++;
 				}
 				startTime = Environment.TickCount;
 				count++;
 				if (count > 0) {
-					assertTick(tick, lastTick, symbol.BinaryIdentifier);
+					assertTick(tickIO, lastTick, symbol.BinaryIdentifier);
 				}
-				lastTick.Copy(tick);
+				lastTick.Copy(tickIO);
 				syncTicks.Unlock();
 				if (count >= expectedCount)
 					return true;
@@ -275,9 +274,9 @@ namespace TickZoom.Common
 					if (!tickQueue.CanDequeue)
 						return false;
 					tickQueue.Dequeue(ref tickBinary);
-					tick.Inject(tickBinary);
+					tickIO.Inject(tickBinary);
 					if (debug && count < 5) {
-						log.Debug("Received a tick " + tick);
+						log.Debug("Received a tick " + tickIO);
 						countLog++;
 					}
 					count++;

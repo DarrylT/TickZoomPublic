@@ -62,7 +62,7 @@ namespace tzdata
 		
 		private void FilterFile(string symbol, string inputPath, string outputPath, TimeStamp startTime, TimeStamp endTime) {
 			TickReader reader = new TickReader();
-			TickWriter writer = new TickWriter(true);
+			TickWriter writer = Factory.TickUtil.TickWriter(true);
 			writer.KeepFileOpen = true;
 			writer.Initialize( outputPath, symbol);
 			reader.Initialize( inputPath, symbol);

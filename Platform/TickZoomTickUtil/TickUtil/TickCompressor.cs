@@ -34,7 +34,7 @@ namespace TickZoom.TickUtil
 	/// <summary>
 	/// Description of TickArray.
 	/// </summary>
-	public class TickCompressor : TickWriter
+	public class TickCompressor : TickWriterDefault
 	{
 		SignatureCompressor creator = new SignatureCompressor();
 		

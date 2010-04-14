@@ -34,7 +34,7 @@ namespace TickZoom.TickUtil
 	/// <summary>
 	/// Description of TickArray.
 	/// </summary>
-	public class TickWriter
+	public class TickWriterDefault : TickWriter
 	{
 		BackgroundWorker backgroundWorker;
    		int maxCount = 0;
@@ -54,7 +54,7 @@ namespace TickZoom.TickUtil
 		bool isPaused = false;
 		string storageFolder;
 		
-		public TickWriter(bool eraseFileToStart)
+		public TickWriterDefault(bool eraseFileToStart)
 		{
 			this.eraseFileToStart = eraseFileToStart;
 			writeQueue = Factory.TickUtil.TickQueue(typeof(TickWriter));

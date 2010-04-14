@@ -137,7 +137,7 @@ namespace TickZoom.Common
 			List<TickQueue> queueList = new List<TickQueue>();
 			SymbolInfo[] symbols = ProjectProperties.Starter.SymbolProperties;
 			for(int i=0; i<symbols.Length; i++) {
-	    		TickWriter tickWriter = new TickWriter(false);
+				TickWriter tickWriter = Factory.TickUtil.TickWriter(false);
 	    		tickWriter.Initialize(DataFolder,symbols[i].Symbol);
 				queueList.Add(tickWriter.WriteQueue);
 			}

@@ -1,4 +1,4 @@
-#region Copyright
+﻿#region Copyright
 /*
  * Software: TickZoom Trading Platform
  * Copyright 2009 M. Wayne Walter
@@ -26,15 +26,21 @@ using System.Reflection;
 
 namespace TickZoom.Api
 {
-	/// <summary>
-	/// Description of Factory.
-	/// </summary>
-	public interface TickUtilFactory
-	{
-		TickQueue TickQueue( Type type);
-		TickQueue TickQueue( string name);
-		TickIO TickIO();
-		FastFillQueue FastItemQueue(string name, int maxSize);
-		TickWriter TickWriter(bool overwriteFile);
+	public interface TickWriter {
+		void Initialize(string folder, string symbol);
+		void Add(TickIO tick);
+		void Pause();
+		void Resume();
+		void Close();
+		bool CanReceive {
+			get;
+		}
+		bool KeepFileOpen {
+			get;
+			set;
+		}
+		TickQueue WriteQueue {
+			get;
+		}
 	}
 }

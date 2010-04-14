@@ -45,6 +45,10 @@ namespace TickZoom.TickUtil
 			tick.Copy(tickIO,contentMask);
 		}
 		
+		public void Copy(TickIO tickIO){
+			tick.Copy(tickIO);
+		}
+		
 		public void Initialize() {
 			tick.Initialize();
 		}

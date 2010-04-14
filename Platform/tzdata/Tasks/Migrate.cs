@@ -55,7 +55,7 @@ namespace tzdata
 //			reader.BulkFileLoad = true;
 			reader.Initialize( file, symbol);
 			
-			TickWriter writer = new TickWriter(true);
+			TickWriter writer = Factory.TickUtil.TickWriter(true);
 			writer.KeepFileOpen = true;
 			writer.Initialize( file + ".temp", symbol);
 			

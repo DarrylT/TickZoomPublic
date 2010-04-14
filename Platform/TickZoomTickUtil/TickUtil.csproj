@@ -81,7 +81,7 @@
     <Compile Include="TickUtil\TickQueueImpl.cs" />
     <Compile Include="TickUtil\TickReader.cs" />
     <Compile Include="TickUtil\TickUtilFactoryImpl.cs" />
-    <Compile Include="TickUtil\TickWriter.cs" />
+    <Compile Include="TickUtil\TickWriterDefault.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TickZoomAPI1.0\API1.0.csproj">

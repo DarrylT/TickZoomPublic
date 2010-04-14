@@ -35,7 +35,7 @@ namespace TickZoom.TickUtil
 	/// <summary>
 	/// Description of BarImport.
 	/// </summary>
-	public class BarWriter : TickWriter
+	public class BarWriter : TickWriterDefault
 	{
 		TickImpl openTick = new TickImpl();
 		TickImpl highTick = new TickImpl();
