@@ -67,6 +67,15 @@ namespace TickZoom.Common
 			fwriter.WriteLine("<H1>" + name + " Strategy Report</H1>");
 	
 			fwriter.WriteLine("<img src=\"Images/DailyEquity.gif\"/><BR>");
+			
+			fwriter.WriteLine("<BR>");
+			
+			WriteTotalStatsHeader();
+			WriteTotalStatsData(equity);
+			WriteStatsFooter();
+			
+			fwriter.WriteLine("<BR>");
+						
 			WriteStatsHeader();
 			WriteStatsData(stats.Monthly,"Month");
 			WriteStatsData(stats.Yearly,"Year");

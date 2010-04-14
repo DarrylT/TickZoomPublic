@@ -39,6 +39,27 @@ namespace TickZoom.Common
 			
 		protected StreamWriter fwriter;
 		
+		public void WriteTotalStatsHeader() {
+			fwriter.WriteLine("<TABLE class=\"stats\" cellspacing=\"2\">");
+			fwriter.WriteLine("<TR>");
+			fwriter.WriteLine("<TD class=\"toprow\">Starting Equity</TD>");
+			fwriter.WriteLine("<TD class=\"toprow\">Closed Equity</TD>");
+			fwriter.WriteLine("<TD class=\"toprow\">Open Equity</TD>");
+			fwriter.WriteLine("<TD class=\"toprow\">Total Equity</TD>");
+			fwriter.WriteLine("<TD class=\"toprow\">Net Profit</TD>");
+			fwriter.WriteLine("</TR>");
+		}
+		
+		public void WriteTotalStatsData(Equity equity) {
+			fwriter.WriteLine("<TR>");
+			fwriter.WriteLine("<TD class=\"data\">"+Math.Round(equity.StartingEquity,2)+"</TD>");
+			fwriter.WriteLine("<TD class=\"data\">"+Math.Round(equity.ClosedEquity,2)+"</TD>");
+			fwriter.WriteLine("<TD class=\"data\">"+Math.Round(equity.OpenEquity,2)+"</TD>");
+			fwriter.WriteLine("<TD class=\"data\">"+Math.Round(equity.CurrentEquity,2)+"</TD>");
+			fwriter.WriteLine("<TD class=\"data\">"+Math.Round(equity.NetProfit,2)+"</TD>");
+			fwriter.WriteLine("</TR>");
+		}
+		
 		public void WriteStatsHeader() {
 			fwriter.WriteLine("<TABLE class=\"stats\" cellspacing=\"2\">");
 			fwriter.WriteLine("<TR>");
