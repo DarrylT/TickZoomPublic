@@ -46,7 +46,7 @@ namespace TickZoom.Common
 		private string symbol;
 		private double minimumTick;
 		private double fullPointValue;
-		private int level2LotSize;
+		private int level2LotSize = 1;
 		private double level2Increment;
 		private int level2LotSizeMinimum;
 		private ulong binaryIdentifier;

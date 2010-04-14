@@ -49,8 +49,6 @@ namespace MiscTest
 
         public override void OnInitialize()
         {
-            PositionSize.Size = Quantity;
-
         }
 
        	TimeStamp firstTime = new TimeStamp("2008-09-08 09:35:00");
@@ -59,7 +57,7 @@ namespace MiscTest
         {
             if (Bars.EndTime[0] == firstTime)
             {
-                Orders.Enter.ActiveNow.BuyLimit(127.92);
+                Orders.Enter.ActiveNow.BuyLimit(127.92,quantity);
             }
             if (Bars.EndTime[0] == secondTime)
             {

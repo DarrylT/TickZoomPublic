@@ -122,9 +122,6 @@ namespace TickZoom.Common
 				} else {
 					throw new ApplicationException("'" + model.Name + "' is neither a strategy nor a portfolio.");
 				}
-			} else if( "positionsize".Equals(properties.Name)) {
-				Strategy strategy = (Strategy) model;
-				strategy.PositionSize.OnProperties(properties);
 			} else {
 				model.OnProperties(properties);
 			}

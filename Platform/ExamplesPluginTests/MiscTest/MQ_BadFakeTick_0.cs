@@ -49,8 +49,6 @@ namespace MiscTest
 		   
 		public override void OnInitialize()
 		{
-            PositionSize.Size = Quantity;
-
 		}
 
 		public override bool OnIntervalClose()
@@ -60,7 +58,7 @@ namespace MiscTest
             if ((((DateTime)Bars.EndTime[0]).ToString("yyyyMMdd") == "20080908") &&
                 (Bars.EndTime[0].TimeOfDay == new Elapsed(9, 42, 0)))          
             {
-                Orders.Enter.ActiveNow.SellLimit(127.74);
+                Orders.Enter.ActiveNow.SellLimit(127.74,quantity);
                 if (Bars.High[0] != Bars.Low[0]) {};
             }
             if ((((DateTime)Bars.EndTime[0]).ToString("yyyyMMdd") == "20080908") &&

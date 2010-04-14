@@ -103,18 +103,18 @@ namespace Loaders
 			double fourTicksEquity = 0;
 			fourTicksEquity += fourTicksPerBar.Performance.Equity.CurrentEquity;
 			fourTicksEquity -= fourTicksPerBar.Performance.Equity.StartingEquity;
-			Assert.AreEqual(-74800,fourTicksEquity,"four ticks");
+			Assert.AreEqual(Math.Round(-7.4800,2),Math.Round(fourTicksEquity,2),"four ticks");
 			double exampleEquity = 0;
 			exampleEquity += exampleReversal.Performance.Equity.CurrentEquity;
 			exampleEquity -= exampleReversal.Performance.Equity.StartingEquity;
-			Assert.AreEqual(-223000D,exampleEquity,"example simple");
+			Assert.AreEqual(Math.Round(-22.3000,2),Math.Round(exampleEquity,2),"example simple");
 			
 			expectedEquity = fourTicksEquity + exampleEquity;
 			
 			double portfolioEquity = singleSymbolPortfolio.Performance.Equity.CurrentEquity;
 			portfolioEquity -= singleSymbolPortfolio.Performance.Equity.StartingEquity;
 			Assert.AreEqual(Math.Round(expectedEquity,4),Math.Round(portfolioEquity,4));
-			Assert.AreEqual(Math.Round(-297800.00D,4),Math.Round(portfolioEquity,4));
+			Assert.AreEqual(Math.Round(-29.7800,4),Math.Round(portfolioEquity,4));
 		}
 		
 		[Test] 
@@ -128,7 +128,7 @@ namespace Loaders
 			double portfolioEquity = multiSymbolPortfolio.Performance.Equity.CurrentEquity;
 			portfolioEquity -= multiSymbolPortfolio.Performance.Equity.StartingEquity;
 			Assert.AreEqual(Math.Round(expectedEquity,4),Math.Round(portfolioEquity,4));
-			Assert.AreEqual(Math.Round(-372600.00,4),Math.Round(portfolioEquity,4));
+			Assert.AreEqual(Math.Round(-37.2600,4),Math.Round(portfolioEquity,4));
 		}
 		
 		[Test]

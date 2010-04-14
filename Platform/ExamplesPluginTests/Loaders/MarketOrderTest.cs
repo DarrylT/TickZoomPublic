@@ -43,7 +43,7 @@ namespace Loaders
 		Strategy strategy;
 		public MarketOrderTest() {
 			Symbols = "USD/JPY";
-			StoreKnownGood = true;
+			StoreKnownGood = false;
 			ShowCharts = false;
 		}
 			
@@ -78,19 +78,19 @@ namespace Loaders
 		
 		[Test]
 		public void VerifyCurrentEquity() {
-			Assert.AreEqual( Math.Round(9999.0420,4),Math.Round(strategy.Performance.Equity.CurrentEquity,4),"current equity");
+			Assert.AreEqual( Math.Round(420.00,4),Math.Round(strategy.Performance.Equity.CurrentEquity,4),"current equity");
 		}
 		[Test]
 		public void VerifyOpenEquity() {
-			Assert.AreEqual( -0.01,strategy.Performance.Equity.OpenEquity,"open equity");
+			Assert.AreEqual( -100.00,strategy.Performance.Equity.OpenEquity,"open equity");
 		}
 		[Test]
 		public void VerifyClosedEquity() {
-			Assert.AreEqual( Math.Round(9999.0520,4),Math.Round(strategy.Performance.Equity.ClosedEquity,4),"closed equity");
+			Assert.AreEqual( Math.Round(520.00,4),Math.Round(strategy.Performance.Equity.ClosedEquity,4),"closed equity");
 		}
 		[Test]
 		public void VerifyStartingEquity() {
-			Assert.AreEqual( 10000,strategy.Performance.Equity.StartingEquity,"starting equity");
+			Assert.AreEqual( 10000.00,strategy.Performance.Equity.StartingEquity,"starting equity");
 		}
 		
 		[Test]

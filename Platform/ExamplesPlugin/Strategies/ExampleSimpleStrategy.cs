@@ -40,7 +40,6 @@ namespace TickZoom
 		public ExampleSimpleStrategy() {
 			Performance.GraphTrades = true;
 			Performance.Equity.GraphEquity = true;
-			PositionSize.Size = 2;
 		}
 		
 		public override void OnInitialize()
@@ -56,13 +55,13 @@ namespace TickZoom
 				if( Position.IsShort) {
 					Orders.Exit.ActiveNow.GoFlat();
 				}
-				Orders.Enter.ActiveNow.BuyMarket();
+				Orders.Enter.ActiveNow.BuyMarket(2);
 			}
 			if( !Position.IsShort && Bars.Close[0] < Bars.Low[1]) {
 				if( Position.IsLong) {
 					Orders.Exit.ActiveNow.GoFlat();
 				}
-				Orders.Enter.ActiveNow.SellMarket();
+				Orders.Enter.ActiveNow.SellMarket(2);
 			}
 			return true;
 		}

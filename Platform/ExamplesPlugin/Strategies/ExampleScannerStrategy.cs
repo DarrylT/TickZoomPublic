@@ -41,7 +41,6 @@ namespace TickZoom
 		public override void OnInitialize()
 		{
 			foreach( Strategy strategy in Strategies) {
-				strategy.PositionSize.Size = 10000;
 				strategy.Performance.GraphTrades = true;
 				strategy.Performance.Equity.GraphEquity = true;
 			}

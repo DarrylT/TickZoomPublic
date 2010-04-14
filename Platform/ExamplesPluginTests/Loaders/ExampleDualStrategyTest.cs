@@ -48,6 +48,7 @@ namespace Loaders
 		
 		public ExampleDualStrategyTest() {
 			Symbols = "Daily4Sim";
+			StoreKnownGood = false;
 		}
 		
 		[TestFixtureSetUp]
@@ -92,8 +93,8 @@ namespace Loaders
 			expected -= fourTicksStrategy.Performance.Equity.StartingEquity;
 			double portfolioTotal = portfolio.Performance.Equity.CurrentEquity;
 			portfolioTotal -= portfolio.Performance.Equity.StartingEquity;
-			Assert.AreEqual(expected, portfolioTotal);
-			Assert.AreEqual(-297800, portfolioTotal);
+			Assert.AreEqual(Math.Round(expected,2), Math.Round(portfolioTotal,2));
+			Assert.AreEqual(Math.Round(-29.78,2), Math.Round(portfolioTotal,2));
 		}
 		
 		[Test]
@@ -104,16 +105,16 @@ namespace Loaders
 			expected -= fourTicksStrategy.Performance.Equity.StartingEquity;
 			double portfolioTotal = portfolio.Performance.Equity.ClosedEquity;
 			portfolioTotal -= portfolio.Performance.Equity.StartingEquity;
-			Assert.AreEqual(expected, portfolioTotal);
-			Assert.AreEqual(-296100, portfolioTotal);
+			Assert.AreEqual(Math.Round(expected,2), Math.Round(portfolioTotal,2));
+			Assert.AreEqual(Math.Round(-29.61,2), Math.Round(portfolioTotal,2));
 		}
 		
 		[Test]
 		public void CheckPortfolioOpenEquity() {
 			double expected = exampleReversal.Performance.Equity.OpenEquity;
 			expected += fourTicksStrategy.Performance.Equity.OpenEquity;
-			Assert.AreEqual(expected, portfolio.Performance.Equity.OpenEquity);
-			Assert.AreEqual(-1700, portfolio.Performance.Equity.OpenEquity);
+			Assert.AreEqual(Math.Round(expected,2), Math.Round(portfolio.Performance.Equity.OpenEquity,2));
+			Assert.AreEqual(Math.Round(-0.17,2), portfolio.Performance.Equity.OpenEquity);
 		}
 		
 		[Test]

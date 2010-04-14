@@ -39,7 +39,6 @@ namespace TickZoom.StarterTest
 		public TestSimpleStrategy() {
 			Performance.GraphTrades = true;
 			Performance.Equity.GraphEquity = true;
-			PositionSize.Size = 10000;
 		}
 		
 		public override void OnInitialize()

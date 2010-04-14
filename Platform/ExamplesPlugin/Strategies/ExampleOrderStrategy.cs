@@ -49,7 +49,6 @@ namespace TickZoom
 			minimumTick = multiplier * Data.SymbolInfo.MinimumTick;
 			ExitStrategy.BreakEven = 30 * minimumTick;
 			ExitStrategy.StopLoss = 45 * minimumTick;
-			PositionSize.Size = 10000;
 		}
 		
 		public override bool OnIntervalClose()

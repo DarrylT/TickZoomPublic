@@ -52,6 +52,7 @@ namespace MockProvider
 //			BreakPoint.SetTickBreakPoint("2009-06-09 10:49:21.502");
 //			BreakPoint.SetBarBreakPoint(15);
 //			BreakPoint.SetSymbolConstraint("EUR/USD");
+			MatchTestResultsOf(typeof(MarketOrderTest));
 			ShowCharts = false;
 			StoreKnownGood = false;
 		}

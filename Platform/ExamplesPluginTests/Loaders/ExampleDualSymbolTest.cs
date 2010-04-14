@@ -93,7 +93,7 @@ namespace Loaders
 			expected -= fullTicksStrategy.Performance.Equity.StartingEquity;
 			double portfolioTotal = portfolio.Performance.Equity.CurrentEquity;
 			portfolioTotal -= portfolio.Performance.Equity.StartingEquity;
-			Assert.AreEqual(-149600, portfolioTotal);
+			Assert.AreEqual(Math.Round(-14.96,2), Math.Round(portfolioTotal,2));
 			Assert.AreEqual(expected, portfolioTotal);
 		}
 		
@@ -106,7 +106,7 @@ namespace Loaders
 			double portfolioTotal = portfolio.Performance.Equity.ClosedEquity;
 			portfolioTotal -= portfolio.Performance.Equity.StartingEquity;
 			Assert.AreEqual(expected, portfolioTotal);
-			Assert.AreEqual(-149200, portfolioTotal);
+			Assert.AreEqual(Math.Round(-14.92,2), Math.Round(portfolioTotal,2));
 		}
 		
 		[Test]
@@ -114,7 +114,7 @@ namespace Loaders
 			double expected = fourTicksStrategy.Performance.Equity.OpenEquity;
 			expected += fullTicksStrategy.Performance.Equity.OpenEquity;
 			Assert.AreEqual(expected, portfolio.Performance.Equity.OpenEquity);
-			Assert.AreEqual(-400, portfolio.Performance.Equity.OpenEquity);
+			Assert.AreEqual(Math.Round(-0.04,2), Math.Round(portfolio.Performance.Equity.OpenEquity,2));
 		}
 		
 		[Test]

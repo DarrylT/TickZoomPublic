@@ -45,7 +45,6 @@ namespace TickZoom
 		{
 			factor = 10;
 			Performance.GraphTrades = true;
-			PositionSize.Size = 10000;
 			
 			sma = new SMA(Bars.Close,length);
 			sma.Drawing.IsVisible = true;

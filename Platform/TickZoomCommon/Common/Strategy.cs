@@ -54,7 +54,6 @@ namespace TickZoom.Common
 		ExitCommon exitNextBar;
 		EnterCommon enterNextBar;
 		Performance performance;
-		PositionSize positionSize;
 		ExitStrategy exitStrategy;
 		OrderManager preOrderManager;
 		OrderManager postOrderManager;
@@ -88,7 +87,6 @@ namespace TickZoom.Common
 			
 			// Interceptors.
 			performance = new Performance(this);
-		    positionSize = new PositionSize(this);
 		    exitStrategy = new ExitStrategy(this);
 		    preOrderManager = Factory.Engine.OrderManager(this);
 			postOrderManager = Factory.Engine.OrderManager(this);
@@ -114,7 +112,6 @@ namespace TickZoom.Common
 			AddInterceptor(preOrderManager);
 			AddInterceptor(performance.Equity);
 			AddInterceptor(performance);
-			AddInterceptor(positionSize);
 			AddInterceptor(exitStrategy);
 			AddInterceptor(postOrderManager);
 		}
@@ -242,15 +239,19 @@ namespace TickZoom.Common
 		}
 		
 		[Category("Strategy Settings")]
-		public PositionSize PositionSize {
-			get { return positionSize; }
-			set { positionSize = value; }
-		}
-
-		[Category("Strategy Settings")]
 		public Performance Performance {
 			get { return performance; }
 			set { performance = value;}
+		}
+		
+		
+		/// <summary>
+		/// Obsolete. Please use the Level2LotSize property in the symbol dictionary instead.
+		/// </summary>
+		[Obsolete("Obsolete. Please use the Level2LotSize property in the symbol dictionary instead.",true)]
+		public PositionSize PositionSize {
+			get { return new PositionSize(); }
+			set { }
 		}
 
 		public virtual double OnGetFitness() {
@@ -329,6 +330,21 @@ namespace TickZoom.Common
 		}
 	}
 	
+	/// <summary>
+	/// Obsolete. Please use the Level2LotSize property in the symbol dictionary instead.
+	/// </summary>
+	[Obsolete("Obsolete. Please use the Level2LotSize property in the symbol dictionary instead.",true)]
+	public class PositionSize {
+		/// <summary>
+		/// Obsolete. Please use the Level2LotSize property in the symbol dictionary instead.
+		/// </summary>
+		[Obsolete("Obsolete. Please use the Level2LotSize property in the symbol dictionary instead.",true)]
+		public int Size {
+			get { return 0; } 
+			set { }
+		}
+	}
+		
 	[Obsolete("Please user Strategy instead.",true)]
 	public class StrategyCommon : Strategy {
 		

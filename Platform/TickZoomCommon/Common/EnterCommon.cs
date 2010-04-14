@@ -46,6 +46,7 @@ namespace TickZoom.Common
 		private bool enableWrongSideOrders = false;
 		private bool allowReversal = true;
 		private bool isNextBar = false;
+		private int lotSize;
 		
 		public EnterCommon(Strategy strategy) : base(strategy) {
 		}
@@ -53,6 +54,7 @@ namespace TickZoom.Common
 		public void OnInitialize()
 		{
 			if( IsDebug) Log.Debug("OnInitialize()");
+			lotSize = Strategy.Data.SymbolInfo.Level2LotSize;
 			Strategy.Drawing.Color = Color.Black;
 			orders.buyMarket = Factory.Engine.LogicalOrder(Strategy.Data.SymbolInfo,Strategy);
 			orders.buyMarket.Type = OrderType.BuyMarket;
@@ -104,7 +106,7 @@ namespace TickZoom.Common
         	SellMarket(1);
         }
         
-        public void SellMarket( double positions) {
+        public void SellMarket( double lots) {
         	if( Strategy.Position.IsShort) {
         		string reversal = allowReversal ? "or long " : "";
         		string reversalEnd = allowReversal ? " since AllowReversal is true" : "";
@@ -121,7 +123,7 @@ namespace TickZoom.Common
         	/// </summary>
         	/// <param name="allowReversal"></param>
         	orders.sellMarket.Price = 0;
-        	orders.sellMarket.Positions = positions;
+        	orders.sellMarket.Positions = lots * lotSize;
         	if( isNextBar) {
 	        	orders.sellMarket.IsNextBar = true;
         	} else {
@@ -141,7 +143,7 @@ namespace TickZoom.Common
         	BuyMarket( 1);
         }
         
-        public void BuyMarket(double positions) {
+        public void BuyMarket(double lots) {
         	if( Strategy.Position.IsLong) {
         		string reversal = allowReversal ? "or short " : "";
         		string reversalEnd = allowReversal ? " since AllowReversal is true" : "";
@@ -151,7 +153,7 @@ namespace TickZoom.Common
         		throw new TickZoomException("Strategy cannot enter long market when position is short. Set AllowReversal to true to allow this.");
         	}
         	orders.buyMarket.Price = 0;
-        	orders.buyMarket.Positions = positions;
+        	orders.buyMarket.Positions = lots * lotSize;
         	if( isNextBar) {
 	        	orders.buyMarket.IsNextBar = true;
         	} else {
@@ -178,12 +180,12 @@ namespace TickZoom.Common
         /// <param name="positions">Number of positions as in 1, 2, 3, etc. To set the size of a single position, 
         ///  use PositionSize.Size.</param>
 
-        public void BuyLimit( double price, double positions) {
+        public void BuyLimit( double price, double lots) {
         	if( Strategy.Position.HasPosition) {
         		throw new TickZoomException("Strategy must be flat before setting a long limit entry.");
         	}
         	orders.buyLimit.Price = price;
-        	orders.buyLimit.Positions = positions;
+        	orders.buyLimit.Positions = lots * lotSize;
         	if( isNextBar) {
 	        	orders.buyLimit.IsNextBar = true;
         	} else {
@@ -202,12 +204,12 @@ namespace TickZoom.Common
         /// <param name="positions">Number of positions as in 1, 2, 3, etc. To set the size of a single position, 
         ///  use PositionSize.Size.</param>
 
-        public void SellLimit( double price, double positions) {
+        public void SellLimit( double price, double lots) {
         	if( Strategy.Position.HasPosition) {
         		throw new TickZoomException("Strategy must be flat before setting a short limit entry.");
         	}
         	orders.sellLimit.Price = price;
-        	orders.sellLimit.Positions = positions;
+        	orders.sellLimit.Positions = lots * lotSize;
         	if( isNextBar) {
 	        	orders.sellLimit.IsNextBar = true;
         	} else {
@@ -226,12 +228,12 @@ namespace TickZoom.Common
         /// <param name="positions">Number of positions as in 1, 2, 3, etc. To set the size of a single position, 
         ///  use PositionSize.Size.</param>
 
-        public void BuyStop( double price, double positions) {
+        public void BuyStop( double price, double lots) {
         	if( Strategy.Position.HasPosition) {
         		throw new TickZoomException("Strategy must be flat before setting a long stop entry.");
         	}
         	orders.buyStop.Price = price;
-        	orders.buyStop.Positions = positions;
+        	orders.buyStop.Positions = lots * lotSize;
         	if( isNextBar) {
 	        	orders.buyStop.IsNextBar = true;
         	} else {
@@ -250,12 +252,12 @@ namespace TickZoom.Common
         /// <param name="positions">Number of positions as in 1, 2, 3, etc. To set the size of a single position, 
         ///  use PositionSize.Size.</param>
         
-        public void SellStop( double price, double positions) {
+        public void SellStop( double price, double lots) {
         	if( Strategy.Position.HasPosition) {
         		throw new TickZoomException("Strategy must be flat before setting a short stop entry.");
         	}
         	orders.sellStop.Price = price;
-        	orders.sellStop.Positions = positions;
+        	orders.sellStop.Positions = lots * lotSize;
         	if( isNextBar) {
 	        	orders.sellStop.IsNextBar = true;
         	} else {

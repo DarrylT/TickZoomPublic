@@ -44,6 +44,10 @@ namespace Loaders
 		Log log = Factory.Log.GetLogger(typeof(ExampleSimulatedTest));
 		#region SetupTest
 		ExampleOrderStrategy strategy;
+		
+		public ExampleSimulatedTest() {
+			StoreKnownGood = false;
+		}
 			
 		[TestFixtureSetUp]
 		public override void RunStrategy() {
@@ -77,15 +81,15 @@ namespace Loaders
 		
 		[Test]
 		public void VerifyCurrentEquity() {
-			Assert.AreEqual( -64800,strategy.Performance.Equity.CurrentEquity,"current equity");
+			Assert.AreEqual( Math.Round(9992.52,2),Math.Round(strategy.Performance.Equity.CurrentEquity,2),"current equity");
 		}
 		[Test]
 		public void VerifyOpenEquity() {
-			Assert.AreEqual( -200,strategy.Performance.Equity.OpenEquity,"open equity");
+			Assert.AreEqual( Math.Round(-0.02,2),Math.Round(strategy.Performance.Equity.OpenEquity,2),"open equity");
 		}
 		[Test]
 		public void VerifyClosedEquity() {
-			Assert.AreEqual( -64600,strategy.Performance.Equity.ClosedEquity,"closed equity");
+			Assert.AreEqual( Math.Round(9992.54,2),Math.Round(strategy.Performance.Equity.ClosedEquity,2),"closed equity");
 		}
 		[Test]
 		public void VerifyStartingEquity() {
