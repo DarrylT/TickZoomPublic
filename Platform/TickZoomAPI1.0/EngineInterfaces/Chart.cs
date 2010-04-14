@@ -48,9 +48,13 @@ namespace TickZoom.Api
 		/// the PositionSize object which can be driven by various logic and usually by
 		/// portfolio asset allocation.</param>
 		int DrawTrade( LogicalOrder order, double fillPrice,  double resultingPosition);
-//		[Obsolete("Use the Update() method instead.",true)]
+		/// <summary>
+		/// Obsolete. Please use only ChartBars instead
+		/// </summary>
+		[Obsolete("Please use only chartBars argument instead.",true)]
 		void AddBar( Bars updateSeries, Bars displaySeries);
-//		void Update();
+		
+		void AddBar( Bars chartBars);
 		int DrawText(string text, Color color, int bar, double y, Positioning orient);
 		int DrawLine( Color color, int bar1, double y1, int bar2, double y2, LineStyle style);
 		[Obsolete("Please use the overloaded DrawArrow() instead.",true)]
@@ -98,11 +102,13 @@ namespace TickZoom.Api
 			set;
 		}
 		
+		[Obsolete("Please use only ChartBars instead.",true)]
 		Bars UpdateBars {
 			get;
 			set;
 		}
 
+		[Obsolete("Please use only ChartBars instead.",true)]
 		Bars DisplayBars {
 			get;
 			set;
@@ -113,17 +119,25 @@ namespace TickZoom.Api
 			set;
 		}
 		
+		/// <summary>
+		/// Obsolete. Please use only IntervalChartBar instead.
+		/// </summary>
+		[Obsolete("Please use only IntervalChartBar instead.",true)]
 		Interval IntervalChartDisplay {
 			get;
 			set;
 		}
 		
-		Interval IntervalChartBar {
+		/// <summary>
+		/// Obsolete. Please use only IntervalChartBar instead.
+		/// </summary>
+		[Obsolete("Please use only IntervalChartBar instead.",true)]
+		Interval IntervalChartUpdate {
 			get;
 			set;
 		}
 		
-		Interval IntervalChartUpdate {
+		Interval IntervalChartBar {
 			get;
 			set;
 		}

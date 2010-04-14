@@ -68,9 +68,7 @@ namespace TickZoom
 		bool isAutoScroll = true;
 		bool isCompactMode = false;
 		ChartType chartType = ChartType.Bar;
-		Interval intervalChartDisplay;
 		Interval intervalChartBar;
-		Interval intervalChartUpdate;
 		string storageFolder;
         private SynchronizationContext context;
         SymbolInfo symbol;
@@ -296,7 +294,7 @@ namespace TickZoom
 			} else {
 				myPaneT.XAxis.Type = AxisType.Date;
 			    XDate size = new XDate(0d);
-			    size.AddSeconds(intervalChartDisplay.Seconds);
+			    size.AddSeconds(intervalChartBar.Seconds);
 			    _clusterWidth = size;
 			}
 	   
@@ -542,22 +540,30 @@ namespace TickZoom
 		Dictionary<ModelInterface,PointPairList> repeatList = new Dictionary<ModelInterface,PointPairList>();
 		
 		int lastColorValue = 2;
+		/// <summary>
+		/// Obsolete. Please use only chartBars argument instead
+		/// </summary>
+		[Obsolete("Please use only chartBars argument instead.",true)]
 		public void AddBar( Bars updateSeries, Bars displaySeries) {
+			throw new NotImplementedException();
+		}
+		
+		public void AddBar( Bars chartBars) {
 			lock( chartLocker) {
 //				dataGraph.PartialErase();
 				
 	    		if( firstTime == TimeStamp.MinValue) {
-	    			firstTime = updateSeries.Time[0];
+	    			firstTime = chartBars.Time[0];
 	    		}
 				// Set the default bar color
 	        	lastColorValue = 2;
 		        //if price is increasing color=black, else color=red
-		        lastColorValue = displaySeries.Close[0] > displaySeries.Open[0] ? 0 : 1;
+		        lastColorValue = chartBars.Close[0] > chartBars.Open[0] ? 0 : 1;
 				
-				UpdateIndicators(updateSeries);
+				UpdateIndicators(chartBars);
 			    
 			    if( showPriceGraph) {
-			    	UpdatePriceGraph(displaySeries,updateSeries);
+			    	UpdatePriceGraph(chartBars,chartBars);
 			    }
 			}
 		}
@@ -905,7 +911,7 @@ namespace TickZoom
 		float resetYScaleSpeed = 1;
 	
 		public bool IsValid {
-			get { return ChartBars != null && DisplayBars != null && UpdateBars != null; }
+			get { return ChartBars != null; }
 		}
 		
 		OHLCBarItem ohlcCurve;
@@ -1326,16 +1332,22 @@ namespace TickZoom
 			set { chartType = value; }
 		}
 		
-		Bars updateBars = null;
+		/// <summary>
+		/// Obsolete. Please use only ChartBars instead
+		/// </summary>
+		[Obsolete("Please use only ChartBars instead.",true)]
 		public Bars UpdateBars {
-			get { return updateBars; }
-			set { updateBars = value; }
+			get { throw new NotImplementedException(); }
+			set { throw new NotImplementedException();  }
 		}
 
-		Bars displayBars;
+		/// <summary>
+		/// Obsolete. Please use only ChartBars instead
+		/// </summary>
+		[Obsolete("Please use only ChartBars instead.",true)]
 		public Bars DisplayBars {
-			get { return displayBars; }
-			set { displayBars = value; }
+			get { throw new NotImplementedException(); }
+			set { throw new NotImplementedException();  }
 		}
 		
 		Bars chartBars;
@@ -1344,10 +1356,22 @@ namespace TickZoom
 			set { chartBars = value; }
 		}
 
-		
+		/// <summary>
+		/// Obsolete. Please use only IntervalChartBar instead.
+		/// </summary>
+		[Obsolete("Please use only IntervalChartBar instead.",true)]
 		public Interval IntervalChartDisplay {
-			get { return intervalChartDisplay; }
-			set { intervalChartDisplay = value; }
+			get { throw new NotImplementedException(); }
+			set { throw new NotImplementedException(); }
+		}
+		
+		/// <summary>
+		/// Obsolete. Please use only IntervalChartBar instead.
+		/// </summary>
+		[Obsolete("Please use only IntervalChartBar instead.",true)]
+		public Interval IntervalChartUpdate {
+			get { throw new NotImplementedException(); }
+			set { throw new NotImplementedException(); }
 		}
 		
 		public Interval IntervalChartBar {
@@ -1355,11 +1379,6 @@ namespace TickZoom
 			set { intervalChartBar = value; }
 		}
 		
-		public Interval IntervalChartUpdate {
-			get { return intervalChartUpdate; }
-			set { intervalChartUpdate = value; }
-		}
-        
 		public SymbolInfo Symbol {
 			get { return symbol; }
 			set { symbol = value; }

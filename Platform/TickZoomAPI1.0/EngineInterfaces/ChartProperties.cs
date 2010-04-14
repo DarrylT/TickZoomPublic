@@ -41,7 +41,20 @@ namespace TickZoom.Api
 			set;
 		}
 		
+		/// <summary>
+		/// Obsolete. Please use only IntervalChartBar instead.
+		/// </summary>
+		[Obsolete("Please use only IntervalChartBar instead.",true)]
 		Interval IntervalChartDisplay {
+			get;
+			set;
+		}
+		
+		/// <summary>
+		/// Obsolete. Please use only IntervalChartBar instead.
+		/// </summary>
+		[Obsolete("Please use only IntervalChartBar instead.",true)]
+		Interval IntervalChartUpdate {
 			get;
 			set;
 		}
@@ -51,11 +64,6 @@ namespace TickZoom.Api
 			set;
 		}
 		
-		Interval IntervalChartUpdate {
-			get;
-			set;
-		}
-
 		ChartType ChartType {
 			get;
 			set;

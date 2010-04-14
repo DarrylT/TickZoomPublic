@@ -67,9 +67,7 @@ namespace TickZoom
         Interval initialInterval;
         Interval intervalDefault;
 		Interval intervalEngine;
-		Interval intervalChartDisplay;
 		Interval intervalChartBar;
-		Interval intervalChartUpdate;
 		string storageFolder;
 		string tickZoomEngine;
         bool isInitialized = false;
@@ -91,17 +89,11 @@ namespace TickZoom
             }
 	        intervalDefault = initialInterval;
 			intervalEngine = initialInterval;
-			intervalChartDisplay = initialInterval;
 			intervalChartBar = initialInterval;
-			intervalChartUpdate = initialInterval;
             InitializeComponent();
             defaultCombo.DataSource = Enum.GetValues(typeof(BarUnit));
             engineBarsCombo.DataSource = Enum.GetValues(typeof(BarUnit));
-            engineBarsCombo2.DataSource = Enum.GetValues(typeof(BarUnit));
-            chartDisplayCombo.DataSource = Enum.GetValues(typeof(BarUnit));
             chartBarsCombo.DataSource = Enum.GetValues(typeof(BarUnit));
-            chartBarsCombo2.DataSource = Enum.GetValues(typeof(BarUnit));
-            chartUpdateCombo.DataSource = Enum.GetValues(typeof(BarUnit));
             IntervalDefaults();
             LoadIntervals();
             IntervalDefaults();
@@ -468,22 +460,12 @@ namespace TickZoom
 	    	starter.ProjectProperties.Starter.Symbols = txtSymbol.Text;
 			starter.ProjectProperties.Starter.IntervalDefault = intervalDefault;
 			if( defaultOnly.Checked) {
-				starter.ProjectProperties.Chart.IntervalChartDisplay = intervalDefault;
 				starter.ProjectProperties.Chart.IntervalChartBar = intervalDefault;
-				starter.ProjectProperties.Chart.IntervalChartUpdate = intervalDefault;
 			} else {
-				starter.ProjectProperties.Chart.IntervalChartDisplay = intervalChartDisplay;
 				starter.ProjectProperties.Chart.IntervalChartBar = intervalChartBar;
-				starter.ProjectProperties.Chart.IntervalChartUpdate = intervalChartUpdate;
-			}
-			if( intervalChartDisplay.BarUnit == BarUnit.Default) {
-				starter.ProjectProperties.Chart.IntervalChartDisplay = intervalDefault;
 			}
 			if( intervalChartBar.BarUnit == BarUnit.Default) {
 				starter.ProjectProperties.Chart.IntervalChartBar = intervalDefault;
-			}
-			if( intervalChartUpdate.BarUnit == BarUnit.Default) {
-				starter.ProjectProperties.Chart.IntervalChartUpdate = intervalDefault;
 			}
 			starter.Run(Plugins.Instance.GetLoader(modelLoaderText));
         }
@@ -573,101 +555,47 @@ namespace TickZoom
 		private void IntervalsUpdate() {
 			intervalDefault = Factory.Engine.DefineInterval((BarUnit)defaultCombo.SelectedValue, Convert.ToInt32(defaultBox.Text));
 			intervalEngine = Factory.Engine.DefineInterval((BarUnit)engineBarsCombo.SelectedValue, Convert.ToInt32(engineBarsBox.Text));
-			if( engineRollingCheckBox.Checked) {
-				intervalEngine= Factory.Engine.DefineInterval((BarUnit)engineBarsCombo.SelectedValue, Convert.ToInt32(engineBarsBox.Text),
-											(BarUnit)engineBarsCombo2.SelectedValue, Convert.ToInt32(engineBarsBox2.Text));
-			} else {
-				intervalChartDisplay = Factory.Engine.DefineInterval((BarUnit)chartDisplayCombo.SelectedValue, Convert.ToInt32(chartDisplayBox.Text));
-			}
-			if( chartBarsCheckBox.Checked ) {
-				intervalChartBar = Factory.Engine.DefineInterval((BarUnit)chartBarsCombo.SelectedValue, Convert.ToInt32(chartBarsBox.Text),
-			                                      (BarUnit)chartBarsCombo2.SelectedValue, Convert.ToInt32(chartBarsBox2.Text));
-			} else {
-				intervalChartBar = Factory.Engine.DefineInterval((BarUnit)chartBarsCombo.SelectedValue, Convert.ToInt32(chartBarsBox.Text));
-			}
-			intervalChartUpdate = Factory.Engine.DefineInterval((BarUnit)chartUpdateCombo.SelectedValue, Convert.ToInt32(chartUpdateBox.Text));
+			intervalChartBar = Factory.Engine.DefineInterval((BarUnit)chartBarsCombo.SelectedValue, Convert.ToInt32(chartBarsBox.Text));
         }
 
 		private void IntervalDefaults() {
 			if( defaultBox.Text.Length == 0) { defaultBox.Text = "1"; }
 			if( engineBarsBox.Text.Length == 0) { engineBarsBox.Text = "1"; }
-			if( engineBarsBox2.Text.Length == 0) { engineBarsBox2.Text = "1"; }
-			if( chartDisplayBox.Text.Length == 0) { chartDisplayBox.Text = "1"; }
 			if( chartBarsBox.Text.Length == 0) { chartBarsBox.Text = "1"; }
-			if( chartBarsBox2.Text.Length == 0) { chartBarsBox2.Text = "1"; }
-			if( chartUpdateBox.Text.Length == 0) { chartUpdateBox.Text = "1"; }
 			if( defaultCombo.Text == "None" || defaultCombo.Text.Length == 0) { 
 				defaultCombo.Text = "Hour";
 			}
 			if( engineBarsCombo.Text == "None" || engineBarsCombo.Text.Length == 0 ) { 
 				engineBarsCombo.Text = "Hour";
 			}
-			if( engineBarsCombo2.Text == "None" || engineBarsCombo2.Text.Length == 0 ) { 
-				engineBarsCombo2.Text = "Hour";
-			}
-			if( chartDisplayCombo.Text == "None" || chartDisplayCombo.Text.Length == 0 ) { 
-				chartDisplayCombo.Text = "Hour";
-			}
 			if( chartBarsCombo.Text == "None" || chartBarsCombo.Text.Length == 0 ) { 
 				chartBarsCombo.Text = "Hour";
 			}
-			if( chartBarsCombo2.Text == "None" || chartBarsCombo2.Text.Length == 0 ) { 
-				chartBarsCombo2.Text = "Hour";
-			}
-			if( chartUpdateCombo.Text == "None" || chartUpdateCombo.Text.Length == 0 ) { 
-				chartUpdateCombo.Text = "Hour";
-			}
-//           	IntervalsUpdate();
-//           	UpdateCheckBoxes();
 		}
         
         void CopyDefaultIntervals() {
        		engineBarsBox.Text = defaultBox.Text;
-       		engineBarsBox2.Text = defaultBox.Text;
        		engineBarsCombo.Text = defaultCombo.Text;
-       		engineBarsCombo2.Text = defaultCombo.Text;
-       		chartDisplayBox.Text = defaultBox.Text;
-       		chartDisplayCombo.Text = defaultCombo.Text;
        		chartBarsBox.Text = defaultBox.Text;
        		chartBarsCombo.Text = defaultCombo.Text;
-       		chartBarsBox2.Text = defaultBox.Text;
-       		chartBarsCombo2.Text = defaultCombo.Text;
-       		chartUpdateBox.Text = defaultBox.Text;
-       		chartUpdateCombo.Text = defaultCombo.Text;
         }
 		
 		void SaveIntervals(Configuration config) {
 			SaveSetting(config,"defaultBox",defaultBox.Text);
 			SaveSetting(config,"defaultCombo",defaultCombo.Text);
 			SaveSetting(config,"engineBarsBox",engineBarsBox.Text);
-			SaveSetting(config,"engineBarsBox2",engineBarsBox2.Text);
 			SaveSetting(config,"engineBarsCombo",engineBarsCombo.Text);
-			SaveSetting(config,"engineBarsCombo2",engineBarsCombo2.Text);
-			SaveSetting(config,"chartDisplayBox",chartDisplayBox.Text);
-			SaveSetting(config,"chartDisplayCombo",chartDisplayCombo.Text);
 			SaveSetting(config,"chartBarsBox",chartBarsBox.Text);
 			SaveSetting(config,"chartBarsCombo",chartBarsCombo.Text);
-			SaveSetting(config,"chartBarsBox2",chartBarsBox2.Text);
-			SaveSetting(config,"chartBarsCombo2",chartBarsCombo2.Text);
-			SaveSetting(config,"chartUpdateBox",chartUpdateBox.Text);
-			SaveSetting(config,"chartUpdateCombo",chartUpdateCombo.Text);
         }
 
 		void LoadIntervals() {
 			defaultBox.Text = CheckNull(Factory.Settings["defaultBox"]);
 			defaultCombo.Text = CheckNull(Factory.Settings["defaultCombo"]);
 			engineBarsBox.Text = CheckNull(Factory.Settings["engineBarsBox"]);
-			engineBarsBox2.Text = CheckNull(Factory.Settings["engineBarsBox2"]);
 			engineBarsCombo.Text = CheckNull(Factory.Settings["engineBarsCombo"]);
-			engineBarsCombo2.Text = CheckNull(Factory.Settings["engineBarsCombo2"]);
-			chartDisplayBox.Text = CheckNull(Factory.Settings["chartDisplayBox"]);
-			chartDisplayCombo.Text = CheckNull(Factory.Settings["chartDisplayCombo"]);
 			chartBarsBox.Text = CheckNull(Factory.Settings["chartBarsBox"]);
 			chartBarsCombo.Text = CheckNull(Factory.Settings["chartBarsCombo"]);
-			chartBarsBox2.Text = CheckNull(Factory.Settings["chartBarsBox2"]);
-			chartBarsCombo2.Text = CheckNull(Factory.Settings["chartBarsCombo2"]);
-			chartUpdateBox.Text = CheckNull(Factory.Settings["chartUpdateBox"]);
-			chartUpdateCombo.Text = CheckNull(Factory.Settings["chartUpdateCombo"]);
         }
 		
 		string CheckNull(string str) {
@@ -697,25 +625,10 @@ namespace TickZoom
         
         void UpdateCheckBoxes() {
        		engineBarsBox.Enabled = !defaultOnly.Checked;
-       		engineBarsBox2.Enabled = !defaultOnly.Checked;
        		engineBarsCombo.Enabled = !defaultOnly.Checked;
-       		engineBarsCombo2.Enabled = !defaultOnly.Checked;
-       		chartDisplayBox.Enabled = !defaultOnly.Checked;
-       		chartDisplayCombo.Enabled = !defaultOnly.Checked;
        		chartBarsBox.Enabled = !defaultOnly.Checked;
        		chartBarsCombo.Enabled = !defaultOnly.Checked;
-       		chartBarsBox2.Enabled = !defaultOnly.Checked;
-       		chartBarsCombo2.Enabled = !defaultOnly.Checked;
-       		chartUpdateBox.Enabled = !defaultOnly.Checked;
-       		chartUpdateCombo.Enabled = !defaultOnly.Checked;
        		
-       		// Set rolling last.
-       		engineBarsBox2.Enabled = engineRollingCheckBox.Checked;
-       		engineBarsCombo2.Enabled = engineRollingCheckBox.Checked;
-       		
-       		// Set rolling last.
-       		chartBarsBox2.Enabled = chartBarsCheckBox.Checked;
-       		chartBarsCombo2.Enabled = chartBarsCheckBox.Checked;
         }
         
         ChartType chartType = ChartType.Bar;

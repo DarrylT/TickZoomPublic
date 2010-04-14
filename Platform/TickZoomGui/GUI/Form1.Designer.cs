@@ -51,32 +51,20 @@ namespace TickZoom
         	this.intervalEngineTxt = new System.Windows.Forms.Label();
         	this.engineBarsCombo = new System.Windows.Forms.ComboBox();
         	this.intervals = new System.Windows.Forms.GroupBox();
-        	this.chartBarsCheckBox = new System.Windows.Forms.CheckBox();
-        	this.chartBarsBox2 = new System.Windows.Forms.TextBox();
-        	this.chartBarsCombo2 = new System.Windows.Forms.ComboBox();
-        	this.engineRollingCheckBox = new System.Windows.Forms.CheckBox();
-        	this.engineBarsBox2 = new System.Windows.Forms.TextBox();
-        	this.engineBarsCombo2 = new System.Windows.Forms.ComboBox();
         	this.label7 = new System.Windows.Forms.Label();
         	this.timeChartRadio = new System.Windows.Forms.RadioButton();
         	this.barChartRadio = new System.Windows.Forms.RadioButton();
         	this.label3 = new System.Windows.Forms.Label();
         	this.label4 = new System.Windows.Forms.Label();
         	this.copyDebugCheckBox = new System.Windows.Forms.CheckBox();
-        	this.chartUpdateBox = new System.Windows.Forms.TextBox();
         	this.chartBarsBox = new System.Windows.Forms.TextBox();
-        	this.chartDisplayBox = new System.Windows.Forms.TextBox();
         	this.engineBarsBox = new System.Windows.Forms.TextBox();
         	this.defaultBox = new System.Windows.Forms.TextBox();
         	this.defaultOnly = new System.Windows.Forms.CheckBox();
-        	this.chartUpdateCombo = new System.Windows.Forms.ComboBox();
-        	this.chartUpdateTxt = new System.Windows.Forms.Label();
         	this.chartBarsCombo = new System.Windows.Forms.ComboBox();
-        	this.chartDisplayCombo = new System.Windows.Forms.ComboBox();
         	this.defaultTxt = new System.Windows.Forms.Label();
         	this.defaultCombo = new System.Windows.Forms.ComboBox();
         	this.chartBarsTxt = new System.Windows.Forms.Label();
-        	this.chartTxt = new System.Windows.Forms.Label();
         	this.timeFrameTxt = new System.Windows.Forms.Label();
         	this.periodTxt = new System.Windows.Forms.Label();
         	this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
@@ -134,15 +122,13 @@ namespace TickZoom
         	// 
         	// lblProgress
         	// 
-        	lock(progressLocker) {
-	        	this.lblProgress.AutoSize = true;
-	        	this.lblProgress.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F);
-	        	this.lblProgress.Location = new System.Drawing.Point(12, 149);
-	        	this.lblProgress.Name = "lblProgress";
-	        	this.lblProgress.Size = new System.Drawing.Size(72, 13);
-	        	this.lblProgress.TabIndex = 8;
-	        	this.lblProgress.Text = "Awaiting Start";
-        	}
+        	this.lblProgress.AutoSize = true;
+        	this.lblProgress.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F);
+        	this.lblProgress.Location = new System.Drawing.Point(12, 149);
+        	this.lblProgress.Name = "lblProgress";
+        	this.lblProgress.Size = new System.Drawing.Size(72, 13);
+        	this.lblProgress.TabIndex = 8;
+        	this.lblProgress.Text = "Awaiting Start";
         	// 
         	// btnRun
         	// 
@@ -188,7 +174,7 @@ namespace TickZoom
         	this.endLabel.TabIndex = 15;
         	this.endLabel.Text = "End Date";
         	// 
-        	// processWorker
+        	// commandWorker
         	// 
         	this.commandWorker.WorkerReportsProgress = true;
         	this.commandWorker.WorkerSupportsCancellation = true;
@@ -207,11 +193,11 @@ namespace TickZoom
         	this.liveButton.UseVisualStyleBackColor = true;
         	this.liveButton.Click += new System.EventHandler(this.RealTimeButtonClick);
         	// 
-        	// output
+        	// logOutput
         	// 
         	this.logOutput.Location = new System.Drawing.Point(12, 198);
         	this.logOutput.Multiline = true;
-        	this.logOutput.Name = "output";
+        	this.logOutput.Name = "logOutput";
         	this.logOutput.ScrollBars = System.Windows.Forms.ScrollBars.Both;
         	this.logOutput.Size = new System.Drawing.Size(475, 161);
         	this.logOutput.TabIndex = 17;
@@ -267,32 +253,20 @@ namespace TickZoom
         	// 
         	// intervals
         	// 
-        	this.intervals.Controls.Add(this.chartBarsCheckBox);
-        	this.intervals.Controls.Add(this.chartBarsBox2);
-        	this.intervals.Controls.Add(this.chartBarsCombo2);
-        	this.intervals.Controls.Add(this.engineRollingCheckBox);
-        	this.intervals.Controls.Add(this.engineBarsBox2);
-        	this.intervals.Controls.Add(this.engineBarsCombo2);
         	this.intervals.Controls.Add(this.label7);
         	this.intervals.Controls.Add(this.timeChartRadio);
         	this.intervals.Controls.Add(this.barChartRadio);
         	this.intervals.Controls.Add(this.label3);
         	this.intervals.Controls.Add(this.label4);
         	this.intervals.Controls.Add(this.copyDebugCheckBox);
-        	this.intervals.Controls.Add(this.chartUpdateBox);
         	this.intervals.Controls.Add(this.chartBarsBox);
-        	this.intervals.Controls.Add(this.chartDisplayBox);
         	this.intervals.Controls.Add(this.engineBarsBox);
         	this.intervals.Controls.Add(this.defaultBox);
         	this.intervals.Controls.Add(this.defaultOnly);
-        	this.intervals.Controls.Add(this.chartUpdateCombo);
-        	this.intervals.Controls.Add(this.chartUpdateTxt);
         	this.intervals.Controls.Add(this.chartBarsCombo);
-        	this.intervals.Controls.Add(this.chartDisplayCombo);
         	this.intervals.Controls.Add(this.defaultTxt);
         	this.intervals.Controls.Add(this.defaultCombo);
         	this.intervals.Controls.Add(this.chartBarsTxt);
-        	this.intervals.Controls.Add(this.chartTxt);
         	this.intervals.Controls.Add(this.timeFrameTxt);
         	this.intervals.Controls.Add(this.periodTxt);
         	this.intervals.Controls.Add(this.intervalEngineTxt);
@@ -305,66 +279,10 @@ namespace TickZoom
         	this.intervals.TabStop = false;
         	this.intervals.Text = "Intervals";
         	// 
-        	// chartBarsCheckBox
-        	// 
-        	this.chartBarsCheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-        	this.chartBarsCheckBox.Location = new System.Drawing.Point(19, 190);
-        	this.chartBarsCheckBox.Name = "chartBarsCheckBox";
-        	this.chartBarsCheckBox.Size = new System.Drawing.Size(59, 24);
-        	this.chartBarsCheckBox.TabIndex = 59;
-        	this.chartBarsCheckBox.Text = "Rolling";
-        	this.chartBarsCheckBox.UseVisualStyleBackColor = true;
-        	this.chartBarsCheckBox.Click += new System.EventHandler(this.ChartBarsCheckBoxClick);
-        	// 
-        	// chartBarsBox2
-        	// 
-        	this.chartBarsBox2.Location = new System.Drawing.Point(92, 193);
-        	this.chartBarsBox2.Name = "chartBarsBox2";
-        	this.chartBarsBox2.Size = new System.Drawing.Size(46, 20);
-        	this.chartBarsBox2.TabIndex = 58;
-        	this.chartBarsBox2.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-        	// 
-        	// chartBarsCombo2
-        	// 
-        	this.chartBarsCombo2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-        	this.chartBarsCombo2.FormattingEnabled = true;
-        	this.chartBarsCombo2.Location = new System.Drawing.Point(145, 193);
-        	this.chartBarsCombo2.Name = "chartBarsCombo2";
-        	this.chartBarsCombo2.Size = new System.Drawing.Size(121, 21);
-        	this.chartBarsCombo2.TabIndex = 57;
-        	// 
-        	// engineRollingCheckBox
-        	// 
-        	this.engineRollingCheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-        	this.engineRollingCheckBox.Location = new System.Drawing.Point(19, 128);
-        	this.engineRollingCheckBox.Name = "engineRollingCheckBox";
-        	this.engineRollingCheckBox.Size = new System.Drawing.Size(59, 24);
-        	this.engineRollingCheckBox.TabIndex = 56;
-        	this.engineRollingCheckBox.Text = "Rolling";
-        	this.engineRollingCheckBox.UseVisualStyleBackColor = true;
-        	this.engineRollingCheckBox.Click += new System.EventHandler(this.EngineRollingCheckBoxClick);
-        	// 
-        	// engineBarsBox2
-        	// 
-        	this.engineBarsBox2.Location = new System.Drawing.Point(92, 131);
-        	this.engineBarsBox2.Name = "engineBarsBox2";
-        	this.engineBarsBox2.Size = new System.Drawing.Size(46, 20);
-        	this.engineBarsBox2.TabIndex = 55;
-        	this.engineBarsBox2.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-        	// 
-        	// engineBarsCombo2
-        	// 
-        	this.engineBarsCombo2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-        	this.engineBarsCombo2.FormattingEnabled = true;
-        	this.engineBarsCombo2.Location = new System.Drawing.Point(145, 131);
-        	this.engineBarsCombo2.Name = "engineBarsCombo2";
-        	this.engineBarsCombo2.Size = new System.Drawing.Size(121, 21);
-        	this.engineBarsCombo2.TabIndex = 54;
-        	// 
         	// label7
         	// 
         	this.label7.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-        	this.label7.Location = new System.Drawing.Point(6, 287);
+        	this.label7.Location = new System.Drawing.Point(6, 171);
         	this.label7.Name = "label7";
         	this.label7.Size = new System.Drawing.Size(80, 20);
         	this.label7.TabIndex = 52;
@@ -372,7 +290,7 @@ namespace TickZoom
         	// 
         	// timeChartRadio
         	// 
-        	this.timeChartRadio.Location = new System.Drawing.Point(168, 283);
+        	this.timeChartRadio.Location = new System.Drawing.Point(168, 167);
         	this.timeChartRadio.Name = "timeChartRadio";
         	this.timeChartRadio.Size = new System.Drawing.Size(104, 24);
         	this.timeChartRadio.TabIndex = 51;
@@ -383,7 +301,7 @@ namespace TickZoom
         	// barChartRadio
         	// 
         	this.barChartRadio.Checked = true;
-        	this.barChartRadio.Location = new System.Drawing.Point(92, 283);
+        	this.barChartRadio.Location = new System.Drawing.Point(92, 167);
         	this.barChartRadio.Name = "barChartRadio";
         	this.barChartRadio.Size = new System.Drawing.Size(70, 24);
         	this.barChartRadio.TabIndex = 50;
@@ -421,32 +339,14 @@ namespace TickZoom
         	this.copyDebugCheckBox.UseVisualStyleBackColor = true;
         	this.copyDebugCheckBox.Click += new System.EventHandler(this.CopyDebugCheckBoxClick);
         	// 
-        	// chartUpdateBox
-        	// 
-        	this.chartUpdateBox.Location = new System.Drawing.Point(92, 257);
-        	this.chartUpdateBox.Name = "chartUpdateBox";
-        	this.chartUpdateBox.Size = new System.Drawing.Size(46, 20);
-        	this.chartUpdateBox.TabIndex = 44;
-        	this.chartUpdateBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-        	this.chartUpdateBox.Leave += new System.EventHandler(this.IntervalChange);
-        	// 
         	// chartBarsBox
         	// 
-        	this.chartBarsBox.Location = new System.Drawing.Point(92, 167);
+        	this.chartBarsBox.Location = new System.Drawing.Point(92, 136);
         	this.chartBarsBox.Name = "chartBarsBox";
         	this.chartBarsBox.Size = new System.Drawing.Size(46, 20);
         	this.chartBarsBox.TabIndex = 43;
         	this.chartBarsBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
         	this.chartBarsBox.Leave += new System.EventHandler(this.IntervalChange);
-        	// 
-        	// chartDisplayBox
-        	// 
-        	this.chartDisplayBox.Location = new System.Drawing.Point(92, 231);
-        	this.chartDisplayBox.Name = "chartDisplayBox";
-        	this.chartDisplayBox.Size = new System.Drawing.Size(46, 20);
-        	this.chartDisplayBox.TabIndex = 42;
-        	this.chartDisplayBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-        	this.chartDisplayBox.Leave += new System.EventHandler(this.IntervalChange);
         	// 
         	// engineBarsBox
         	// 
@@ -479,44 +379,15 @@ namespace TickZoom
         	this.defaultOnly.UseVisualStyleBackColor = true;
         	this.defaultOnly.Click += new System.EventHandler(this.DefaultOnlyClick);
         	// 
-        	// chartUpdateCombo
-        	// 
-        	this.chartUpdateCombo.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-        	this.chartUpdateCombo.FormattingEnabled = true;
-        	this.chartUpdateCombo.Location = new System.Drawing.Point(145, 256);
-        	this.chartUpdateCombo.Name = "chartUpdateCombo";
-        	this.chartUpdateCombo.Size = new System.Drawing.Size(121, 21);
-        	this.chartUpdateCombo.TabIndex = 37;
-        	this.chartUpdateCombo.SelectedIndexChanged += new System.EventHandler(this.IntervalChange);
-        	// 
-        	// chartUpdateTxt
-        	// 
-        	this.chartUpdateTxt.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-        	this.chartUpdateTxt.Location = new System.Drawing.Point(6, 260);
-        	this.chartUpdateTxt.Name = "chartUpdateTxt";
-        	this.chartUpdateTxt.Size = new System.Drawing.Size(80, 20);
-        	this.chartUpdateTxt.TabIndex = 36;
-        	this.chartUpdateTxt.Text = "Chart Update";
-        	// 
         	// chartBarsCombo
         	// 
         	this.chartBarsCombo.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
         	this.chartBarsCombo.FormattingEnabled = true;
-        	this.chartBarsCombo.Location = new System.Drawing.Point(145, 166);
+        	this.chartBarsCombo.Location = new System.Drawing.Point(145, 135);
         	this.chartBarsCombo.Name = "chartBarsCombo";
         	this.chartBarsCombo.Size = new System.Drawing.Size(121, 21);
         	this.chartBarsCombo.TabIndex = 34;
         	this.chartBarsCombo.SelectedIndexChanged += new System.EventHandler(this.IntervalChange);
-        	// 
-        	// chartDisplayCombo
-        	// 
-        	this.chartDisplayCombo.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-        	this.chartDisplayCombo.FormattingEnabled = true;
-        	this.chartDisplayCombo.Location = new System.Drawing.Point(145, 231);
-        	this.chartDisplayCombo.Name = "chartDisplayCombo";
-        	this.chartDisplayCombo.Size = new System.Drawing.Size(121, 21);
-        	this.chartDisplayCombo.TabIndex = 32;
-        	this.chartDisplayCombo.SelectedIndexChanged += new System.EventHandler(this.IntervalChange);
         	// 
         	// defaultTxt
         	// 
@@ -540,20 +411,11 @@ namespace TickZoom
         	// chartBarsTxt
         	// 
         	this.chartBarsTxt.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-        	this.chartBarsTxt.Location = new System.Drawing.Point(6, 170);
+        	this.chartBarsTxt.Location = new System.Drawing.Point(6, 139);
         	this.chartBarsTxt.Name = "chartBarsTxt";
         	this.chartBarsTxt.Size = new System.Drawing.Size(80, 20);
         	this.chartBarsTxt.TabIndex = 28;
         	this.chartBarsTxt.Text = "Chart Bars";
-        	// 
-        	// chartTxt
-        	// 
-        	this.chartTxt.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-        	this.chartTxt.Location = new System.Drawing.Point(6, 235);
-        	this.chartTxt.Name = "chartTxt";
-        	this.chartTxt.Size = new System.Drawing.Size(80, 20);
-        	this.chartTxt.TabIndex = 27;
-        	this.chartTxt.Text = "Chart Display";
         	// 
         	// timeFrameTxt
         	// 
@@ -660,30 +522,18 @@ namespace TickZoom
         private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
         private System.Windows.Forms.RadioButton timeChartRadio;
         private System.Windows.Forms.Label label7;
-        private System.Windows.Forms.ComboBox engineBarsCombo2;
-        private System.Windows.Forms.TextBox engineBarsBox2;
-        private System.Windows.Forms.CheckBox engineRollingCheckBox;
-        private System.Windows.Forms.ComboBox chartBarsCombo2;
-        private System.Windows.Forms.TextBox chartBarsBox2;
-        private System.Windows.Forms.CheckBox chartBarsCheckBox;
         private System.Windows.Forms.RadioButton barChartRadio;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.CheckBox copyDebugCheckBox;
         private System.Windows.Forms.TextBox defaultBox;
         private System.Windows.Forms.TextBox engineBarsBox;
-        private System.Windows.Forms.TextBox chartDisplayBox;
         private System.Windows.Forms.TextBox chartBarsBox;
-        private System.Windows.Forms.TextBox chartUpdateBox;
         private System.Windows.Forms.ComboBox engineBarsCombo;
         private System.Windows.Forms.CheckBox defaultOnly;
-        private System.Windows.Forms.ComboBox chartDisplayCombo;
         private System.Windows.Forms.ComboBox chartBarsCombo;
-        private System.Windows.Forms.Label chartUpdateTxt;
-        private System.Windows.Forms.ComboBox chartUpdateCombo;
         private System.Windows.Forms.ComboBox defaultCombo;
         private System.Windows.Forms.Label defaultTxt;
-        private System.Windows.Forms.Label chartTxt;
         private System.Windows.Forms.Label chartBarsTxt;
         private System.Windows.Forms.Label periodTxt;
         private System.Windows.Forms.Label timeFrameTxt;

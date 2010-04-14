@@ -65,11 +65,8 @@ namespace TickZoom
 			// 
 			this.chartControl1.ChartBars = null;
 			this.chartControl1.ChartType = TickZoom.Api.ChartType.Bar;
-			this.chartControl1.DisplayBars = null;
 			this.chartControl1.StrategyForTrades = null;
 			this.chartControl1.IntervalChartBar = null;
-			this.chartControl1.IntervalChartDisplay = null;
-			this.chartControl1.IntervalChartUpdate = null;
 			this.chartControl1.IsDynamicUpdate = false;
 			this.chartControl1.Location = new System.Drawing.Point(3, 6);
 			this.chartControl1.Name = "chartControl1";
@@ -83,7 +80,6 @@ namespace TickZoom
 			this.chartControl1.ShowPriceGraph = true;
 			this.chartControl1.Size = new System.Drawing.Size(791, 452);
 			this.chartControl1.TabIndex = 0;
-			this.chartControl1.UpdateBars = null;
 			// 
 			// PortfolioDoc
 			// 

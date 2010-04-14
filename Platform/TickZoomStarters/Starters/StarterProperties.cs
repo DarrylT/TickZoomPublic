@@ -93,8 +93,6 @@ namespace TickZoom.Common
 			get { return intervalDefault; }
 			set { intervalDefault = value;
 				  chartProperties.IntervalChartBar = value; 
-				  chartProperties.IntervalChartDisplay = value; 
-				  chartProperties.IntervalChartUpdate = value; 
 				  engineProperties.IntervalDefault = value; 
 			}
 		}

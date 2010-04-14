@@ -45,15 +45,13 @@ namespace TickZoom.Common
 		public readonly static Interval IntervalDay1 = Factory.Engine.DefineInterval(BarUnit.Day,1);
 		
 		TickZoom.Api.Interval intervalChartBar = IntervalDay1;
-		TickZoom.Api.Interval intervalChartDisplay = IntervalDay1;
-		TickZoom.Api.Interval intervalChartUpdate = IntervalDay1;
 		
 		public ChartProperties()
 		{
 			// Avoid exceptions during design mode.
 			try {
-				intervalChartUpdate = TickZoom.Api.Factory.Engine.DefineInterval(TickZoom.Api.BarUnit.Default,0);
-				intervalChartDisplay = TickZoom.Api.Factory.Engine.DefineInterval(TickZoom.Api.BarUnit.Default,0);
+				intervalChartBar = TickZoom.Api.Factory.Engine.DefineInterval(TickZoom.Api.BarUnit.Default,0);
+				intervalChartBar = TickZoom.Api.Factory.Engine.DefineInterval(TickZoom.Api.BarUnit.Default,0);
 				intervalChartBar = TickZoom.Api.Factory.Engine.DefineInterval(TickZoom.Api.BarUnit.Default,0);
 			} catch {
 				
@@ -67,19 +65,27 @@ namespace TickZoom.Common
 			set { showPriceGraph = value; }
 		}
 		
-		public TickZoom.Api.Interval IntervalChartDisplay {
-			get { return intervalChartDisplay; }
-			set { intervalChartDisplay = value; }
+		/// <summary>
+		/// Obsolete. Please use only IntervalChartBar instead.
+		/// </summary>
+		[Obsolete("Please use only IntervalChartBar instead.",true)]
+		public Interval IntervalChartDisplay {
+			get { throw new NotImplementedException(); }
+			set { throw new NotImplementedException(); }
+		}
+		
+		/// <summary>
+		/// Obsolete. Please use only IntervalChartBar instead.
+		/// </summary>
+		[Obsolete("Please use only IntervalChartBar instead.",true)]
+		public Interval IntervalChartUpdate {
+			get { throw new NotImplementedException(); }
+			set { throw new NotImplementedException(); }
 		}
 		
 		public TickZoom.Api.Interval IntervalChartBar {
 			get { return intervalChartBar; }
 			set { intervalChartBar = value; }
-		}
-		
-		public TickZoom.Api.Interval IntervalChartUpdate {
-			get { return intervalChartUpdate; }
-			set { intervalChartUpdate = value; }
 		}
 
 		TickZoom.Api.ChartType chartType = TickZoom.Api.ChartType.Bar;

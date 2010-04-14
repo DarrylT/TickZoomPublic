@@ -53,7 +53,7 @@ namespace TickZoom.Api
  		/// <summary>
  		/// With which other symbols with this one get drawn on a chart? Returns
  		/// a group number where 0 means never draw this symbol on any chart.
- 		/// All symbols with that same ChartGroup number will appear on the same
+ 		/// All symbols with the same ChartGroup number will appear on the same
  		/// chart. You can only set this property inside your Loader before
  		/// the engine initializes the portfolios and strategies.
  		/// </summary>

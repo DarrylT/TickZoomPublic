@@ -54,6 +54,21 @@ namespace TickZoom.Common
 				if( !otherProperty.CanWrite) {
 					throw new ApplicationException( "Sorry, " + otherObj.ToString() + " doesn't have a setter for property: "+property.Name);
 				}
+				object[] objs = property.GetCustomAttributes(typeof(ObsoleteAttribute),true);
+				bool obsoleteProperty = objs.Length > 0;
+				objs = otherProperty.GetCustomAttributes(typeof(ObsoleteAttribute),true);
+				bool obsoleteOther = objs.Length > 0;
+				if( obsoleteOther != obsoleteProperty) {
+					if( obsoleteProperty) {
+						throw new ApplicationException( "Sorry, the property " + property.Name + " is obsolete for " + this.GetType().Name + " but not for " + otherObj.GetType().Name);
+					} else {
+						throw new ApplicationException( "Sorry, the property " + otherProperty.Name + " is obsolete for " + otherObj.GetType().Name + " but not for " + this.GetType().Name);
+					}
+				}
+				if( obsoleteProperty || obsoleteOther) {
+					// Skip this one.
+					continue;
+				}
 				otherProperty.SetValue(otherObj,property.GetValue(this,null), null);
 			}
 		}

@@ -67,9 +67,7 @@ namespace TickZoom
 		bool isAutoScroll = true;
 		bool isCompactMode = false;
 		ChartType chartType = ChartType.Bar;
-		Interval intervalChartDisplay = initialInterval;
 		Interval intervalChartBar = initialInterval;
-		Interval intervalChartUpdate = initialInterval;
 		string storageFolder;
 		SymbolInfo symbol;
 		bool showTradeTips = true;
@@ -427,16 +425,24 @@ namespace TickZoom
 		Dictionary<ModelInterface,PointPairList> repeatList = new Dictionary<ModelInterface,PointPairList>();
 		
 		int lastColorValue = 2;
+		/// <summary>
+		/// Obsolete. Please use only chartBars argument instead
+		/// </summary>
+		[Obsolete("Please use only chartBars argument instead.",true)]
 		public void AddBar( Bars updateSeries, Bars displaySeries) {
+			throw new NotImplementedException();
+		}
+		
+		public void AddBar( Bars chartBars) {
 			lock( chartLocker) {
-				double time = (double) updateSeries.Time[0];
+				double time = (double) chartBars.Time[0];
 	    		if( firstTime == TimeStamp.MinValue) {
-	    			firstTime = updateSeries.Time[0];
+	    			firstTime = chartBars.Time[0];
 	    		}
 				// Set the default bar color
 	        	lastColorValue = 2;
 		        //if price is increasing color=black, else color=red
-		        lastColorValue = displaySeries.Close[0] > displaySeries.Open[0] ? 0 : 1;
+		        lastColorValue = chartBars.Close[0] > chartBars.Open[0] ? 0 : 1;
 				
 				string paintBarName = "";
 			
@@ -447,7 +453,7 @@ namespace TickZoom
 						lineList.Add( new PointPairList());
 	    			}
 	    			if( indicator.Count > 0) { 
-						while( lineList[j].Count <= updateSeries.CurrentBar) {
+						while( lineList[j].Count <= chartBars.CurrentBar) {
 							lineList[j].Add(double.NaN,double.NaN);
 						}
 	    				double val = indicator[0];
@@ -469,7 +475,7 @@ namespace TickZoom
 		    					break;
 		    				case GraphType.Histogram:
 		    					int startBar = 0; 
-			    				ppair = lineList[j][updateSeries.CurrentBar];
+			    				ppair = lineList[j][chartBars.CurrentBar];
 			    				ppair.X = time;
 			    				ppair.Y = val;
 			    				ppair.Z = colorIndex;
@@ -479,7 +485,7 @@ namespace TickZoom
 	    							ppList = new PointPairList();
 	    							repeatList[indicator] = ppList;
 		    					}
-								while( ppList.Count <= updateSeries.CurrentBar) {
+								while( ppList.Count <= chartBars.CurrentBar) {
 									ppList.Add(double.NaN,double.NaN);
 								}
 		    					// TODO: Make pplist an array. Wrap Indicator in IndicatorGraph object.
@@ -500,7 +506,7 @@ namespace TickZoom
 	//		    					}
 		    					break;
 		    				default:
-			    				ppair = lineList[j][updateSeries.CurrentBar];
+			    				ppair = lineList[j][chartBars.CurrentBar];
 			    				ppair.X = time;
 			    				ppair.Y = val;
 			    				ppair.Z = colorIndex;
@@ -511,29 +517,29 @@ namespace TickZoom
 			    
 			    if( showPriceGraph) {
 		    		StockPt pt;
-		    		if( spl.Count <= updateSeries.CurrentBar ) {
-		    			time = (double) updateSeries.Time[0];
-						double high = displaySeries.High[0];
-				        double low = displaySeries.Low[0];
-				        double open = displaySeries.Open[0];
-				        double close = displaySeries.Close[0];
-						pt = new StockPt( time, displaySeries.High[0],
-				                                 displaySeries.Low[0],
-				                                 displaySeries.Open[0],
-				                                 displaySeries.Close[0], 10000 );
+		    		if( spl.Count <= chartBars.CurrentBar ) {
+		    			time = (double) chartBars.Time[0];
+						double high = chartBars.High[0];
+				        double low = chartBars.Low[0];
+				        double open = chartBars.Open[0];
+				        double close = chartBars.Close[0];
+						pt = new StockPt( time, chartBars.High[0],
+				                                 chartBars.Low[0],
+				                                 chartBars.Open[0],
+				                                 chartBars.Close[0], 10000 );
 				        //if price is increasing color=black, else color=red
 				        pt.ColorValue = lastColorValue;
 						spl.Add( pt );
 		    		} else {
-					    pt = (StockPt) spl.GetAt(updateSeries.CurrentBar);
+					    pt = (StockPt) spl.GetAt(chartBars.CurrentBar);
 					    // Update the bar on the chart.
-						pt.High = displaySeries.High[0];
-						pt.Low = displaySeries.Low[0];
-						pt.Open = displaySeries.Open[0];
-				        pt.Close = displaySeries.Close[0];
+						pt.High = chartBars.High[0];
+						pt.Low = chartBars.Low[0];
+						pt.Open = chartBars.Open[0];
+				        pt.Close = chartBars.Close[0];
 				        pt.ColorValue = lastColorValue;
 		    		}
-		    		UpdateScaleCheck( displaySeries );
+		    		UpdateScaleCheck( chartBars );
 		
 			    }
 			}
@@ -1052,18 +1058,22 @@ namespace TickZoom
 			set { chartType = value; }
 		}
 		
-		Bars updateBars = null;
-		[Browsable(false)]
+		/// <summary>
+		/// Obsolete. Please use only ChartBars instead
+		/// </summary>
+		[Obsolete("Please use only ChartBars instead.",true)]
 		public Bars UpdateBars {
-			get { return updateBars; }
-			set { updateBars = value; }
+			get { throw new NotImplementedException(); }
+			set { throw new NotImplementedException();  }
 		}
 
-		Bars displayBars;
-		[Browsable(false)]
+		/// <summary>
+		/// Obsolete. Please use only ChartBars instead
+		/// </summary>
+		[Obsolete("Please use only ChartBars instead.",true)]
 		public Bars DisplayBars {
-			get { return displayBars; }
-			set { displayBars = value; }
+			get { throw new NotImplementedException(); }
+			set { throw new NotImplementedException();  }
 		}
 		
 		Bars chartBars;
@@ -1073,19 +1083,27 @@ namespace TickZoom
 			set { chartBars = value; }
 		}
 
-		public Interval IntervalChartDisplay {
-			get { return intervalChartDisplay; }
-			set { intervalChartDisplay = value; }
-		}
-		
 		public Interval IntervalChartBar {
 			get { return intervalChartBar; }
 			set { intervalChartBar = value; }
 		}
 		
+		/// <summary>
+		/// Obsolete. Please use only IntervalChartBar instead.
+		/// </summary>
+		[Obsolete("Please use only IntervalChartBar instead.",true)]
+		public Interval IntervalChartDisplay {
+			get { throw new NotImplementedException(); }
+			set { throw new NotImplementedException(); }
+		}
+		
+		/// <summary>
+		/// Obsolete. Please use only IntervalChartBar instead.
+		/// </summary>
+		[Obsolete("Please use only IntervalChartBar instead.",true)]
 		public Interval IntervalChartUpdate {
-			get { return intervalChartUpdate; }
-			set { intervalChartUpdate = value; }
+			get { throw new NotImplementedException(); }
+			set { throw new NotImplementedException(); }
 		}
 		
 		public SymbolInfo Symbol {
