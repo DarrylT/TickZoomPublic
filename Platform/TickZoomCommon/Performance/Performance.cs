@@ -48,7 +48,7 @@ namespace TickZoom.Common
 		TransactionPairsBinary comboTradesBinary;
 		bool graphTrades = true;
 		Equity equity;
-		TradeProfitLoss profitLoss;
+		TradeProfitLoss tradeProfitLoss;
 		List<double> positionChanges = new List<double>();
 		PositionCommon position;
 		Model model;
@@ -56,7 +56,7 @@ namespace TickZoom.Common
 		public Performance(Model model)
 		{
 			this.model = model;
-			profitLoss = new TradeProfitLoss(model);
+			tradeProfitLoss = new TradeProfitLoss(model);
 			equity = new Equity(model,this);
 			comboTradesBinary  = new TransactionPairsBinary();
 			comboTradesBinary.Name = "ComboTrades";
@@ -96,8 +96,8 @@ namespace TickZoom.Common
 		
 		public void OnInitialize()
 		{ 
-			comboTrades  = new TransactionPairs(GetCurrentPrice,profitLoss,comboTradesBinary);
-			profitLoss.FullPointValue = model.Data.SymbolInfo.FullPointValue;
+			comboTrades  = new TransactionPairs(GetCurrentPrice,tradeProfitLoss,comboTradesBinary);
+			tradeProfitLoss.FullPointValue = model.Data.SymbolInfo.FullPointValue;
 
 		}
 		
@@ -172,7 +172,7 @@ namespace TickZoom.Common
 			comboTrade.ExitBar = model.Chart.ChartBars.BarCount;
 			comboTrade.Completed = true;
 			comboTradesBinary.Tail = comboTrade;
-			double pnl = profitLoss.CalculateProfit(comboTrade.Direction,comboTrade.EntryPrice,comboTrade.ExitPrice);
+			double pnl = tradeProfitLoss.CalculateProfit(comboTrade.Direction,comboTrade.EntryPrice,comboTrade.ExitPrice);
 			Equity.OnChangeClosedEquity( pnl);
 			if( tradeInfo) tradeLog.Info( model.Name + "," + Equity.ClosedEquity + "," + pnl + "," + comboTrade);
 			if( model is Strategy) {
@@ -243,8 +243,8 @@ namespace TickZoom.Common
 		}
 
 		public double Slippage {
-			get { return profitLoss.Slippage; }
-			set { profitLoss.Slippage = value; }
+			get { return tradeProfitLoss.Slippage; }
+			set { tradeProfitLoss.Slippage = value; }
 		}
 		
 		
@@ -253,8 +253,8 @@ namespace TickZoom.Common
 		}
 
 		public double Commission {
-			get { return profitLoss.Commission; }
-			set { profitLoss.Commission = value; }
+			get { return tradeProfitLoss.Commission; }
+			set { tradeProfitLoss.Commission = value; }
 		}
 		
 		public PositionCommon Position {
@@ -393,7 +393,7 @@ namespace TickZoom.Common
 		}
 		
 		[Obsolete("Please use Slippage and Commission properties on Performance.",true)]
-		public ProfitLoss ProfitLoss {
+		public ProfitLoss TradeProfitLoss {
 			get { return null; }
 			set { }
 		}

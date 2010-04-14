@@ -161,14 +161,16 @@ namespace Loaders
 		
 		public override void OnLoad(ProjectProperties properties) {
 			properties.Engine.RealtimeOutput = false;
+			Portfolio portfolio = CreatePortfolio("Portfolio","EntirePortfolio");
 			foreach( var symbol in properties. Starter.SymbolProperties) {
 				string name = "ExampleOrderStrategy+" + symbol.Symbol;
 				ExampleOrderStrategy strategy = (ExampleOrderStrategy) CreateStrategy("ExampleOrderStrategy",name);
 				strategy.Multiplier = 10D;
 				strategy.SymbolDefault = symbol.Symbol;
-				AddDependency("Portfolio",strategy);
+//				portfolio.Performance.Equity.StartingEquity = 100000;
+				AddDependency(portfolio,strategy);
 			}
-			TopModel = GetPortfolio("Portfolio");
+			TopModel = portfolio;
 		}
 	}
 }

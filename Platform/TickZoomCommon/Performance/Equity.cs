@@ -61,7 +61,7 @@ namespace TickZoom.Common
 		{
 			this.model = model;
 			this.performance = performance;
-			equityProfitLoss = new TradeProfitLoss(model);
+			equityProfitLoss = new EquityProfitLoss();
 			dailyBinary = new TransactionPairsBinary();
 		}
 		
@@ -71,6 +71,9 @@ namespace TickZoom.Common
 				OnInitialize();
 			}
 			context.Invoke();
+			if( EventType.Initialize == eventType) {
+				OnPostInitialize();
+			}
 			if( EventType.OpenInterval == eventType) {
 				OnIntervalOpen((Interval)eventDetail);
 			} else if( EventType.Close == eventType) {
@@ -86,6 +89,13 @@ namespace TickZoom.Common
 			if( portfolio != null && portfolio.PortfolioType == PortfolioType.MultiSymbol) {
 				isMultiSymbolPortfolio = true; // portfolio.PortfolioType == PortfolioType.MultiSymbol;
 			}
+			model.AddInterceptor( EventType.OpenInterval, this);
+			model.AddInterceptor( EventType.Close, this);
+			model.AddInterceptor( EventType.CloseInterval, this);
+		}
+		
+		public void OnPostInitialize() {
+			closedEquity = startingEquity;
 			daily  = new TransactionPairs(GetCurrentEquity,equityProfitLoss,dailyBinary);
 			dailyBinary.Name = "Daily";
 			weeklyBinary  = new TransactionPairsBinary();
@@ -97,7 +107,6 @@ namespace TickZoom.Common
 			yearlyBinary = new TransactionPairsBinary();
 			yearly  = new TransactionPairs(GetCurrentEquity,equityProfitLoss,yearlyBinary);
 			yearlyBinary.Name = "Yearly";
-			closedEquity = startingEquity;
 			
 			if( graphEquity) {
 				equity = new IndicatorCommon();
@@ -123,9 +132,6 @@ namespace TickZoom.Common
 				model.RequestUpdate(Intervals.Day1);
 			}
 			
-			model.AddInterceptor( EventType.OpenInterval, this);
-			model.AddInterceptor( EventType.Close, this);
-			model.AddInterceptor( EventType.CloseInterval, this);
 			isInitialized = true;
 		}
 		
