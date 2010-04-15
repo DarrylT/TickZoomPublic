@@ -80,6 +80,7 @@
     <Compile Include="Common\ReverseCommon.cs" />
     <Compile Include="Common\Strategy.cs" />
     <Compile Include="Common\StrategySupport.cs" />
+    <Compile Include="Common\StrategyWatcher.cs" />
     <Compile Include="Data\TSTickConverter.cs" />
     <Compile Include="Enums\Trend.cs" />
     <Compile Include="Indicators\ADX.cs" />

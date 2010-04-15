@@ -43,7 +43,7 @@ namespace TickZoom.Common
 		string symbolDefault = "Default";
 		DrawingInterface drawing;
 		bool isActive = true;
-	
+		private Action<ModelInterface> isActiveChange;
 		List<Interval> updateIntervals = new List<Interval>();
 		Data data;
 		Chart chart;
@@ -426,13 +426,24 @@ namespace TickZoom.Common
 		public List<StrategyInterceptor> StrategyInterceptors {
 			get { return strategyInterceptors; }
 		}
+		
+		public Action<ModelInterface> IsActiveChange {
+			get { return isActiveChange; }
+			set { isActiveChange = value; }
+		}		
 
 		/// <summary>
 		/// Whether receiving events from the data engine or not.
 		/// </summary>
 		public bool IsActive {
 			get { return isActive; }
-			set { isActive = value; }
+			set { if( isActive != value) {
+					isActive = value;
+					if( isActiveChange != null) {
+						isActiveChange(this);
+					}
+				}
+			}
 		}
 	}
 

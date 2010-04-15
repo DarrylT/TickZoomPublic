@@ -39,6 +39,11 @@ namespace TickZoom.Api
 			set;
 		}
 		
+		Action<ModelInterface> IsActiveChange {
+			get;
+			set;
+		}
+		
 		Context Context {
 			get;
 			set;
@@ -122,6 +127,7 @@ namespace TickZoom.Api
 		void OnProperties(ModelProperties properties);
 		
 		void OnConfigure();
+		
 		void OnInitialize();
 		
 		void OnEvent( EventContext context, EventType eventType, object eventDetail);

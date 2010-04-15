@@ -30,6 +30,8 @@ using TickZoom.Api;
 
 namespace TickZoom.Common
 {
+
+		
 	public class Portfolio : Model, PortfolioInterface
 	{
 		private static readonly Log log = Factory.Log.GetLogger(typeof(Portfolio));
@@ -52,6 +54,8 @@ namespace TickZoom.Common
 			FullName = this.GetType().Name;
 			Performance.GraphTrades = false;
 		}
+		
+		
 		
 		public sealed override void OnConfigure() {
 			BreakPoint.TrySetStrategy(this);
@@ -123,37 +127,6 @@ namespace TickZoom.Common
 			}
 		}
 		
-		private class StrategyWatcher {
-			private double previousPosition = 0;
-			private PositionInterface position;
-			private StrategyInterface strategy;
-			
-			public StrategyWatcher(StrategyInterface strategy) {
-				this.strategy = strategy;
-				this.position = strategy.Result.Position;
-			}
-			
-			public bool PositionChanged {
-				get { return previousPosition != position.Current; }
-			}
-			
-			public IList<LogicalOrder> ActiveOrders {
-				get { return strategy.ActiveOrders; }
-			}
-			
-			public bool IsActiveOrdersChanged {
-				get { return strategy.IsActiveOrdersChanged; }
-			}
-			
-			public void Refresh() {
-				previousPosition = position.Current;
-			}
-			
-			public PositionInterface Position {
-				get { return position; }
-			}
-		}
-		
 		public override void OnEvent(EventContext context, EventType eventType, object eventDetail)
 		{
 			base.OnEvent(context, eventType, eventDetail);
@@ -168,81 +141,92 @@ namespace TickZoom.Common
 		
 		public override bool OnProcessTick(Tick tick)
 		{
-			MergeSignals();
-			MergeOrders();
+			if (portfolioType == PortfolioType.SingleSymbol) {
+				MergeSingleSymbol();
+			} else if (portfolioType == PortfolioType.MultiSymbol) {
+				MergeMultiSymbol();
+			} else {
+				throw new ApplicationException("PortfolioType was never set.");
+			}
 			return true;
 		}
 
-		private void MergeOrders() {
-			if (portfolioType == PortfolioType.SingleSymbol) {
-				bool mergeOrders = false;
-				foreach (var watcher in watchers) {
-					if (watcher.IsActiveOrdersChanged) {
-						mergeOrders = true;
-						break;
-					}
+		private void MergeSingleSymbol()
+		{
+			bool mergeOrders = false;
+			double internalSignal = 0;
+			double totalPrice = 0;
+			int changeCount = 0;
+			int count = watchers.Count;
+			for(int i=0; i<count; i++) {
+				var watcher = watchers[i];
+				if( !watcher.IsActive) continue;
+				internalSignal += watcher.Position.Current;
+				if (watcher.PositionChanged) {
+					totalPrice += watcher.Position.Price;
+					changeCount++;
+					watcher.Refresh();
 				}
-				if( mergeOrders) { 
-					activeOrders.Clear();
-					foreach (var watcher in watchers) {
-						activeOrders.AddRange(watcher.ActiveOrders);
-					}
+				if (watcher.IsActiveOrdersChanged) {
+					mergeOrders = true;
+				}
+			}
+			if (changeCount > 0) {
+				double averagePrice = (totalPrice / changeCount).Round();
+				Position.Change(internalSignal, averagePrice, Ticks[0].Time);
+				Result.Position.Copy(Position);
+			}
+			if( mergeOrders) { 
+				activeOrders.Clear();
+				for(int i=0; i<count; i++) {
+					var watcher = watchers[i];
+					if( !watcher.IsActive) continue;
+					activeOrders.AddRange(watcher.ActiveOrders);
 				}
 			}
 		}
-
-		private void MergeSignals()
-		{
-			if (portfolioType == PortfolioType.SingleSymbol) {
-				double internalSignal = 0;
-				double totalPrice = 0;
-				int changeCount = 0;
-				foreach (var watcher in watchers) {
-					internalSignal += watcher.Position.Current;
-					if (watcher.PositionChanged) {
-						totalPrice += watcher.Position.Price;
-						changeCount++;
-						watcher.Refresh();
-					}
-				}
-				if (changeCount > 0) {
-					double averagePrice = (totalPrice / changeCount).Round();
-					Position.Change(internalSignal, averagePrice, Ticks[0].Time);
-					Result.Position.Copy(Position);
-				}
-			} else if (portfolioType == PortfolioType.MultiSymbol) {
-				double tempClosedEquity = 0;
+		
+		public void MergeMultiSymbol() {
+			double tempClosedEquity = 0;
+			double tempOpenEquity = 0;
+			int count = strategies.Count;
+			for(int i=0; i<count; i++) {
+				var strategy = strategies[i];
+				tempOpenEquity += strategy.Performance.Equity.OpenEquity;
+				tempClosedEquity += strategy.Performance.Equity.ClosedEquity;
+				tempClosedEquity -= strategy.Performance.Equity.StartingEquity;
+			}
+			count = portfolios.Count;
+			for(int i=0; i<count; i++) {
+				var portfolio = portfolios[i];
+				tempOpenEquity += portfolio.Performance.Equity.OpenEquity;
+				tempClosedEquity += portfolio.Performance.Equity.ClosedEquity;
+				tempClosedEquity -= portfolio.Performance.Equity.StartingEquity;
+			}
+			if (tempClosedEquity != closedEquity) {
+				double change = tempClosedEquity - closedEquity;
+				Performance.Equity.OnChangeClosedEquity(change);
+				closedEquity = tempClosedEquity;
+			}
+		}
+		
+		public double GetOpenEquity() {
+			if( portfolioType == PortfolioType.SingleSymbol) {
+				return performance.Equity.OpenEquity;
+			} else if( portfolioType == PortfolioType.MultiSymbol) {
 				double tempOpenEquity = 0;
-				foreach (var strategy in strategies) {
+				foreach( var strategy in strategies) {
 					tempOpenEquity += strategy.Performance.Equity.OpenEquity;
-					tempClosedEquity += strategy.Performance.Equity.ClosedEquity;
-					tempClosedEquity -= strategy.Performance.Equity.StartingEquity;
 				}
-				foreach (var portfolio in portfolios) {
-					tempOpenEquity += portfolio.Performance.Equity.OpenEquity;
-					tempClosedEquity += portfolio.Performance.Equity.ClosedEquity;
-					tempClosedEquity -= portfolio.Performance.Equity.StartingEquity;
+				foreach( var portfolio in portfolios) {
+					tempOpenEquity += portfolio.GetOpenEquity();
 				}
-				if (tempClosedEquity != closedEquity) {
-					double change = tempClosedEquity - closedEquity;
-					Performance.Equity.OnChangeClosedEquity(change);
-					closedEquity = tempClosedEquity;
-				}
+				return tempOpenEquity;
 			} else {
 				throw new ApplicationException("PortfolioType was never set.");
 			}
 		}
 		
-		public double GetOpenEquity() {
-			double tempOpenEquity = 0;
-			foreach( var strategy in strategies) {
-				tempOpenEquity += strategy.Performance.Equity.OpenEquity;
-			}
-			foreach( var portfolio in portfolios) {
-				tempOpenEquity += portfolio.Performance.Equity.OpenEquity;
-			}
-			return tempOpenEquity;
-		}
 		
 		/// <summary>
 		/// Shortcut to look at the data of and control any dependant strategies.
