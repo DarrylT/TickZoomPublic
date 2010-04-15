@@ -39,6 +39,7 @@ namespace TickZoom.Test
 		private static readonly Log log = Factory.Log.GetLogger(typeof(VerifyFeed));
 		private static readonly bool debug = log.IsDebugEnabled;
 		private TickQueue tickQueue = Factory.TickUtil.TickQueue(typeof(VerifyFeed));
+		private object taskLocker = new object();
 		
 		public ReceiverState OnGetReceiverState(SymbolInfo symbol) {
 			return ReceiverState.Ready;
@@ -240,5 +241,27 @@ namespace TickZoom.Test
 				log.Warn("Already terminated.");
 			}
 		}
+		
+ 		private volatile bool isDisposed = false;
+	    public void Dispose() 
+	    {
+	        Dispose(true);
+	        GC.SuppressFinalize(this);      
+	    }
+	
+	    protected virtual void Dispose(bool disposing)
+	    {
+       		if( !isDisposed) {
+	    		lock( taskLocker) {
+		            isDisposed = true;   
+		            if (disposing) {
+		            	if( tickQueue != null) {
+		            		tickQueue.Terminate();
+		            	}
+		            }
+	    		}
+    		}
+	    }
+	    
 	}
 }

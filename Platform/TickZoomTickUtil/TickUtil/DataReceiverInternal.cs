@@ -29,8 +29,8 @@ using TickZoom.Api;
 namespace TickZoom.TickUtil
 {
 	public class DataReceiverDefault : Receiver {
-	   		static readonly Log log = Factory.Log.GetLogger(typeof(DataReceiverDefault));
-	   		static readonly bool debug = log.IsDebugEnabled;
+	   	static readonly Log log = Factory.Log.GetLogger(typeof(DataReceiverDefault));
+	   	static readonly bool debug = log.IsDebugEnabled;
 		TickQueue readQueue = Factory.TickUtil.TickQueue(typeof(DataReceiverDefault));
         Provider sender;
 		private ReceiverState receiverState = ReceiverState.Ready;
@@ -90,6 +90,10 @@ namespace TickZoom.TickUtil
 		
 		public TickQueue ReadQueue {
 			get { return readQueue; }
+		}
+		
+		public void Dispose() {
+			
 		}
 		
 	}

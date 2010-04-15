@@ -540,5 +540,23 @@ namespace MBTest
 		public void OnEvent( SymbolInfo symbol, int eventType, object eventDetail) {
 			
 		}
+		
+		private bool isDisposed;
+	    public void Dispose() 
+	    {
+	        Dispose(true);
+	        GC.SuppressFinalize(this);      
+	    }
+	
+	    protected virtual void Dispose(bool disposing)
+	    {
+       		if( !isDisposed) {
+	            isDisposed = true;   
+	            if (disposing) {
+	            	//
+	            }
+    		}
+	    }
+	    
     }
 }

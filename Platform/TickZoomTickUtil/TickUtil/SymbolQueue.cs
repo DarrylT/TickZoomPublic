@@ -130,11 +130,6 @@ namespace TickZoom.TickUtil
 			tickQueue.EnQueue(EventType.StartHistorical, symbol1);
 		}
 		
-		public void OnStop()
-		{
-			tickQueue.EnQueue(EventType.Terminate, symbol);
-		}
-		
 		public void OnEndHistorical(SymbolInfo symbol1)
 		{
 			tickQueue.EnQueue(EventType.EndHistorical, symbol);
@@ -149,6 +144,24 @@ namespace TickZoom.TickUtil
 		{
 			tickQueue.EnQueue(EventType.Error, error);
 		}
+		
+ 		private volatile bool isDisposed = false;
+	    public void Dispose() 
+	    {
+	        Dispose(true);
+	        GC.SuppressFinalize(this);      
+	    }
+	
+	    protected virtual void Dispose(bool disposing)
+	    {
+       		if( !isDisposed) {
+	            isDisposed = true;   
+	            if (disposing) {
+	            	tickQueue.Terminate();
+	            }
+    		}
+	    }
+		
 	}
 }
 
